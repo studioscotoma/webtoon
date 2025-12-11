@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio SCOTOMA</title>
+    <style>
+        /* --- Studio SCOTOMA Global Style --- */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #050505; /* 完全な黒に近いグレー */
+            color: #e0e0e0;
+            font-family: 'Courier New', Courier, monospace; /* プログラムコードのようなフォント */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* ロゴエリア */
+        header {
+            margin-top: 100px;
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            letter-spacing: 0.2em;
+            font-weight: normal;
+            margin: 0;
+            position: relative;
+            display: inline-block;
+        }
+
+        /* スコトーマ（盲点）を表現するギミック */
+        h1::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120%;
+            height: 120%;
+            background: radial-gradient(circle, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 70%);
+            opacity: 0; /* マウスが乗ると盲点が晴れる */
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        h1:hover::after {
+            opacity: 1; 
+        }
+
+        .subtitle {
+            font-size: 10px;
+            color: #555;
+            margin-top: 10px;
+            letter-spacing: 0.1em;
+        }
+
+        /* 作品リストエリア */
+        .works-container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .work-card {
+            display: flex;
+            align-items: center;
+            background-color: #0a0a0a;
+            border: 1px solid #222;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-decoration: none; /* リンクの下線を消す */
+            color: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .work-card:hover {
+            border-color: #0ff; /* ホバー時にシアン色に発光 */
+            background-color: #111;
+            transform: translateX(5px); /* 少し右に動く */
+        }
+
+        .work-thumb {
+            width: 80px;
+            height: 80px;
+            background-color: #333;
+            margin-right: 20px;
+            object-fit: cover;
+            /* グレースケールにしておく */
+            filter: grayscale(100%);
+            transition: filter 0.3s ease;
+        }
+
+        .work-card:hover .work-thumb {
+            filter: grayscale(0%); /* ホバー時にカラーに戻る */
+        }
+
+        .work-info h2 {
+            font-size: 18px;
+            margin: 0 0 8px 0;
+            letter-spacing: 0.05em;
+        }
+
+        .work-info p {
+            font-size: 12px;
+            color: #888;
+            margin: 0;
+            line-height: 1.4;
+        }
+
+        /* フッター */
+        footer {
+            margin-top: auto;
+            padding: 40px;
+            font-size: 10px;
+            color: #333;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Studio SCOTOMA</h1>
+        <div class="subtitle">WE SHOW WHAT YOU CANNOT SEE</div>
+    </header>
+
+    <div class="works-container">
+        <a href="glitch/ep001.html" class="work-card">
+            <img src="glitch/cover.webp" alt="Glitch Thumbnail" class="work-thumb">
+            
+            <div class="work-info">
+                <h2>Glitch: Seoul Login</h2>
+                <p>Status: Ongoing<br>Genre: Cyberpunk / Thriller / Economical </p>
+            </div>
+        </a>
+
+        </div>
+
+    <footer>
+        &copy; 2025 Studio SCOTOMA. All rights reserved.
+    </footer>
+
+</body>
+</html>
