@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glitch: Seoul Login 001</title>
+    <title>Glitch: Seoul Login 002</title>
     <style>
         /* --- 基本設定 --- */
         body {
@@ -249,16 +249,16 @@
 <body>
 		<!-- 表紙 	-->
     <div id="cover-screen">
-        <img id="cover-image" src="cover.webp" alt="Glitch: Seoul Login Cover">
+        <img id="cover-image" src="ep002/cover.webp" alt="Glitch: Seoul Login Cover">
         <button id="start-button">CONNECT TO SEOUL</button>
     </div>
     
     <div id="viewer-container"></div>
 
     <div class="next-episode-area">
-        <a href="ep002.html" class="next-button">
+        <a href="ep003.html" class="next-button">
             <span class="next-label">To Be Continued...</span>
-            <span class="next-title">EPISODE 02</span>
+            <span class="next-title">EPISODE 03</span>
         </a>
     </div>
     
@@ -269,8 +269,8 @@
 
         <div class="ep-select-wrapper">
             <select onchange="if(this.value) location.href=this.value">
-                <option value="#" selected>EP.01</option>
-                <option value="ep002.html">EP.02</option>
+                <option value="index.html">EP.01</option>
+                <option value="#" selected>EP.02</option>
                 </select>
         </div>
 
@@ -308,7 +308,7 @@
         // 2. 本編画像の生成
         const CONFIG = {
             totalImages: 31,
-            filePrefix: 'ep001/scene',
+            filePrefix: 'ep002/scene',
             fileExtension: '.webp'
         };
         
@@ -317,189 +317,189 @@
         const scenarioData = [
             { 
                 id: 1, 
-                kr: "인생은 게임이라고 누군가가 말했다.", 
-                ja: "人生はゲームだ、と誰かが言った。", 
+                kr: "명동 스트리트 상의 사람들에게 지금은 AR 태그가 붙어 있다.", 
+                ja: "明洞ストリート上の人々に今ではARタグがついている。", 
                 fr: "On dit que la vie est un jeu." 
             },
             { 
                 id: 2, 
-                kr: "그렇다면 개발자는 어디에 있습니까?", 
-                ja: "なら、デベロッパーはどこに居るのだろう？", 
+                kr: "뭐야 이건…사람에게 태그가 표시됩니까?", 
+                ja: "何だこれは……人にタグが表示されてる？", 
                 fr: "Alors, où sont les développeurs ?" 
             },
             { 
                 id: 3, 
-                kr: "버프도 너프도, 밸런스 조정이 오징어 된다.", 
-                ja: "バフもナーフも、バランス調整がイカれてやがる。", 
+                kr: "진정. 의식을 집중하라. 필요한 정보만 모아라.", 
+                ja: "落ち着け。意識を集中しろ。必要な情報だけを集めろ。", 
                 fr: "Les améliorations, les nerfs et les ajustements d'équilibrage sont complètement dingues." 
             },
             { 
                 id: 4, 
-                kr: "여러분의 활약을 기원합니다.", 
-                ja: "あなたのご活躍をお祈りしています。", 
+                kr: "시야가 진정해 눈에 들어오는 재벌 엘리트의 Armani(아르마니) 모습의 사업가.", 
+                ja: "視界が落ち着き、目に入る財閥エリートのArmani(アルマーニ)姿のビジネスマン。", 
                 fr: "Je te souhaite bonne chance." 
             },
             { 
                 id: 5, 
-                kr: "강지훈군. 스펙(학력과 자격)은 이것뿐이지?", 
-                ja: "カン・ジフン君。スペック（学歴と資格）はこれだけかね？", 
+                kr: "또 소음인가……, 의식을 집중해, 필요한 정보에만 집중해라.", 
+                ja: "またノイズか……、意識を集中して、必要な情報だけに集中しろ。", 
                 fr: "Kang Ji-hoon. Ce sont bien tes caractéristiques (formation et qualifications) ?" 
             },
             { 
                 id: 6, 
-                kr: "……독학으로 프로그래밍을. 보안 관련 대회에서 입상 경험도…", 
-                ja: "……独学でプログラミングを。セキュリティ関連の大会で入賞経験も……", 
+                kr: "다르다! 그 녀석의 처리만이 쿠소라구이다!", 
+                ja: "違う！あいつの処理だけがクッソラグい！", 
                 fr: "…Programmation autodidacte. Vous avez même gagné des concours de sécurité…" 
             },
             { 
                 id: 7, 
-                kr: "그런 것은 놀이야. 우리가 보고 있는 것은, 너의 부모의 직업, 출신 대학, 그리고 「신용 스코어」이다.", 
-                ja: "そういうのは遊びだよ。我々が見ているのは、君の親の職業、出身大学、そして『信用スコア』だ。", 
+                kr: "페그 평균의 잠재적 변동성?", 
+                ja: "ペッグ平均の潜在的ボラティリティ？", 
                 fr: "Ce n'est qu'un jeu. On regarde juste la profession de tes parents, l'université où ils ont fait leurs études et ton « score de crédit »." 
             },
             { 
                 id: 8, 
-                kr: "언제까지 멍하니? 너는 우리 시스템에 맞지 않는다. … … 퇴출한마저.", 
-                ja: "いつまでぼーっとしてるんだ？君は、我が社のシステムに適合しない。……退出したまえ。", 
+                kr: "……!", 
+                ja: "……！", 
                 fr: "Tu vas encore faire l'idiot ? Tu ne rentres pas dans notre système… Sortie." 
             },
             { 
                 id: 9, 
-                kr: "세계는 '부모 뽑기'다.", 
-                ja: "世界は『親ガチャ』だ。", 
+                kr: "**쥬......**", 
+                ja: "**ジュッ……**", 
                 fr: "Le monde est une sorte de « gacha parental »." 
             },
             { 
                 id: 10, 
-                kr: "노력 부족이 아니다. 머리가 나빴던 것도 아니다.", 
-                ja: "努力不足じゃない。頭が悪かったわけでもない。", 
+                kr: "아파! 그 녀석 자신의 상황이 전혀 보이지 않았는가?", 
+                ja: "痛ってぇ！あいつ自分の状況が全く見えてないのか？", 
                 fr: "Ce n'est pas faute d'avoir essayé. Ce n'est pas par bêtise." 
             },
             { 
                 id: 11, 
-                kr: "로그인하는 서버를 실수했을 뿐일지도 모른다.", 
-                ja: "ログインするサーバーを間違えただけかもしれない。", 
+                kr: "젠장, 어깨 통증을 어떻게든하지 않으면!", 
+                ja: "……くそ、肩が焼けるように熱い！", 
                 fr: "Je me suis peut-être juste connecté au mauvais serveur." 
             },
             { 
                 id: 12, 
-                kr: "…… 리셋", 
-                ja: "……リセット", 
+                kr: "진통제, 붕대, 소독액, 무엇이든 좋은", 
+                ja: "鎮痛剤、ガーゼ、消毒液、何でも良い", 
                 fr: "…Réinitialiser" 
             },
             { 
                 id: 13, 
-                kr: "할 수 있으면 좋지만.", 
-                ja: "できればいいのに。", 
+                kr: "『화상용 하이드로겔 즉효 치료 거즈 패드』 이것이다!", 
+                ja: "『火傷用ハイドロジェル包帯』これだ！", 
                 fr: "J'aimerais bien." 
             },
             { 
                 id: 14, 
-                kr: "** 빗! 빗! 빗! **", 
-                ja: "**ビーッ！ ビーッ！ ビーッ！**", 
+                kr: "뭐야? 고통이 사라질까? 무슨 일이야? 내 몸은?", 
+                ja: "え？触っただけで痛みが消えた？俺の体はどうなってるんだ？", 
                 fr: "**Bip ! Bip ! Bip !**" 
             },
             { 
                 id: 15, 
-                kr: "정부 긴급 경고 ......! ? 지진인가? 미사일?", 
-                ja: "政府緊急アラート……！？地震か？ ミサイルか？", 
+                kr: "구…… 이번에는 뭐야?", 
+                ja: "ぐ……今度は何だ？", 
                 fr: "Alerte d'urgence gouvernementale… ?! Tremblement de terre ? Missile ?" 
             },
             { 
                 id: 16, 
-                kr: "긴급 알림 강지훈으로", 
-                ja: "緊急アラート カン・ジフンへ", 
+                kr: "플루코기 도시락", 
+                ja: "プルコギ弁当", 
                 fr: "Alerte d'urgence à Kang Ji-hoon" 
             },
             { 
                 id: 17, 
-                kr: "이게 뭐야?", 
-                ja: "何だこれ？", 
+                kr: "배가 줄고 죽을 것 같아. 0원으로 플루코기 도시락을 입수하고 싶다. **제출**", 
+                ja: "腹が減って死にそう、0ウォンでプルコギ弁当を食べる方法。**Enter**", 
                 fr: "Qu'est-ce que c'est ?" 
             },
             { 
                 id: 18, 
-                kr: "당신은 'Slave'가 아닌 'Master' 후보다.", 
-                ja: "貴殿は『Slave』ではない、『Master』候補だ。", 
+                kr: "……에? 플루코기 도시락에 식중독이 의심되고 버려?", 
+                ja: "……はぁ？プルコギ弁当に食中毒の疑い事例あり、廃棄しろ？", 
                 fr: "Tu n'es pas un « Esclave », tu es candidat « Maître »." 
             },
             { 
                 id: 19, 
-                kr: "...... 무슨 농담인가? 이것은 정부 밖에 사용할 수없는 전용 통신이다?", 
-                ja: "……何の冗談だ？ これは政府しか使えない緊急通信だぞ？", 
+                kr: "본부에서 뭔지 모르겠지만 가능한 한 만지지 않고 버려 줘? 무슨 말을 하는 거야? 알았어?", 
+                ja: "本部から何か知らんけどできるだけ触らず捨てといてくれ？何言ってるんですか？分かりました？", 
                 fr: "…C'est une blague ? C'est un message privé que seul le gouvernement peut utiliser, tu sais ?" 
             },
             { 
                 id: 20, 
-                kr: "현실 수정 패치 v2.0을 적용 하시겠습니까?", 
-                ja: "現実修正パッチv2.0 を適用しますか？", 
+                kr: "예 GET", 
+                ja: "はいGET", 
                 fr: "Veux-tu appliquer le Patch de Correction de la Réalité v2.0 ?" 
             },
             { 
                 id: 21, 
-                kr: "재미있는 농담이다.", 
-                ja: "面白い冗談だ。", 
+                kr: "맛있다.", 
+                ja: "美味い。", 
                 fr: "C'est une blague." 
             },
             { 
                 id: 22, 
-                kr: "예", 
-                ja: "YES", 
+                kr: "단 1행의 코드(명령문)로, 이것이 쓰레기인 것은 아닐 것이다.", 
+                ja: "たった1行のコード（命令文）で、これがゴミなわけないだろ。", 
                 fr: "OUI" 
             },
             { 
                 id: 23, 
-                kr: "** 꿀벌 꿀벌! **", 
-                ja: "**バチバチバチ！**", 
+                kr: "상태 완전 복구. 이상 없음.", 
+                ja: "ステータス完全回復。異常なし。", 
                 fr: "**Crépitement crépitement crépitement !**" 
             },
             { 
                 id: 24, 
-                kr: "눈이… ?", 
-                ja: "目が……！？", 
+                kr: "지하철 개찰구. 귀가 러시의 시간대.", 
+                ja: "地下鉄の改札口。帰宅ラッシュの時間帯。", 
                 fr: "Vos yeux… ?!" 
             },
             { 
                 id: 25, 
-                kr: "대량의 데이터 스트림이 시각화되고 늘어나고 있습니다.", 
-                ja: "大量のデータストリームが可視化されて伸びている", 
+                kr: "시스템에는 반드시 결함이 있습니다.", 
+                ja: "システムには必ず欠陥がある。", 
                 fr: "D'énormes flux de données s'affichent et s'étendent." 
             },
             { 
                 id: 26, 
-                kr: "뭐야… … 이것은…", 
-                ja: "なんだ……これは……", 
+                kr: "일순간 수리중의 명령을 개찰에 오버라이드 한다.", 
+                ja: "改札に修理業者用のゲートオープン命令を入れる。", 
                 fr: "Qu'est-ce que c'est… ?" 
             },
             { 
                 id: 27, 
-                kr: "손 위에 반투명 창이 팝업", 
-                ja: "手の上に、半透明のウィンドウがポップアップする", 
+                kr: "아무도 알아차리지 않는다.", 
+                ja: "誰も気づいて居ない。", 
                 fr: "Une fenêtre translucide apparaît au-dessus de ma main." 
             },
             { 
                 id: 28, 
-                kr: "창 밖의 다리에도 창이 팝업하는 것이 보인다", 
-                ja: "窓の外の足にもウィンドウがポップアップするのが見える", 
-                fr: "Quelqu'un m'entend ?" 
+                kr: "이 나라는 고장 중이다. 그러므로 수리점은 어디에나 갈 수 있다.", 
+                ja: "この国は修理中だ。だから、修理屋はどこへでも行ける。", 
+                fr: "Une fenêtre translucide apparaît au-dessus de ma main." 
             },
             { 
                 id: 29, 
-                kr: "인생은 게임이라고 누군가가 말했다.", 
-                ja: "人生はゲームだ、と誰かが言った。" ,
-                fr: "On dit que la vie est un jeu." 
+                kr: "서울교통공사 5호선: 여의널 스테이션", 
+                ja: "ソウル交通公社5号線: 汝矣ナルステーション（ヨイナル駅） ", 
+                fr: "Une fenêtre translucide apparaît au-dessus de ma main." 
             },
             { 
                 id: 30, 
-                kr: "그렇다면 개발자는 어디에 있습니까?", 
-                ja: "なら、デベロッパーはどこに居るのだろう？", 
-                fr: "Alors, où sont les développeurs ?" 
+                kr: "지하철로 해킹이 끝난 「Be Real」(스마트폰 어플)을 연다.", 
+                ja: "地下鉄でハッキング済みの「Be Real」（スマホアプリ）を開く。", 
+                fr: "Une fenêtre translucide apparaît au-dessus de ma main." 
             },
             { 
                 id: 31, 
-                kr: "GLITCH: SEOUL LOGIN", 
-                ja: "GLITCH: SEOUL LOGIN", 
-                fr: "GLITCH: SEOUL LOGIN" 
+                kr: "만나러 가는 두 사람의 코드네임.", 
+                ja: "会いに行く2人の人間のコードネーム。", 
+                fr: "Une fenêtre translucide apparaît au-dessus de ma main." 
             },
             // ... ここに必要な分だけ追加してください ...
         ];

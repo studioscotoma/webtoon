@@ -9,9 +9,9 @@
         body {
             margin: 0;
             padding: 0;
-            background-color: #050505; /* 完全な黒に近いグレー */
+            background-color: #050505;
             color: #e0e0e0;
-            font-family: 'Courier New', Courier, monospace; /* プログラムコードのようなフォント */
+            font-family: 'Courier New', Courier, monospace;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -32,9 +32,10 @@
             margin: 0;
             position: relative;
             display: inline-block;
+            cursor: default;
         }
 
-        /* スコトーマ（盲点）を表現するギミック */
+        /* スコトーマ（盲点）ギミック */
         h1::after {
             content: '';
             position: absolute;
@@ -44,7 +45,7 @@
             width: 120%;
             height: 120%;
             background: radial-gradient(circle, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 70%);
-            opacity: 0; /* マウスが乗ると盲点が晴れる */
+            opacity: 0;
             transition: opacity 0.5s ease;
             pointer-events: none;
         }
@@ -68,22 +69,26 @@
             box-sizing: border-box;
         }
 
+        /* 作品カード（コンテナ） */
         .work-card {
-            display: flex;
-            align-items: center;
             background-color: #0a0a0a;
             border: 1px solid #222;
             padding: 20px;
-            margin-bottom: 20px;
-            text-decoration: none; /* リンクの下線を消す */
-            color: inherit;
+            margin-bottom: 30px;
             transition: all 0.3s ease;
         }
 
         .work-card:hover {
-            border-color: #0ff; /* ホバー時にシアン色に発光 */
-            background-color: #111;
-            transform: translateX(5px); /* 少し右に動く */
+            border-color: #333; /* ホバーで少し明るく */
+        }
+
+        /* サムネイルと情報のエリア（ここをクリックで1話へ） */
+        .work-main-link {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: inherit;
+            margin-bottom: 15px; /* ボタンとの間隔 */
         }
 
         .work-thumb {
@@ -92,19 +97,26 @@
             background-color: #333;
             margin-right: 20px;
             object-fit: cover;
-            /* グレースケールにしておく */
             filter: grayscale(100%);
             transition: filter 0.3s ease;
         }
 
+        /* カード全体にホバーしたらサムネがカラーになる */
         .work-card:hover .work-thumb {
-            filter: grayscale(0%); /* ホバー時にカラーに戻る */
+            filter: grayscale(0%);
         }
 
         .work-info h2 {
             font-size: 18px;
             margin: 0 0 8px 0;
             letter-spacing: 0.05em;
+            transition: color 0.3s ease;
+        }
+        
+        /* タイトルホバー時 */
+        .work-main-link:hover h2 {
+            color: #0ff;
+            text-shadow: 0 0 8px rgba(0, 255, 255, 0.4);
         }
 
         .work-info p {
@@ -112,6 +124,40 @@
             color: #888;
             margin: 0;
             line-height: 1.4;
+        }
+
+        /* --- エピソードボタンエリア --- */
+        .episode-list {
+            display: flex;
+            gap: 10px; /* ボタン間の隙間 */
+            padding-top: 15px;
+            border-top: 1px solid #1a1a1a; /* 区切り線 */
+        }
+
+        .ep-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            font-size: 12px;
+            text-decoration: none;
+            color: #888;
+            border: 1px solid #333;
+            background-color: #050505;
+            transition: all 0.2s ease;
+            letter-spacing: 0.1em;
+        }
+
+        .ep-btn:hover {
+            color: #0ff;
+            border-color: #0ff;
+            background-color: rgba(0, 255, 255, 0.05);
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* 最新話を目立たせる（任意） */
+        .ep-btn.new {
+            border-color: #555;
+            color: #ddd;
         }
 
         /* フッター */
@@ -132,14 +178,23 @@
     </header>
 
     <div class="works-container">
-        <a href="glitch/ep001.html" class="work-card">
-            <img src="glitch/cover.webp" alt="Glitch Thumbnail" class="work-thumb">
+        
+        <div class="work-card">
             
-            <div class="work-info">
-                <h2>Glitch: Seoul Login</h2>
-                <p>Status: Ongoing<br>Genre: Cyberpunk / Thriller / Economical </p>
+            <a href="glitch/ep001.html" class="work-main-link">
+                <img src="glitch/cover.webp" alt="Glitch Thumbnail" class="work-thumb">
+                <div class="work-info">
+                    <h2>Glitch: Seoul Login</h2>
+                    <p>Status: Ongoing<br>Genre: Cyberpunk / Thriller / Cryptic</p>
+                </div>
+            </a>
+
+            <div class="episode-list">
+                <a href="glitch/ep001.html" class="ep-btn">EP.01</a>
+                <a href="glitch/ep002.html" class="ep-btn new">EP.02</a>
             </div>
-        </a>
+
+        </div>
 
         </div>
 

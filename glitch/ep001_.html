@@ -144,11 +144,9 @@
             transform: scale(0.98);
         }
         
-        /* --- ナビゲーションエリアのスタイル --- */
-        
-        /* 1. NEXTボタンエリア (まだ次がないのでComing Soon表示) */
+        /* NEXTボタンのスタイル */
         .next-episode-area {
-            padding: 60px 20px 40px;
+            padding: 30px 10px 100px;
             text-align: center;
             background-color: #000;
         }
@@ -158,101 +156,45 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            width: 100%;
-            max-width: 300px;
+            width: 90%;
+            max-width: 280px;
             padding: 20px;
             border: 1px solid #333;
             background-color: #050505;
             color: #fff;
             text-decoration: none;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        /* Coming Soon 用の無効化スタイル */
-        .next-button.disabled {
-            border-color: #222;
-            opacity: 0.6;
-            cursor: default;
-            pointer-events: none; /* クリック不可 */
+        .next-button:hover {
+            border-color: #0ff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            transform: translateY(-5px);
         }
 
         .next-label {
             font-size: 10px;
-            color: #666;
+            color: #888;
             letter-spacing: 0.2em;
             margin-bottom: 5px;
         }
 
         .next-title {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: bold;
             letter-spacing: 0.1em;
             font-family: 'Courier New', sans-serif;
-            color: #888;
         }
-
-        /* 2. フッターナビゲーション (Prev / Top / Select) */
-        .nav-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            background-color: #0a0a0a;
-            border-top: 1px solid #222;
-            margin-top: 20px;
-        }
-
-        .nav-link {
-            font-size: 12px;
-            color: #888;
-            text-decoration: none;
-            font-weight: bold;
-            letter-spacing: 0.1em;
-            padding: 10px;
-            transition: color 0.3s;
-        }
-
-        .nav-link:hover {
-            color: #0ff;
-        }
-
-        /* エピソード選択プルダウン */
-        .ep-select-wrapper {
-            position: relative;
-        }
-
-        .ep-select-wrapper select {
-            appearance: none;
-            background-color: #000;
-            color: #0ff;
-            border: 1px solid #333;
-            padding: 5px 30px 5px 15px;
-            font-size: 14px;
-            font-family: 'Courier New', monospace;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        .ep-select-wrapper::after {
-            content: '▼';
-            font-size: 8px;
-            color: #0ff;
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            pointer-events: none;
-        }
-
     </style>
 </head>
 <body>
-		<!-- 表紙 	-->
     <div id="cover-screen">
         <img id="cover-image" src="cover.webp" alt="Glitch: Seoul Login Cover">
         <button id="start-button">CONNECT TO SEOUL</button>
     </div>
-    
+
     <div id="viewer-container"></div>
 
     <div class="next-episode-area">
@@ -261,50 +203,19 @@
             <span class="next-title">EPISODE 02</span>
         </a>
     </div>
-    
-    <div class="nav-footer">
-        <a href="index.html" class="nav-link">
-            &lt; PREV
-        </a>
 
-        <div class="ep-select-wrapper">
-            <select onchange="if(this.value) location.href=this.value">
-                <option value="#" selected>EP.01</option>
-                <option value="ep002.html">EP.02</option>
-                </select>
-        </div>
-
-        <a href="../index.html" class="nav-link">
-            STUDIO &gt;
-        </a>
-    </div>
-    
     <script>
-    		// true にすると表紙をスキップします。本番公開時は false にしてください。
-        const DEBUG_MODE = false;
-    
         // 1. 表紙の制御
         const coverScreen = document.getElementById('cover-screen');
         const startButton = document.getElementById('start-button');
         const viewerContainer = document.getElementById('viewer-container');
-				
-				// スタート処理を関数化（使い回すため）
-        const startWebtoon = () => {
+
+        startButton.addEventListener('click', () => {
             coverScreen.classList.add('hidden');
             viewerContainer.classList.add('active');
             window.scrollTo(0, 0);
-        };
-				
-				// デバッグモードの判定
-        if (DEBUG_MODE) {
-            // デバッグ中なら、クリックを待たずに即スタート
-            console.log("🔧 Debug Mode: Cover skipped.");
-            startWebtoon();
-        } else {
-            // 本番なら、ボタンクリックを待つ
-            startButton.addEventListener('click', startWebtoon);
-        }
-				
+        });
+
         // 2. 本編画像の生成
         const CONFIG = {
             totalImages: 31,
@@ -556,15 +467,15 @@
             container.appendChild(sceneBlock);
         }
 
-        // ==========================================
-        // フッター要素をコンテナの最後に移動
-        // ==========================================
-        // これにより、スマホで見た時に画像の直下にボタンが配置されます
+        // ===============================================
+        // 【重要】NEXTボタンをコンテナの最後に移動させる処理
+        // ===============================================
+        // ページ内にある .next-episode-area を取得し、
+        // viewer-container の一番最後に「移動（appendChild）」させます。
         const nextArea = document.querySelector('.next-episode-area');
-        const navFooter = document.querySelector('.nav-footer');
-        
-        if (nextArea) container.appendChild(nextArea);
-        if (navFooter) container.appendChild(navFooter);
+        if (nextArea) {
+            container.appendChild(nextArea);
+        }
 
     </script>
     
