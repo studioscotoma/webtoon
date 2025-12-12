@@ -68,10 +68,19 @@
             color: #cccccc;
             margin-bottom: 12px;
         }
-
-        /* 3. フランス語：サブ */
-        .text-fr {
+        
+        /* 3. スペイン語：サブ */
+        .text-es {
             font-size: 12px;
+            color: #808080; /* 少し暗めに戻しました（視認性のため） */
+            font-style: italic;
+            font-family: 'Georgia', serif;
+            opacity: 0.8;
+        }
+
+        /* 4. フランス語：サブ */
+        .text-fr {
+            font-size: 11px;
             color: #666666; /* 少し暗めに戻しました（視認性のため） */
             font-style: italic;
             font-family: 'Georgia', serif;
@@ -315,194 +324,256 @@
         // 字幕データ (必要に応じて追加)
         // (※ ここに字幕データ scenarioData があれば入れる)
         const scenarioData = [
-            { 
-                id: 1, 
-                kr: "인생은 게임이라고 누군가가 말했다.", 
-                ja: "人生はゲームだ、と誰かが言った。", 
-                fr: "On dit que la vie est un jeu." 
-            },
-            { 
-                id: 2, 
-                kr: "그렇다면 개발자는 어디에 있습니까?", 
-                ja: "なら、デベロッパーはどこに居るのだろう？", 
-                fr: "Alors, où sont les développeurs ?" 
-            },
-            { 
-                id: 3, 
-                kr: "버프도 너프도, 밸런스 조정이 오징어 된다.", 
-                ja: "バフもナーフも、バランス調整がイカれてやがる。", 
-                fr: "Les améliorations, les nerfs et les ajustements d'équilibrage sont complètement dingues." 
-            },
-            { 
-                id: 4, 
-                kr: "여러분의 활약을 기원합니다.", 
-                ja: "あなたのご活躍をお祈りしています。", 
-                fr: "Je te souhaite bonne chance." 
-            },
-            { 
-                id: 5, 
-                kr: "강지훈군. 스펙(학력과 자격)은 이것뿐이지?", 
-                ja: "カン・ジフン君。スペック（学歴と資格）はこれだけかね？", 
-                fr: "Kang Ji-hoon. Ce sont bien tes caractéristiques (formation et qualifications) ?" 
-            },
-            { 
-                id: 6, 
-                kr: "……독학으로 프로그래밍을. 보안 관련 대회에서 입상 경험도…", 
-                ja: "……独学でプログラミングを。セキュリティ関連の大会で入賞経験も……", 
-                fr: "…Programmation autodidacte. Vous avez même gagné des concours de sécurité…" 
-            },
-            { 
-                id: 7, 
-                kr: "그런 것은 놀이야. 우리가 보고 있는 것은, 너의 부모의 직업, 출신 대학, 그리고 「신용 스코어」이다.", 
-                ja: "そういうのは遊びだよ。我々が見ているのは、君の親の職業、出身大学、そして『信用スコア』だ。", 
-                fr: "Ce n'est qu'un jeu. On regarde juste la profession de tes parents, l'université où ils ont fait leurs études et ton « score de crédit »." 
-            },
-            { 
-                id: 8, 
-                kr: "언제까지 멍하니? 너는 우리 시스템에 맞지 않는다. … … 퇴출한마저.", 
-                ja: "いつまでぼーっとしてるんだ？君は、我が社のシステムに適合しない。……退出したまえ。", 
-                fr: "Tu vas encore faire l'idiot ? Tu ne rentres pas dans notre système… Sortie." 
-            },
-            { 
-                id: 9, 
-                kr: "세계는 '부모 뽑기'다.", 
-                ja: "世界は『親ガチャ』だ。", 
-                fr: "Le monde est une sorte de « gacha parental »." 
-            },
-            { 
-                id: 10, 
-                kr: "노력 부족이 아니다. 머리가 나빴던 것도 아니다.", 
-                ja: "努力不足じゃない。頭が悪かったわけでもない。", 
-                fr: "Ce n'est pas faute d'avoir essayé. Ce n'est pas par bêtise." 
-            },
-            { 
-                id: 11, 
-                kr: "로그인하는 서버를 실수했을 뿐일지도 모른다.", 
-                ja: "ログインするサーバーを間違えただけかもしれない。", 
-                fr: "Je me suis peut-être juste connecté au mauvais serveur." 
-            },
-            { 
-                id: 12, 
-                kr: "…… 리셋", 
-                ja: "……リセット", 
-                fr: "…Réinitialiser" 
-            },
-            { 
-                id: 13, 
-                kr: "할 수 있으면 좋지만.", 
-                ja: "できればいいのに。", 
-                fr: "J'aimerais bien." 
-            },
-            { 
-                id: 14, 
-                kr: "** 빗! 빗! 빗! **", 
-                ja: "**ビーッ！ ビーッ！ ビーッ！**", 
-                fr: "**Bip ! Bip ! Bip !**" 
-            },
-            { 
-                id: 15, 
-                kr: "정부 긴급 경고 ......! ? 지진인가? 미사일?", 
-                ja: "政府緊急アラート……！？地震か？ ミサイルか？", 
-                fr: "Alerte d'urgence gouvernementale… ?! Tremblement de terre ? Missile ?" 
-            },
-            { 
-                id: 16, 
-                kr: "긴급 알림 강지훈으로", 
-                ja: "緊急アラート カン・ジフンへ", 
-                fr: "Alerte d'urgence à Kang Ji-hoon" 
-            },
-            { 
-                id: 17, 
-                kr: "이게 뭐야?", 
-                ja: "何だこれ？", 
-                fr: "Qu'est-ce que c'est ?" 
-            },
-            { 
-                id: 18, 
-                kr: "당신은 'Slave'가 아닌 'Master' 후보다.", 
-                ja: "貴殿は『Slave』ではない、『Master』候補だ。", 
-                fr: "Tu n'es pas un « Esclave », tu es candidat « Maître »." 
-            },
-            { 
-                id: 19, 
-                kr: "...... 무슨 농담인가? 이것은 정부 밖에 사용할 수없는 전용 통신이다?", 
-                ja: "……何の冗談だ？ これは政府しか使えない緊急通信だぞ？", 
-                fr: "…C'est une blague ? C'est un message privé que seul le gouvernement peut utiliser, tu sais ?" 
-            },
-            { 
-                id: 20, 
-                kr: "현실 수정 패치 v2.0을 적용 하시겠습니까?", 
-                ja: "現実修正パッチv2.0 を適用しますか？", 
-                fr: "Veux-tu appliquer le Patch de Correction de la Réalité v2.0 ?" 
-            },
-            { 
-                id: 21, 
-                kr: "재미있는 농담이다.", 
-                ja: "面白い冗談だ。", 
-                fr: "C'est une blague." 
-            },
-            { 
-                id: 22, 
-                kr: "예", 
-                ja: "YES", 
-                fr: "OUI" 
-            },
-            { 
-                id: 23, 
-                kr: "** 꿀벌 꿀벌! **", 
-                ja: "**バチバチバチ！**", 
-                fr: "**Crépitement crépitement crépitement !**" 
-            },
-            { 
-                id: 24, 
-                kr: "눈이… ?", 
-                ja: "目が……！？", 
-                fr: "Vos yeux… ?!" 
-            },
-            { 
-                id: 25, 
-                kr: "대량의 데이터 스트림이 시각화되고 늘어나고 있습니다.", 
-                ja: "大量のデータストリームが可視化されて伸びている", 
-                fr: "D'énormes flux de données s'affichent et s'étendent." 
-            },
-            { 
-                id: 26, 
-                kr: "뭐야… … 이것은…", 
-                ja: "なんだ……これは……", 
-                fr: "Qu'est-ce que c'est… ?" 
-            },
-            { 
-                id: 27, 
-                kr: "손 위에 반투명 창이 팝업", 
-                ja: "手の上に、半透明のウィンドウがポップアップする", 
-                fr: "Une fenêtre translucide apparaît au-dessus de ma main." 
-            },
-            { 
-                id: 28, 
-                kr: "창 밖의 다리에도 창이 팝업하는 것이 보인다", 
-                ja: "窓の外の足にもウィンドウがポップアップするのが見える", 
-                fr: "Quelqu'un m'entend ?" 
-            },
-            { 
-                id: 29, 
-                kr: "인생은 게임이라고 누군가가 말했다.", 
-                ja: "人生はゲームだ、と誰かが言った。" ,
-                fr: "On dit que la vie est un jeu." 
-            },
-            { 
-                id: 30, 
-                kr: "그렇다면 개발자는 어디에 있습니까?", 
-                ja: "なら、デベロッパーはどこに居るのだろう？", 
-                fr: "Alors, où sont les développeurs ?" 
-            },
-            { 
-                id: 31, 
-                kr: "GLITCH: SEOUL LOGIN", 
-                ja: "GLITCH: SEOUL LOGIN", 
-                fr: "GLITCH: SEOUL LOGIN" 
-            },
-            // ... ここに必要な分だけ追加してください ...
-        ];
+				{
+				    id: 1,
+				    kr: "인생은 게임이라고, 누군가 말했다.",
+				    ja: "人生はゲームだ、と誰かが言った。",
+				    fr: "Quelqu'un a dit un jour que la vie est un jeu.",
+				    th: "มีคนเคยบอกว่า... ชีวิตก็เหมือนเกม",
+				    es: "Alguien dijo una vez que la vida es un juego."
+				},
+				{
+				    id: 2,
+				    kr: "그렇다면, 이따위로 만든 개발자는 어디에 숨어 있는 거지?",
+				    ja: "なら、デベロッパーはどこに居るのだろう？",
+				    fr: "Dans ce cas, où se cachent les développeurs ?",
+				    th: "ถ้างั้น... ไอ้ผู้พัฒนาเกมนี้มันมุดหัวอยู่ที่ไหนกัน?",
+				    es: "En ese caso, ¿dónde se esconden los desarrolladores?"
+				},
+				{
+				    id: 3,
+				    kr: "버프니 너프니, 밸런스 꼬라지가 아주 가관이군.",
+				    ja: "バフもナーフも、バランス調整がイカれてやがる。",
+				    fr: "Buffs, nerfs... l'équilibrage de ce monde est complètement pété.",
+				    th: "ทั้งบัฟ ทั้งเนิร์ฟ สมดุลเกมนี้มันพังพินาศไปหมดแล้ว",
+				    es: "Buffs, nerfs... el equilibrio de este mundo está totalmente roto."
+				},
+				{
+				    id: 4,
+				    kr: "귀하의 앞날에 무궁한 영광이 있기를 빕니다.",
+				    ja: "あなたのご活躍をお祈りしています。",
+				    fr: "Nous vous souhaitons une excellente continuation.",
+				    th: "ขอให้โชคดีในเส้นทางข้างหน้า (จดหมายปฏิเสธ)",
+				    es: "Le deseamos mucho éxito en sus futuros proyectos."
+				},
+				{
+				    id: 5,
+				    kr: "강지훈 군. 자네 스펙은... 고작 이게 다인가?",
+				    ja: "カン・ジフン君。スペック（学歴と資格）はこれだけかね？",
+				    fr: "Kang Ji-hoon. C'est tout ce que vous avez sur votre CV ?",
+				    th: "คุณคังจีฮุน... คุณสมบัติมีแค่นี้งั้นเหรอ?",
+				    es: "Kang Ji-hoon. ¿Estas son todas tus credenciales?"
+				},
+				{
+				    id: 6,
+				    kr: "......독학으로 익힌 프로그래밍. 보안 관련 대회 입상 경력이라......",
+				    ja: "……独学でプログラミングを。セキュリティ関連の大会で入賞経験も……",
+				    fr: "...Programmation en autodidacte. Prix remportés lors de concours de sécurité...",
+				    th: "...เรียนเขียนโปรแกรมด้วยตัวเอง เคยได้รับรางวัลการแข่งขันด้านความปลอดภัยไซเบอร์...",
+				    es: "...Aprendiste programación de forma autodidacta. Premios en competiciones de seguridad..."
+				},
+				{
+				    id: 7,
+				    kr: "그런 건 애들 장난이야. 우리가 보는 건 부모의 직업, 출신 대학, 그리고 『신용 점수』다.",
+				    ja: "そういうのは遊びだよ。我々が見ているのは、君の親の職業、出身大学、そして『信用スコア』だ。",
+				    fr: "Ce ne sont que des jeux d'enfant. Nous regardons le métier de vos parents, votre université et votre \"Score de Crédit\".",
+				    th: "ของพรรค์นั้นมันก็แค่เรื่องเล่นขายของ สิ่งที่เราดูคืออาชีพพ่อแม่ มหาวิทยาลัยที่จบ และ \"เครดิตสกอร์\" ต่างหาก",
+				    es: "Eso son juegos de niños. Lo que miramos es la profesión de tus padres, tu universidad y tu \"Puntuación de Crédito\"."
+				},
+				{
+				    id: 8,
+				    kr: "언제까지 멍하니 서 있을 건가? 자네는 우리 시스템에 부적합해. ......나가 보게.",
+				    ja: "いつまでぼーっとしてるんだ？君は、我が社のシステムに適合しない。……退出したまえ。",
+				    fr: "Qu'attendez-vous ? Vous ne correspondez pas au système de notre entreprise. ...Sortez.",
+				    th: "จะยืนบื้ออยู่อีกนานแค่ไหน? คุณไม่เหมาะกับระบบของบริษัทเรา... เชิญออกไปได้",
+				    es: "¿Cuánto tiempo vas a quedarte ahí pasmado? No encajas en el sistema de nuestra empresa. ...Retírate."
+				},
+				{
+				    id: 9,
+				    kr: "이 세상은 결국 『부모 가챠(수저 계급)』다.",
+				    ja: "世界は『親ガチャ』だ。",
+				    fr: "Ce monde n'est qu'une \"loterie de la naissance\".",
+				    th: "โลกนี้มันก็แค่ \"กาชาสุ่มพ่อแม่\"",
+				    es: "Este mundo es una \"lotería de nacimiento\"."
+				},
+				{
+				    id: 10,
+				    kr: "노력이 부족했던 게 아니야. 머리가 나빴던 것도 아니고.",
+				    ja: "努力不足じゃない。頭が悪かったわけでもない。",
+				    fr: "Ce n'est pas un manque d'efforts. Ce n'est pas non plus parce que je suis bête.",
+				    th: "ไม่ใช่ว่าไม่พยายาม ไม่ใช่ว่าหัวไม่ดี",
+				    es: "No es falta de esfuerzo. Tampoco es que sea tonto."
+				},
+				{
+				    id: 11,
+				    kr: "그저... 로그인할 서버를 잘못 골랐을 뿐일지도 몰라.",
+				    ja: "ログインするサーバーを間違えただけかもしれない。",
+				    fr: "Je me suis peut-être juste trompé de serveur de connexion.",
+				    th: "อาจจะเป็นแค่... ฉันล็อกอินผิดเซิร์ฟเวอร์ก็เท่านั้นเอง",
+				    es: "Quizás simplemente me conecté al servidor equivocado."
+				},
+				{
+				    id: 12,
+				    kr: "...리셋 (Reset).",
+				    ja: "…リセット",
+				    fr: "...Reset.",
+				    th: "...รีเซ็ต",
+				    es: "...Reset."
+				},
+				{
+				    id: 13,
+				    kr: "할 수만 있다면.",
+				    ja: "できればいいのに。",
+				    fr: "Si seulement c'était possible.",
+				    th: "ถ้าทำได้ก็คงดี",
+				    es: "Ojalá pudiera."
+				},
+				{
+				    id: 14,
+				    kr: "삐이익! 삐이익! 삐이익!",
+				    ja: "ビーッ！ ビーッ！ ビーッ！",
+				    fr: "Bip ! Bip ! Bip !",
+				    th: "ตี้ด! ตี้ด! ตี้ด!",
+				    es: "¡Bip! ¡Bip! ¡Bip!"
+				},
+				{
+				    id: 15,
+				    kr: "정부 긴급 재난 문자......!? 지진인가? 미사일?",
+				    ja: "政府緊急アラート……！？地震か？ ミサイルか？",
+				    fr: "Alerte d'urgence du gouvernement... !? Un séisme ? Un missile ?",
+				    th: "แจ้งเตือนฉุกเฉินจากรัฐบาล...!? แผ่นดินไหวเหรอ? หรือขีปนาวุธ?",
+				    es: "¿¡Alerta de emergencia del gobierno...!? ¿Un terremoto? ¿Un misil?"
+				},
+				{
+				    id: 16,
+				    kr: "[긴급 알림] 수신자: 강지훈",
+				    ja: "緊急アラート カン・ジフンへ",
+				    fr: "[ALERTE URGENCE] Pour : Kang Ji-hoon",
+				    th: "[แจ้งเตือนฉุกเฉิน] ถึง: คังจีฮุน",
+				    es: "[ALERTA DE EMERGENCIA] Para: Kang Ji-hoon"
+				},
+				{
+				    id: 17,
+				    kr: "뭐야 이게?",
+				    ja: "何だこれ？",
+				    fr: "C'est quoi ça ?",
+				    th: "นี่มันอะไรกัน?",
+				    es: "¿Qué es esto?"
+				},
+				{
+				    id: 18,
+				    kr: "귀하는 『Slave(노예)』가 아닌, 『Master(지배자)』 후보입니다.",
+				    ja: "貴殿は『Slave』ではない、『Master』候補だ。",
+				    fr: "Vous n'êtes pas un \"Slave\", mais un candidat \"Master\".",
+				    th: "ท่านไม่ใช่ \"Slave\" แต่เป็นผู้ท้าชิงตำแหน่ง \"Master\"",
+				    es: "No eres un \"Slave\", eres un candidato a \"Master\"."
+				},
+				{
+				    id: 19,
+				    kr: "......무슨 장난이지? 이건 정부망으로만 보낼 수 있는 긴급 문자잖아?",
+				    ja: "……何の冗談だ？ これは政府しか使えない緊急通信だぞ？",
+				    fr: "...C'est une blague ? C'est un canal d'urgence réservé au gouvernement, non ?",
+				    th: "...ตลกอะไรเนี่ย? นี่มันช่องทางสื่อสารฉุกเฉินที่รัฐบาลใช้เท่านั้นไม่ใช่เหรอ?",
+				    es: "...¿Es una broma? ¿No se supone que esto es un canal de emergencia exclusivo del gobierno?"
+				},
+				{
+				    id: 20,
+				    kr: "[현실 수정 패치 v2.0]을 적용하시겠습니까?",
+				    ja: "現実修正パッチv2.0 を適用しますか？",
+				    fr: "Appliquer le [Patch de Correction du Réel v2.0] ?",
+				    th: "ต้องการติดตั้ง [แพทช์แก้ไขความจริง v2.0] หรือไม่?",
+				    es: "¿Desea aplicar el [Parche de Corrección de Realidad v2.0]?"
+				},
+				{
+				    id: 21,
+				    kr: "재밌는 농담이네.",
+				    ja: "面白い冗談だ。",
+				    fr: "Elle est bien bonne.",
+				    th: "ตลกร้ายชะมัด",
+				    es: "Qué broma tan graciosa."
+				},
+				{
+				    id: 22,
+				    kr: "수락",
+				    ja: "YES",
+				    fr: "OUI",
+				    th: "YES (ตกลง)",
+				    es: "SÍ"
+				},
+				{
+				    id: 23,
+				    kr: "파지직! 파직!",
+				    ja: "バチバチバチ！",
+				    fr: "Bzzzt ! Crac !",
+				    th: "เปรี๊ยะ! เปรี๊ยะ!",
+				    es: "¡Bzzzt! ¡Crac!"
+				},
+				{
+				    id: 24,
+				    kr: "눈이......!?",
+				    ja: "目が……！？",
+				    fr: "Mes yeux... !?",
+				    th: "ตาฉัน...!?",
+				    es: "¡¿Mis ojos...?!"
+				},
+				{
+				    id: 25,
+				    kr: "(대량의 데이터 스트림이 시각화되어 뻗어 나간다)",
+				    ja: "大量のデータストリームが可視化されて伸びている",
+				    fr: "(Des flux de données massifs deviennent visibles et s'étendent)",
+				    th: "(กระแสข้อมูลมหาศาลปรากฏขึ้นและพุ่งทะยานออกไป)",
+				    es: "(Flujos masivos de datos se hacen visibles y se extienden)"
+				},
+				{
+				    id: 26,
+				    kr: "뭐야...... 이건......",
+				    ja: "なんだ……これは……",
+				    fr: "Qu'est-ce que... c'est que ça...",
+				    th: "นี่มัน... อะไรกัน...",
+				    es: "Qué... es esto..."
+				},
+				{
+				    id: 27,
+				    kr: "(손 위에 반투명한 윈도우 창이 팝업 된다)",
+				    ja: "手の上に、半透明のウィンドウがポップアップする",
+				    fr: "(Une fenêtre semi-transparente apparaît au-dessus de sa main)",
+				    th: "(หน้าต่างโปร่งแสงเด้งขึ้นมาบนฝ่ามือ)",
+				    es: "(Una ventana semitransparente aparece sobre su mano)"
+				},
+				{
+				    id: 28,
+				    kr: "(창밖을 지나가는 사람들의 다리에도 스테이터스 창이 보인다)",
+				    ja: "窓の外の足にもウィンドウがポップアップするのが見える",
+				    fr: "(Il voit des fenêtres apparaître sur les passants à l'extérieur)",
+				    th: "(เห็นหน้าต่างสถานะเด้งขึ้นมาบนขาของผู้คนที่อยู่นอกหน้าต่าง)",
+				    es: "(Ve ventanas emergentes sobre los transeúntes al otro lado de la ventana)"
+				},
+				{
+				    id: 29,
+				    kr: "인생은 게임이라고, 누군가 말했다.",
+				    ja: "人生はゲームだ、と誰かが言った。",
+				    fr: "Quelqu'un a dit un jour que la vie est un jeu.",
+				    th: "มีคนเคยบอกว่า... ชีวิตก็เหมือนเกม",
+				    es: "Alguien dijo una vez que la vida es un juego."
+				},
+				{
+				    id: 30,
+				    kr: "그렇다면, 개발자는 어디에 있는 거지?",
+				    ja: "なら、デベロッパーはどこに居るのだろう？",
+				    fr: "Dans ce cas, où sont les développeurs ?",
+				    th: "ถ้างั้น... ผู้พัฒนาเกมนี้มันอยู่ที่ไหนกัน?",
+				    es: "En ese caso, ¿dónde están los desarrolladores?"
+				},
+				{
+				    id: 31,
+				    kr: "GLITCH: SEOUL LOGIN",
+				    ja: "GLITCH: SEOUL LOGIN",
+				    fr: "GLITCH: SEOUL LOGIN",
+				    th: "GLITCH: SEOUL LOGIN",
+				    es: "GLITCH: SEOUL LOGIN"
+				}
+				// ... ここに必要な分だけ追加してください ...
+		];
         
         const container = document.getElementById('viewer-container');
 
@@ -543,12 +614,20 @@
                     captionDiv.appendChild(pJa);
                 }
 
+                if (sceneText.es) {
+                    const pEs = document.createElement('p');
+                    pEs.className = 'text-es';
+                    pEs.textContent = sceneText.es;
+                    captionDiv.appendChild(pEs);
+                }
+
                 if (sceneText.fr) {
                     const pFr = document.createElement('p');
                     pFr.className = 'text-fr';
                     pFr.textContent = sceneText.fr;
                     captionDiv.appendChild(pFr);
                 }
+               
 
                 sceneBlock.appendChild(captionDiv);
             }

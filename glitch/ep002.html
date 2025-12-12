@@ -68,10 +68,19 @@
             color: #cccccc;
             margin-bottom: 12px;
         }
-
-        /* 3. フランス語：サブ */
-        .text-fr {
+        
+        /* 3. スペイン語：サブ */
+        .text-es {
             font-size: 12px;
+            color: #808080; /* 少し暗めに戻しました（視認性のため） */
+            font-style: italic;
+            font-family: 'Georgia', serif;
+            opacity: 0.8;
+        }
+
+        /* 4. フランス語：サブ */
+        .text-fr {
+            font-size: 11px;
             color: #666666; /* 少し暗めに戻しました（視認性のため） */
             font-style: italic;
             font-family: 'Georgia', serif;
@@ -307,7 +316,7 @@
 				
         // 2. 本編画像の生成
         const CONFIG = {
-            totalImages: 31,
+            totalImages: 32,
             filePrefix: 'ep002/scene',
             fileExtension: '.webp'
         };
@@ -315,194 +324,263 @@
         // 字幕データ (必要に応じて追加)
         // (※ ここに字幕データ scenarioData があれば入れる)
         const scenarioData = [
-            { 
-                id: 1, 
-                kr: "명동 스트리트 상의 사람들에게 지금은 AR 태그가 붙어 있다.", 
-                ja: "明洞ストリート上の人々に今ではARタグがついている。", 
-                fr: "On dit que la vie est un jeu." 
-            },
-            { 
-                id: 2, 
-                kr: "뭐야 이건…사람에게 태그가 표시됩니까?", 
-                ja: "何だこれは……人にタグが表示されてる？", 
-                fr: "Alors, où sont les développeurs ?" 
-            },
-            { 
-                id: 3, 
-                kr: "진정. 의식을 집중하라. 필요한 정보만 모아라.", 
-                ja: "落ち着け。意識を集中しろ。必要な情報だけを集めろ。", 
-                fr: "Les améliorations, les nerfs et les ajustements d'équilibrage sont complètement dingues." 
-            },
-            { 
-                id: 4, 
-                kr: "시야가 진정해 눈에 들어오는 재벌 엘리트의 Armani(아르마니) 모습의 사업가.", 
-                ja: "視界が落ち着き、目に入る財閥エリートのArmani(アルマーニ)姿のビジネスマン。", 
-                fr: "Je te souhaite bonne chance." 
-            },
-            { 
-                id: 5, 
-                kr: "또 소음인가……, 의식을 집중해, 필요한 정보에만 집중해라.", 
-                ja: "またノイズか……、意識を集中して、必要な情報だけに集中しろ。", 
-                fr: "Kang Ji-hoon. Ce sont bien tes caractéristiques (formation et qualifications) ?" 
-            },
-            { 
-                id: 6, 
-                kr: "다르다! 그 녀석의 처리만이 쿠소라구이다!", 
-                ja: "違う！あいつの処理だけがクッソラグい！", 
-                fr: "…Programmation autodidacte. Vous avez même gagné des concours de sécurité…" 
-            },
-            { 
-                id: 7, 
-                kr: "페그 평균의 잠재적 변동성?", 
-                ja: "ペッグ平均の潜在的ボラティリティ？", 
-                fr: "Ce n'est qu'un jeu. On regarde juste la profession de tes parents, l'université où ils ont fait leurs études et ton « score de crédit »." 
-            },
-            { 
-                id: 8, 
-                kr: "……!", 
-                ja: "……！", 
-                fr: "Tu vas encore faire l'idiot ? Tu ne rentres pas dans notre système… Sortie." 
-            },
-            { 
-                id: 9, 
-                kr: "**쥬......**", 
-                ja: "**ジュッ……**", 
-                fr: "Le monde est une sorte de « gacha parental »." 
-            },
-            { 
-                id: 10, 
-                kr: "아파! 그 녀석 자신의 상황이 전혀 보이지 않았는가?", 
-                ja: "痛ってぇ！あいつ自分の状況が全く見えてないのか？", 
-                fr: "Ce n'est pas faute d'avoir essayé. Ce n'est pas par bêtise." 
-            },
-            { 
-                id: 11, 
-                kr: "젠장, 어깨 통증을 어떻게든하지 않으면!", 
-                ja: "……くそ、肩が焼けるように熱い！", 
-                fr: "Je me suis peut-être juste connecté au mauvais serveur." 
-            },
-            { 
-                id: 12, 
-                kr: "진통제, 붕대, 소독액, 무엇이든 좋은", 
-                ja: "鎮痛剤、ガーゼ、消毒液、何でも良い", 
-                fr: "…Réinitialiser" 
-            },
-            { 
-                id: 13, 
-                kr: "『화상용 하이드로겔 즉효 치료 거즈 패드』 이것이다!", 
-                ja: "『火傷用ハイドロジェル包帯』これだ！", 
-                fr: "J'aimerais bien." 
-            },
-            { 
-                id: 14, 
-                kr: "뭐야? 고통이 사라질까? 무슨 일이야? 내 몸은?", 
-                ja: "え？触っただけで痛みが消えた？俺の体はどうなってるんだ？", 
-                fr: "**Bip ! Bip ! Bip !**" 
-            },
-            { 
-                id: 15, 
-                kr: "구…… 이번에는 뭐야?", 
-                ja: "ぐ……今度は何だ？", 
-                fr: "Alerte d'urgence gouvernementale… ?! Tremblement de terre ? Missile ?" 
-            },
-            { 
-                id: 16, 
-                kr: "플루코기 도시락", 
-                ja: "プルコギ弁当", 
-                fr: "Alerte d'urgence à Kang Ji-hoon" 
-            },
-            { 
-                id: 17, 
-                kr: "배가 줄고 죽을 것 같아. 0원으로 플루코기 도시락을 입수하고 싶다. **제출**", 
-                ja: "腹が減って死にそう、0ウォンでプルコギ弁当を食べる方法。**Enter**", 
-                fr: "Qu'est-ce que c'est ?" 
-            },
-            { 
-                id: 18, 
-                kr: "……에? 플루코기 도시락에 식중독이 의심되고 버려?", 
-                ja: "……はぁ？プルコギ弁当に食中毒の疑い事例あり、廃棄しろ？", 
-                fr: "Tu n'es pas un « Esclave », tu es candidat « Maître »." 
-            },
-            { 
-                id: 19, 
-                kr: "본부에서 뭔지 모르겠지만 가능한 한 만지지 않고 버려 줘? 무슨 말을 하는 거야? 알았어?", 
-                ja: "本部から何か知らんけどできるだけ触らず捨てといてくれ？何言ってるんですか？分かりました？", 
-                fr: "…C'est une blague ? C'est un message privé que seul le gouvernement peut utiliser, tu sais ?" 
-            },
-            { 
-                id: 20, 
-                kr: "예 GET", 
-                ja: "はいGET", 
-                fr: "Veux-tu appliquer le Patch de Correction de la Réalité v2.0 ?" 
-            },
-            { 
-                id: 21, 
-                kr: "맛있다.", 
-                ja: "美味い。", 
-                fr: "C'est une blague." 
-            },
-            { 
-                id: 22, 
-                kr: "단 1행의 코드(명령문)로, 이것이 쓰레기인 것은 아닐 것이다.", 
-                ja: "たった1行のコード（命令文）で、これがゴミなわけないだろ。", 
-                fr: "OUI" 
-            },
-            { 
-                id: 23, 
-                kr: "상태 완전 복구. 이상 없음.", 
-                ja: "ステータス完全回復。異常なし。", 
-                fr: "**Crépitement crépitement crépitement !**" 
-            },
-            { 
-                id: 24, 
-                kr: "지하철 개찰구. 귀가 러시의 시간대.", 
-                ja: "地下鉄の改札口。帰宅ラッシュの時間帯。", 
-                fr: "Vos yeux… ?!" 
-            },
-            { 
-                id: 25, 
-                kr: "시스템에는 반드시 결함이 있습니다.", 
-                ja: "システムには必ず欠陥がある。", 
-                fr: "D'énormes flux de données s'affichent et s'étendent." 
-            },
-            { 
-                id: 26, 
-                kr: "일순간 수리중의 명령을 개찰에 오버라이드 한다.", 
-                ja: "改札に修理業者用のゲートオープン命令を入れる。", 
-                fr: "Qu'est-ce que c'est… ?" 
-            },
-            { 
-                id: 27, 
-                kr: "아무도 알아차리지 않는다.", 
-                ja: "誰も気づいて居ない。", 
-                fr: "Une fenêtre translucide apparaît au-dessus de ma main." 
-            },
-            { 
-                id: 28, 
-                kr: "이 나라는 고장 중이다. 그러므로 수리점은 어디에나 갈 수 있다.", 
-                ja: "この国は修理中だ。だから、修理屋はどこへでも行ける。", 
-                fr: "Une fenêtre translucide apparaît au-dessus de ma main." 
-            },
-            { 
-                id: 29, 
-                kr: "서울교통공사 5호선: 여의널 스테이션", 
-                ja: "ソウル交通公社5号線: 汝矣ナルステーション（ヨイナル駅） ", 
-                fr: "Une fenêtre translucide apparaît au-dessus de ma main." 
-            },
-            { 
-                id: 30, 
-                kr: "지하철로 해킹이 끝난 「Be Real」(스마트폰 어플)을 연다.", 
-                ja: "地下鉄でハッキング済みの「Be Real」（スマホアプリ）を開く。", 
-                fr: "Une fenêtre translucide apparaît au-dessus de ma main." 
-            },
-            { 
-                id: 31, 
-                kr: "만나러 가는 두 사람의 코드네임.", 
-                ja: "会いに行く2人の人間のコードネーム。", 
-                fr: "Une fenêtre translucide apparaît au-dessus de ma main." 
-            },
-            // ... ここに必要な分だけ追加してください ...
-        ];
+				{
+				    id: 1,
+				    kr: "이제 명동 거리의 사람들 위로 AR 태그가 떠다닌다.",
+				    ja: "明洞ストリート上の人々に今ではARタグがついている",
+				    fr: "Désormais, des tags AR flottent au-dessus des gens dans les rues de Myeongdong.",
+				    th: "ตอนนี้ผู้คนบนถนนเมียงดงมี AR Tag ติดอยู่เต็มไปหมด",
+				    es: "Ahora hay etiquetas AR flotando sobre la gente en las calles de Myeongdong."
+				},
+				{
+				    id: 2,
+				    kr: "뭐야 이건...... 사람들에게 태그가 표시되고 있잖아?",
+				    ja: "何だこれは……人にタグが表示されてる？",
+				    fr: "C'est quoi ça... Des tags s'affichent sur les gens ?",
+				    th: "นี่มันอะไรกัน... มีแท็กแสดงขึ้นมาบนตัวคนงั้นเหรอ?",
+				    es: "¿Qué es esto...? ¿Están apareciendo etiquetas sobre la gente?"
+				},
+				{
+				    id: 3,
+				    kr: "진정해. 의식을 집중해. 필요한 데이터만 수집하는 거야.",
+				    ja: "落ち着け。意識を集中しろ。必要な情報だけを集めろ。",
+				    fr: "Calme-toi. Concentre-toi. Ne collecte que les informations nécessaires.",
+				    th: "ใจเย็นเข้าไว้... ตั้งสติ... รวบรวมแค่ข้อมูลที่จำเป็นก็พอ",
+				    es: "Cálmate. Concéntrate. Recopila solo la información necesaria."
+				},
+				{
+				    id: 4,
+				    kr: "(시야가 안정되자, 아르마니 슈트를 입은 재벌 엘리트가 눈에 들어온다)",
+				    ja: "視界が落ち着き、目に入る財閥エリートのArmani(アルマーニ)姿のビジネスマン",
+				    fr: "(La vision se stabilise, un homme d'affaires de l'élite chaebol en Armani apparaît)",
+				    th: "(พอสายตาเริ่มโฟกัสได้ ก็เห็นนักธุรกิจระดับหัวกะทิในชุดอาร์มานี่)",
+				    es: "(La visión se estabiliza y veo a un hombre de negocios de la élite chaebol vestido de Armani)"
+				},
+				{
+				    id: 5,
+				    kr: "또 노이즈인가...... 집중해, 필요한 정보에만 포커스를 맞춰.",
+				    ja: "またノイズか……、意識を集中して、必要な情報だけに集中しろ。",
+				    fr: "Encore du bruit... Concentre-toi, vise uniquement l'info utile.",
+				    th: "สัญญาณรบกวนอีกแล้วเหรอ... ตั้งสติ โฟกัสแค่ข้อมูลที่จำเป็นสิ",
+				    es: "Otra vez ruido... Concéntrate, enfócate solo en la información necesaria."
+				},
+				{
+				    id: 6,
+				    kr: "아니야! 저 자식 데이터만 렉(Lag)이 쩔잖아!",
+				    ja: "違う！あいつの処理だけがクッソラグい！",
+				    fr: "Non ! C'est juste son traitement à lui qui lag à mort !",
+				    th: "ไม่ใช่! มีแค่การประมวลผลของเจ้านั่นที่แล็กชิบหาย!",
+				    es: "¡No! ¡Solo su procesamiento tiene un lag de mierda!"
+				},
+				{
+				    id: 7,
+				    kr: "PEG 비율의 잠재적 변동성(Volatility)?",
+				    ja: "ペッグ平均の潜在的ボラティリティ？",
+				    fr: "Volatilité potentielle du ratio PEG ?",
+				    th: "ความผันผวนแฝงของค่าเฉลี่ย PEG?",
+				    es: "¿Volatilidad potencial del ratio PEG?"
+				},
+				{
+				    id: 8,
+				    kr: "......!",
+				    ja: "……！",
+				    fr: "...... !",
+				    th: "......!",
+				    es: "¡......!"
+				},
+				{
+				    id: 9,
+				    kr: "치익......",
+				    ja: "ジュッ……",
+				    fr: "Tchhh...",
+				    th: "ฉ่า......",
+				    es: "Tssss..."
+				},
+				{
+				    id: 10,
+				    kr: "아윽! 저 새끼는 지 상황이 전혀 안 보이는 거야?",
+				    ja: "痛ってぇ！あいつ自分の状況が全く見えてないのか？",
+				    fr: "Aïe ! Ce type ne voit pas du tout dans quel état il est ?",
+				    th: "โอ๊ย! เจ้านั่นมองไม่เห็นสถานการณ์ของตัวเองเลยรึไง?",
+				    es: "¡Ay! ¿Es que ese tipo no ve su propia situación en absoluto?"
+				},
+				{
+				    id: 11,
+				    kr: "......젠장, 어깨가 타들어가듯 뜨거워!",
+				    ja: "……くそ、肩が焼けるように熱い！",
+				    fr: "...Merde, mon épaule me brûle !",
+				    th: "...โธ่เว้ย ไหล่ร้อนเหมือนโดนไฟเผาเลย!",
+				    es: "...Mierda, ¡me arde el hombro como si se quemara!"
+				},
+				{
+				    id: 12,
+				    kr: "진통제, 거즈, 소독약... 뭐라도 좋아.",
+				    ja: "鎮痛剤、ガーゼ、消毒液、何でも良い",
+				    fr: "Antidouleurs, gazes, désinfectant, n'importe quoi.",
+				    th: "ยาแก้ปวด ผ้ากอซ ยาฆ่าเชื้อ... อะไรก็ได้",
+				    es: "Analgésicos, gasas, desinfectante, lo que sea."
+				},
+				{
+				    id: 13,
+				    kr: "『화상용 하이드로젤 밴드』... 이거다!",
+				    ja: "『火傷用ハイドロジェル包帯』これだ！",
+				    fr: "« Pansement hydrogel pour brûlures »... C'est ça !",
+				    th: "『พลาสเตอร์ไฮโดรเจลสำหรับแผลไฟไหม้』... นี่แหละ!",
+				    es: "«Apósito de hidrogel para quemaduras»... ¡Es esto!"
+				},
+				{
+				    id: 14,
+				    kr: "어? 손이 닿기만 했는데 고통이 사라졌어? 내 몸이 어떻게 된 거지?",
+				    ja: "え？触っただけで痛みが消えた？俺の体はどうなってるんだ？",
+				    fr: "Hein ? La douleur a disparu juste au contact ? Qu'est-ce qui m'arrive ?",
+				    th: "เอ๊ะ? แค่แตะความเจ็บก็หายไปเลยเหรอ? ร่างกายฉันมันเกิดบ้าอะไรขึ้นเนี่ย?",
+				    es: "¿Eh? ¿El dolor desapareció solo con tocarlo? ¿Qué le pasa a mi cuerpo?"
+				},
+				{
+				    id: 15,
+				    kr: "꼬르륵...... 이번엔 또 뭐야?",
+				    ja: "ぐぅ……今度は何だ？",
+				    fr: "Grrr... Et maintenant quoi ?",
+				    th: "โครก...... คราวนี้อะไรอีก?",
+				    es: "Grrr... ¿Y ahora qué?"
+				},
+				{
+				    id: 16,
+				    kr: "불고기 도시락",
+				    ja: "プルコギ弁当",
+				    fr: "Bento Bulgogi",
+				    th: "ข้าวกล่อง불โกกิ",
+				    es: "Bento de Bulgogi"
+				},
+				{
+				    id: 17,
+				    kr: "배고파 뒤지겠네. 0원으로 불고기 도시락 먹는 법. [Enter]",
+				    ja: "腹が減って死にそう、0ウォンでプルコギ弁当を食べる方法。**Enter**",
+				    fr: "Je meurs de faim. Comment manger un bento Bulgogi pour 0 won. [Entrée]",
+				    th: "หิวจะตายอยู่แล้ว วิธีกินข้าวกล่อง불โกกิด้วยเงิน 0 วอน [Enter]",
+				    es: "Me muero de hambre. Cómo comer un bento de Bulgogi por 0 wones. [Enter]"
+				},
+				{
+				    id: 18,
+				    kr: "......엉? 불고기 도시락 식중독 의심 사례 발생, 전량 폐기하라고?",
+				    ja: "……はぁ？プルコギ弁当に食中毒の疑い事例あり、廃棄しろ？",
+				    fr: "...Hein ? Cas suspect d'intoxication alimentaire dans le bento Bulgogi, jetez-le ?",
+				    th: "...หา? ข้าวกล่อง불โกกิมีกรณีสงสัยว่าอาหารเป็นพิษ ให้ทิ้งทั้งหมดงั้นเหรอ?",
+				    es: "...¿Eh? ¿Sospecha de intoxicación alimentaria en el bento de Bulgogi, deséchelo?"
+				},
+				{
+				    id: 19,
+				    kr: "(점원) \"본사 지침이라는데... 최대한 손대지 말고 폐기해 달라네요? 이게 무슨 소리야... 알겠습니다.\"",
+				    ja: "本部から何か知らんけどできるだけ触らず捨てといてくれ？何言ってるんですか？分かりました？",
+				    fr: "(Vendeur) \"Le siège dit de le jeter sans y toucher ? Qu'est-ce qu'ils racontent... D'accord, compris.\"",
+				    th: "(พนักงาน) \"สำนักงานใหญ่บอกให้ทิ้งโดยไม่ต้องสัมผัสเหรอ? พูดอะไรของเขาเนี่ย... เข้าใจแล้วครับ\"",
+				    es: "(Dependiente) \"¿La central dice que lo tire sin tocarlo? ¿De qué están hablando? ...Entendido.\""
+				},
+				{
+				    id: 20,
+				    kr: "오케이, 겟 (GET).",
+				    ja: "はいGET",
+				    fr: "Et voilà, GET.",
+				    th: "เรียบร้อย GET",
+				    es: "Bien, GET."
+				},
+				{
+				    id: 21,
+				    kr: "맛있네.",
+				    ja: "美味い。",
+				    fr: "Délicieux.",
+				    th: "อร่อย",
+				    es: "Delicioso."
+				},
+				{
+				    id: 22,
+				    kr: "단 한 줄의 코드(명령어)로... 이게 쓰레기일 리가 없잖아.",
+				    ja: "たった1行のコード（命令文）で、これがゴミなわけないだろ。",
+				    fr: "Juste une ligne de code... Impossible que ce soit des ordures.",
+				    th: "แค่โค้ดบรรทัดเดียว... ของแบบนี้จะเป็นขยะได้ยังไง",
+				    es: "Con solo una línea de código... No hay forma de que esto sea basura."
+				},
+				{
+				    id: 23,
+				    kr: "스테이터스 완전 회복. 이상 무.",
+				    ja: "ステータス完全回復。異常なし。",
+				    fr: "Statut entièrement rétabli. Aucune anomalie.",
+				    th: "สถานะฟื้นฟูสมบูรณ์ ไม่มีความผิดปกติ",
+				    es: "Estado totalmente recuperado. Sin anomalías."
+				},
+				{
+				    id: 24,
+				    kr: "(지하철 개찰구. 퇴근 시간대)",
+				    ja: "地下鉄の改札口。帰宅ラッシュの時間帯",
+				    fr: "(Portiques du métro. Heure de pointe)",
+				    th: "(ประตูตรวจตั๋วรถไฟใต้ดิน ช่วงเวลาเร่งด่วน)",
+				    es: "(Tornos del metro. Hora punta)"
+				},
+				{
+				    id: 25,
+				    kr: "시스템에는 반드시 결함(Bug)이 있다.",
+				    ja: "システムには必ず欠陥がある。",
+				    fr: "Tout système a ses failles.",
+				    th: "ระบบย่อมมีข้อบกพร่องเสมอ",
+				    es: "Todo sistema tiene fallos."
+				},
+				{
+				    id: 26,
+				    kr: "개찰구에 『수리 기사 전용 게이트 개방』 명령을 입력한다.",
+				    ja: "改札に修理業者用のゲートオープン命令を入れる",
+				    fr: "J'insère la commande d'ouverture 'Maintenance' dans le portique.",
+				    th: "ป้อนคำสั่งเปิดประตูสำหรับ 'ช่างซ่อมบำรุง' เข้าไปที่เครื่องตรวจตั๋ว",
+				    es: "Introduzco el comando de apertura de 'Mantenimiento' en el torno."
+				},
+				{
+				    id: 27,
+				    kr: "아무도 눈치채지 못해.",
+				    ja: "誰も気づいて居ない",
+				    fr: "Personne ne le remarque.",
+				    th: "ไม่มีใครสังเกตเห็น",
+				    es: "Nadie se da cuenta."
+				},				
+				{
+				    id: 28,
+				    kr: "이 나라는 지금 수리 중이야. 그러니까, 수리공은 어디든 갈 수 있지.",
+				    ja: "この国は修理中だ。だから、修理屋はどこへでも行ける。",
+				    fr: "Ce pays est en réparation. Alors, le réparateur peut aller partout.",
+				    th: "ประเทศนี้กำลังซ่อมบำรุงอยู่ เพราะงั้น... ช่างซ่อมจะไปที่ไหนก็ได้",
+				    es: "Este país está en reparaciones. Así que el reparador puede ir a donde quiera."
+				},
+				{
+				    id: 29,
+				    kr: "서울교통공사 5호선: 여의나루역",
+				    ja: "ソウル交通公社5号線: 汝矣ナルステーション（ヨイナル駅）",
+				    fr: "Métro de Séoul Ligne 5 : Station Yeouinaru",
+				    th: "รถไฟใต้ดินโซลสาย 5: สถานียออีนารู",
+				    es: "Metro de Seúl Línea 5: Estación Yeouinaru"
+				},
+				{
+				    id: 30,
+				    kr: "(지하철 안에서 해킹된 『Be Real』 앱을 연다)",
+				    ja: "地下鉄でハッキング済みの「Be Real」（スマホアプリ）を開く",
+				    fr: "(Ouvre l'application \"Be Real\" piratée dans le métro)",
+				    th: "(เปิดแอป \"Be Real\" ที่แฮ็กมาแล้วบนรถไฟใต้ดิน)",
+				    es: "(Abro la aplicación \"Be Real\" hackeada en el metro)"
+				},
+				{
+				    id: 31,
+				    kr: "만나러 갈 두 사람의 코드네임.",
+				    ja: "会いに行く2人の人間のコードネーム",
+				    fr: "Les noms de code des deux cibles.",
+				    th: "โค้ดเนมของคน 2 คนที่จะไปหา",
+				    es: "Los nombres en clave de las dos personas a las que voy a ver."
+				},
+				{
+				    id: 32,
+				    kr: "GLITCH: SEOUL LOGIN",
+				    ja: "GLITCH: SEOUL LOGIN",
+				    fr: "GLITCH: SEOUL LOGIN",
+				    th: "GLITCH: SEOUL LOGIN",
+				    es: "GLITCH: SEOUL LOGIN"
+				}
+		];
         
         const container = document.getElementById('viewer-container');
 
@@ -543,12 +621,20 @@
                     captionDiv.appendChild(pJa);
                 }
 
+                if (sceneText.es) {
+                    const pEs = document.createElement('p');
+                    pEs.className = 'text-es';
+                    pEs.textContent = sceneText.es;
+                    captionDiv.appendChild(pEs);
+                }
+
                 if (sceneText.fr) {
                     const pFr = document.createElement('p');
                     pFr.className = 'text-fr';
                     pFr.textContent = sceneText.fr;
                     captionDiv.appendChild(pFr);
                 }
+               
 
                 sceneBlock.appendChild(captionDiv);
             }
