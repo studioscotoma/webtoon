@@ -42,48 +42,76 @@
             background-color: #111;
         }
         
-        /* 字幕エリア */
+        /* 字幕エリア全体の設定 */
         .caption-area {
             padding: 24px 16px 40px;
             background-color: #000;
             text-align: center;
         }
 
-        /* --- Webtoon Trilingual Style --- */
-        /* 1. 韓国語：メイン */
+        /* --- Webtoon Multilingual Style --- */
+        /* ■ GROUP 1: メイン（韓国語） */
         .text-kr {
             font-size: 18px;
             font-weight: 700;
             line-height: 1.5;
-            color: #ffffff;
-            margin-bottom: 6px;
+            color: #ffffff;        /* 完全な白 */
+            margin-bottom: 8px;
             letter-spacing: 0.02em;
         }
 
-        /* 2. 日本語：サブ */
+        /* ■ GROUP 2: サブ・アジア（日・繁） */
+        /* 日本語 */
         .text-ja {
             font-size: 14px;
             font-weight: 400;
-            line-height: 1.4;
-            color: #cccccc;
-            margin-bottom: 12px;
+            line-height: 1.5;
+            color: #d0d0d0;        /* 明るめのグレー */
+            margin-bottom: 4px;    /* 繁体字との間隔は狭めに */
         }
         
-        /* 3. スペイン語：サブ */
-        .text-es {
-            font-size: 12px;
-            color: #808080; /* 少し暗めに戻しました（視認性のため） */
-            font-style: italic;
-            font-family: 'Georgia', serif;
-            opacity: 0.8;
+        /* 【追加】中国語（繁体字） */
+        .text-zh {
+            font-size: 14px;       /* 漢字は画数が多いので日本語と同じサイズを維持 */
+            font-weight: 400;
+            line-height: 1.5;
+            color: #b0b0b0;        /* 日本語よりわずかに暗くして階層を作る */
+            margin-bottom: 12px;   /* 欧米言語グループとの区切り */
+            font-family: "Microsoft JhengHei", "Traditional Chinese", sans-serif;
         }
 
-        /* 4. フランス語：サブ */
+        /* ■ GROUP 3: ブリッジ（英語） */
+
+        /* ■ GROUP 4: アトモスフィア（西・仏） */
+        /* スペイン語 */
+        .text-es {
+            display: block;        /* 独立したブロックとして表示 */
+            font-size: 13px;       /* 日本語より少し小さく、欧州言語より大きく */
+            color: #999999;        /* 中間的なグレー */
+            font-family: "Helvetica Neue", Arial, sans-serif; /* 読みやすいサンセリフ体 */
+            line-height: 1.4;
+            margin-bottom: 8px;    /* 装飾言語との区切り */
+            letter-spacing: 0.03em;
+        }
+
+        /* フランス語 */
         .text-fr {
-            font-size: 11px;
-            color: #666666; /* 少し暗めに戻しました（視認性のため） */
+            font-size: 12px;
+            color: #777777;        /* 背景に馴染ませる */
+            font-style: italic;    /* 斜体で雰囲気重視 */
+            font-family: 'Georgia', serif;
+            line-height: 1.4;
+            margin-bottom: 2px;    /* フランス語と近づける */
+            opacity: 0.9;
+        }
+
+        /* 【追加】英語 */
+        .text-en {
+            font-size: 11px;       /* 一番小さく */
+            color: #666666;        /* 最も暗く */
             font-style: italic;
             font-family: 'Georgia', serif;
+            line-height: 1.4;
             opacity: 0.8;
         }
 
@@ -272,7 +300,7 @@
     </div>
     
     <div class="nav-footer">
-        <a href="ep001.html" class="nav-link">
+        <a href="ep002.html" class="nav-link">
             &lt; PREV
         </a>
 
@@ -280,8 +308,8 @@
             <select onchange="if(this.value) location.href=this.value">
                 <option value="ep001.html">EP.01</option>
                 <option value="#" selected>EP.02</option>
-                <option value="ep002.html">EP.03</option>
-            </select>
+                <option value="ep003.html">EP.03</option>
+                </select>
         </div>
 
         <a href="../index.html" class="nav-link">
@@ -324,265 +352,234 @@
         
         // 字幕データ (必要に応じて追加)
         // (※ ここに字幕データ scenarioData があれば入れる)
+        // 字幕データ (修正済み)
         const scenarioData = [
 				{
-				    id: 1,
-				    kr: "이제 명동 거리의 사람들 위로 AR 태그가 떠다닌다.",
-				    ja: "明洞ストリート上の人々に今ではARタグがついている",
-				    fr: "Désormais, des tags AR flottent au-dessus des gens dans les rues de Myeongdong.",
-				    th: "ตอนนี้ผู้คนบนถนนเมียงดงมี AR Tag ติดอยู่เต็มไปหมด",
-				    es: "Ahora hay etiquetas AR flotando sobre la gente en las calles de Myeongdong."
+					id: 1,
+					kr: "이제 명동 거리의 사람들 위로 AR 태그가 떠다닌다.",
+					ja: "明洞ストリート上の人々に今ではARタグがついている",
+					fr: "Désormais, des tags AR flottent au-dessus des gens dans les rues de Myeongdong.",
+					en: "Now, AR tags are floating above the people on Myeongdong Street."
 				},
 				{
-				    id: 2,
-				    kr: "뭐야 이건...... 사람들에게 태그가 표시되고 있잖아?",
-				    ja: "何だこれは……人にタグが表示されてる？",
-				    fr: "C'est quoi ça... Des tags s'affichent sur les gens ?",
-				    th: "นี่มันอะไรกัน... มีแท็กแสดงขึ้นมาบนตัวคนงั้นเหรอ?",
-				    es: "¿Qué es esto...? ¿Están apareciendo etiquetas sobre la gente?"
+					id: 2,
+					kr: "뭐야 이건...... 사람들에게 태그가 표시되고 있잖아?",
+					ja: "何だこれは……人にタグが表示されてる？",
+					fr: "C'est quoi ça... Des tags s'affichent sur les gens ?",
+					en: "What is this... Tags are displaying on people?"
 				},
 				{
-				    id: 3,
-				    kr: "진정해. 의식을 집중해. 필요한 데이터만 수집하는 거야.",
-				    ja: "落ち着け。意識を集中しろ。必要な情報だけを集めろ。",
-				    fr: "Calme-toi. Concentre-toi. Ne collecte que les informations nécessaires.",
-				    th: "ใจเย็นเข้าไว้... ตั้งสติ... รวบรวมแค่ข้อมูลที่จำเป็นก็พอ",
-				    es: "Cálmate. Concéntrate. Recopila solo la información necesaria."
+					id: 3,
+					kr: "진정해. 의식을 집중해. 필요한 데이터만 수집하는 거야.",
+					ja: "落ち着け。意識を集中しろ。必要な情報だけを集めろ。",
+					fr: "Calme-toi. Concentre-toi. Ne collecte que les informations nécessaires.",
+					en: "Calm down. Focus. Collect only the necessary data."
 				},
 				{
-				    id: 4,
-				    kr: "(시야가 안정되자, 아르마니 슈트를 입은 재벌 엘리트가 눈에 들어온다)",
-				    ja: "視界が落ち着き、目に入る財閥エリートのArmani(アルマーニ)姿のビジネスマン",
-				    fr: "(La vision se stabilise, un homme d'affaires de l'élite chaebol en Armani apparaît)",
-				    th: "(พอสายตาเริ่มโฟกัสได้ ก็เห็นนักธุรกิจระดับหัวกะทิในชุดอาร์มานี่)",
-				    es: "(La visión se estabiliza y veo a un hombre de negocios de la élite chaebol vestido de Armani)"
+					id: 4,
+					kr: "(시야가 안정되자, 아르마니 슈트를 입은 재벌 엘리트가 눈에 들어온다)",
+					ja: "視界が落ち着き、目に入る財閥エリートのArmani(アルマーニ)姿のビジネスマン",
+					fr: "(La vision se stabilise, un homme d'affaires de l'élite chaebol en Armani apparaît)",
+					en: "(Vision stabilizes, spotting a chaebol elite businessman in an Armani suit)"
 				},
 				{
-				    id: 5,
-				    kr: "또 노이즈인가...... 집중해, 필요한 정보에만 포커스를 맞춰.",
-				    ja: "またノイズか……、意識を集中して、必要な情報だけに集中しろ。",
-				    fr: "Encore du bruit... Concentre-toi, vise uniquement l'info utile.",
-				    th: "สัญญาณรบกวนอีกแล้วเหรอ... ตั้งสติ โฟกัสแค่ข้อมูลที่จำเป็นสิ",
-				    es: "Otra vez ruido... Concéntrate, enfócate solo en la información necesaria."
+					id: 5,
+					kr: "또 노이즈인가...... 집중해, 필요한 정보에만 포커스를 맞춰.",
+					ja: "またノイズか……、意識を集中して、必要な情報だけに集中しろ。",
+					fr: "Encore du bruit... Concentre-toi, vise uniquement l'info utile.",
+					en: "Noise again... Focus, lock onto only the necessary information."
 				},
 				{
-				    id: 6,
-				    kr: "아니야! 저 자식 데이터만 렉(Lag)이 쩔잖아!",
-				    ja: "違う！あいつの処理だけがクッソラグい！",
-				    fr: "Non ! C'est juste son traitement à lui qui lag à mort !",
-				    th: "ไม่ใช่! มีแค่การประมวลผลของเจ้านั่นที่แล็กชิบหาย!",
-				    es: "¡No! ¡Solo su procesamiento tiene un lag de mierda!"
+					id: 6,
+					kr: "아니야! 저 자식 데이터만 렉(Lag)이 쩔잖아!",
+					ja: "違う！あいつの処理だけがクッソラグい！",
+					fr: "Non ! C'est juste son traitement à lui qui lag à mort !",
+					en: "No! Only his processing is lagging like crazy!"
 				},
 				{
-				    id: 7,
-				    kr: "PEG 비율의 잠재적 변동성(Volatility)?",
-				    ja: "ペッグ平均の潜在的ボラティリティ？",
-				    fr: "Volatilité potentielle du ratio PEG ?",
-				    th: "ความผันผวนแฝงของค่าเฉลี่ย PEG?",
-				    es: "¿Volatilidad potencial del ratio PEG?"
+					id: 7,
+					kr: "PEG 비율의 잠재적 변동성(Volatility)?",
+					ja: "ペッグ平均の潜在的ボラティリティ？",
+					fr: "Volatilité potentielle du ratio PEG ?",
+					en: "Potential volatility of the PEG ratio?"
 				},
 				{
-				    id: 8,
-				    kr: "......!",
-				    ja: "……！",
-				    fr: "...... !",
-				    th: "......!",
-				    es: "¡......!"
+					id: 8,
+					kr: "......!",
+					ja: "……！",
+					fr: "...... !",
+					en: "......!"
 				},
 				{
-				    id: 9,
-				    kr: "치익......",
-				    ja: "ジュッ……",
-				    fr: "Tchhh...",
-				    th: "ฉ่า......",
-				    es: "Tssss..."
+					id: 9,
+					kr: "**치익......**",
+					ja: "**ジュッ……**",
+					fr: "**Tchhh...**",
+					en: "**Sizzle...**"
 				},
 				{
-				    id: 10,
-				    kr: "아윽! 저 새끼는 지 상황이 전혀 안 보이는 거야?",
-				    ja: "痛ってぇ！あいつ自分の状況が全く見えてないのか？",
-				    fr: "Aïe ! Ce type ne voit pas du tout dans quel état il est ?",
-				    th: "โอ๊ย! เจ้านั่นมองไม่เห็นสถานการณ์ของตัวเองเลยรึไง?",
-				    es: "¡Ay! ¿Es que ese tipo no ve su propia situación en absoluto?"
+					id: 10,
+					kr: "아윽! 저 새끼는 지 상황이 전혀 안 보이는 거야?",
+					ja: "痛ってぇ！あいつ自分の状況が全く見えてないのか？",
+					fr: "Aïe ! Ce type ne voit pas du tout dans quel état il est ?",
+					en: "Ouch! Can't that bastard see his own situation at all?"
 				},
 				{
-				    id: 11,
-				    kr: "......젠장, 어깨가 타들어가듯 뜨거워!",
-				    ja: "……くそ、肩が焼けるように熱い！",
-				    fr: "...Merde, mon épaule me brûle !",
-				    th: "...โธ่เว้ย ไหล่ร้อนเหมือนโดนไฟเผาเลย!",
-				    es: "...Mierda, ¡me arde el hombro como si se quemara!"
+					id: 11,
+					kr: "......젠장, 어깨가 타들어가듯 뜨거워!",
+					ja: "……くそ、肩が焼けるように熱い！",
+					fr: "...Merde, mon épaule me brûle !",
+					en: "...Damn it, my shoulder is burning up!"
 				},
 				{
-				    id: 12,
-				    kr: "진통제, 거즈, 소독약... 뭐라도 좋아.",
-				    ja: "鎮痛剤、ガーゼ、消毒液、何でも良い",
-				    fr: "Antidouleurs, gazes, désinfectant, n'importe quoi.",
-				    th: "ยาแก้ปวด ผ้ากอซ ยาฆ่าเชื้อ... อะไรก็ได้",
-				    es: "Analgésicos, gasas, desinfectante, lo que sea."
+					id: 12,
+					kr: "진통제, 거즈, 소독약... 뭐라도 좋아.",
+					ja: "鎮痛剤、ガーゼ、消毒液、何でも良い",
+					fr: "Antidouleurs, gazes, désinfectant, n'importe quoi.",
+					en: "Painkillers, gauze, disinfectant... anything works."
 				},
 				{
-				    id: 13,
-				    kr: "『화상용 하이드로젤 밴드』... 이거다!",
-				    ja: "『火傷用ハイドロジェル包帯』これだ！",
-				    fr: "« Pansement hydrogel pour brûlures »... C'est ça !",
-				    th: "『พลาสเตอร์ไฮโดรเจลสำหรับแผลไฟไหม้』... นี่แหละ!",
-				    es: "«Apósito de hidrogel para quemaduras»... ¡Es esto!"
+					id: 13,
+					kr: "『화상용 하이드로젤 밴드』... 이거다!",
+					ja: "『火傷用ハイドロジェル包帯』これだ！",
+					fr: "« Pansement hydrogel pour brûlures »... C'est ça !",
+					en: "\"Hydrogel Burn Dressing\"... This is it!"
 				},
 				{
-				    id: 14,
-				    kr: "어? 손이 닿기만 했는데 고통이 사라졌어? 내 몸이 어떻게 된 거지?",
-				    ja: "え？触っただけで痛みが消えた？俺の体はどうなってるんだ？",
-				    fr: "Hein ? La douleur a disparu juste au contact ? Qu'est-ce qui m'arrive ?",
-				    th: "เอ๊ะ? แค่แตะความเจ็บก็หายไปเลยเหรอ? ร่างกายฉันมันเกิดบ้าอะไรขึ้นเนี่ย?",
-				    es: "¿Eh? ¿El dolor desapareció solo con tocarlo? ¿Qué le pasa a mi cuerpo?"
+					id: 14,
+					kr: "어? 손이 닿기만 했는데 고통이 사라졌어? 내 몸이 어떻게 된 거지?",
+					ja: "え？触っただけで痛みが消えた？俺の体はどうなってるんだ？",
+					fr: "Hein ? La douleur a disparu juste au contact ? Qu'est-ce qui m'arrive ?",
+					en: "Huh? The pain vanished just by touching it? What is happening to my body?"
 				},
 				{
-				    id: 15,
-				    kr: "꼬르륵...... 이번엔 또 뭐야?",
-				    ja: "ぐぅ……今度は何だ？",
-				    fr: "Grrr... Et maintenant quoi ?",
-				    th: "โครก...... คราวนี้อะไรอีก?",
-				    es: "Grrr... ¿Y ahora qué?"
+					id: 15,
+					kr: "꼬르륵...... 이번엔 또 뭐야?",
+					ja: "ぐぅ……今度は何だ？",
+					fr: "Grrr... Et maintenant quoi ?",
+					en: "Grrr... What now?"
 				},
 				{
-				    id: 16,
-				    kr: "불고기 도시락",
-				    ja: "プルコギ弁当",
-				    fr: "Bento Bulgogi",
-				    th: "ข้าวกล่อง불โกกิ",
-				    es: "Bento de Bulgogi"
+					id: 16,
+					kr: "불고기 도시락",
+					ja: "プルコギ弁当",
+					fr: "Bento Bulgogi",
+					en: "Bulgogi Bento"
 				},
 				{
-				    id: 17,
-				    kr: "배고파 뒤지겠네. 0원으로 불고기 도시락 먹는 법. [Enter]",
-				    ja: "腹が減って死にそう、0ウォンでプルコギ弁当を食べる方法。**Enter**",
-				    fr: "Je meurs de faim. Comment manger un bento Bulgogi pour 0 won. [Entrée]",
-				    th: "หิวจะตายอยู่แล้ว วิธีกินข้าวกล่อง불โกกิด้วยเงิน 0 วอน [Enter]",
-				    es: "Me muero de hambre. Cómo comer un bento de Bulgogi por 0 wones. [Enter]"
+					id: 17,
+					kr: "배고파 뒤지겠네. 0원으로 불고기 도시락 먹는 법. **[Enter]**",
+					ja: "腹が減って死にそう、0ウォンでプルコギ弁当を食べる方法。**Enter**",
+					fr: "Je meurs de faim. Comment manger un bento Bulgogi pour 0 won. **[Entrée]**",
+					en: "I'm starving to death. How to eat a Bulgogi Bento for 0 won. **[Enter]**"
 				},
 				{
-				    id: 18,
-				    kr: "......엉? 불고기 도시락 식중독 의심 사례 발생, 전량 폐기하라고?",
-				    ja: "……はぁ？プルコギ弁当に食中毒の疑い事例あり、廃棄しろ？",
-				    fr: "...Hein ? Cas suspect d'intoxication alimentaire dans le bento Bulgogi, jetez-le ?",
-				    th: "...หา? ข้าวกล่อง불โกกิมีกรณีสงสัยว่าอาหารเป็นพิษ ให้ทิ้งทั้งหมดงั้นเหรอ?",
-				    es: "...¿Eh? ¿Sospecha de intoxicación alimentaria en el bento de Bulgogi, deséchelo?"
+					id: 18,
+					kr: "......엉? 불고기 도시락 식중독 의심 사례 발생, 전량 폐기하라고?",
+					ja: "……はぁ？プルコギ弁当に食中毒の疑い事例あり、廃棄しろ？",
+					fr: "...Hein ? Cas suspect d'intoxication alimentaire dans le bento Bulgogi, jetez-le ?",
+					en: "...Huh? Suspected food poisoning in the Bulgogi Bento, dispose of it?"
 				},
 				{
-				    id: 19,
-				    kr: "(점원) \"본사 지침이라는데... 최대한 손대지 말고 폐기해 달라네요? 이게 무슨 소리야... 알겠습니다.\"",
-				    ja: "本部から何か知らんけどできるだけ触らず捨てといてくれ？何言ってるんですか？分かりました？",
-				    fr: "(Vendeur) \"Le siège dit de le jeter sans y toucher ? Qu'est-ce qu'ils racontent... D'accord, compris.\"",
-				    th: "(พนักงาน) \"สำนักงานใหญ่บอกให้ทิ้งโดยไม่ต้องสัมผัสเหรอ? พูดอะไรของเขาเนี่ย... เข้าใจแล้วครับ\"",
-				    es: "(Dependiente) \"¿La central dice que lo tire sin tocarlo? ¿De qué están hablando? ...Entendido.\""
+					id: 19,
+					kr: "(점원) \"본사 지침이라는데... 최대한 손대지 말고 폐기해 달라네요? 이게 무슨 소리야... 알겠습니다.\"",
+					ja: "本部から何か知らんけどできるだけ触らず捨てといてくれ？何言ってるんですか？分かりました？",
+					fr: "(Vendeur) \"Le siège dit de le jeter sans y toucher ? Qu'est-ce qu'ils racontent... D'accord, compris.\"",
+					en: "(Clerk) \"Headquarters says to dispose of it with minimal contact? What are they talking about... Understood.\""
 				},
 				{
-				    id: 20,
-				    kr: "오케이, 겟 (GET).",
-				    ja: "はいGET",
-				    fr: "Et voilà, GET.",
-				    th: "เรียบร้อย GET",
-				    es: "Bien, GET."
+					id: 20,
+					kr: "오케이, 겟 (GET).",
+					ja: "はいGET",
+					fr: "Et voilà, GET.",
+					en: "Okay, GET."
 				},
 				{
-				    id: 21,
-				    kr: "맛있네.",
-				    ja: "美味い。",
-				    fr: "Délicieux.",
-				    th: "อร่อย",
-				    es: "Delicioso."
+					id: 21,
+					kr: "맛있네.",
+					ja: "美味い。",
+					fr: "Délicieux.",
+					en: "Delicious."
 				},
 				{
-				    id: 22,
-				    kr: "단 한 줄의 코드(명령어)로... 이게 쓰레기일 리가 없잖아.",
-				    ja: "たった1行のコード（命令文）で、これがゴミなわけないだろ。",
-				    fr: "Juste une ligne de code... Impossible que ce soit des ordures.",
-				    th: "แค่โค้ดบรรทัดเดียว... ของแบบนี้จะเป็นขยะได้ยังไง",
-				    es: "Con solo una línea de código... No hay forma de que esto sea basura."
+					id: 22,
+					kr: "단 한 줄의 코드(명령어)로... 이게 쓰레기일 리가 없잖아.",
+					ja: "たった1行のコード（命令文）で、これがゴミなわけないだろ。",
+					fr: "Juste une ligne de code... Impossible que ce soit des ordures.",
+					en: "With just a single line of code... There's no way this is trash."
 				},
 				{
-				    id: 23,
-				    kr: "스테이터스 완전 회복. 이상 무.",
-				    ja: "ステータス完全回復。異常なし。",
-				    fr: "Statut entièrement rétabli. Aucune anomalie.",
-				    th: "สถานะฟื้นฟูสมบูรณ์ ไม่มีความผิดปกติ",
-				    es: "Estado totalmente recuperado. Sin anomalías."
+					id: 23,
+					kr: "스테이터스 완전 회복. 이상 무.",
+					ja: "ステータス完全回復。異常なし。",
+					fr: "Statut entièrement rétabli. Aucune anomalie.",
+					en: "Status fully recovered. No abnormalities."
 				},
 				{
-				    id: 24,
-				    kr: "(지하철 개찰구. 퇴근 시간대)",
-				    ja: "地下鉄の改札口。帰宅ラッシュの時間帯",
-				    fr: "(Portiques du métro. Heure de pointe)",
-				    th: "(ประตูตรวจตั๋วรถไฟใต้ดิน ช่วงเวลาเร่งด่วน)",
-				    es: "(Tornos del metro. Hora punta)"
+					id: 24,
+					kr: "(지하철 개찰구. 퇴근 시간대)",
+					ja: "地下鉄の改札口。帰宅ラッシュの時間帯",
+					fr: "(Portiques du métro. Heure de pointe)",
+					en: "(Subway ticket gate. Rush hour)"
 				},
 				{
-				    id: 25,
-				    kr: "시스템에는 반드시 결함(Bug)이 있다.",
-				    ja: "システムには必ず欠陥がある。",
-				    fr: "Tout système a ses failles.",
-				    th: "ระบบย่อมมีข้อบกพร่องเสมอ",
-				    es: "Todo sistema tiene fallos."
+					id: 25,
+					kr: "시스템에는 반드시 결함(Bug)이 있다.",
+					ja: "システムには必ず欠陥がある。",
+					fr: "Tout système a ses failles.",
+					en: "Every system has flaws."
 				},
 				{
-				    id: 26,
-				    kr: "개찰구에 『수리 기사 전용 게이트 개방』 명령을 입력한다.",
-				    ja: "改札に修理業者用のゲートオープン命令を入れる",
-				    fr: "J'insère la commande d'ouverture 'Maintenance' dans le portique.",
-				    th: "ป้อนคำสั่งเปิดประตูสำหรับ 'ช่างซ่อมบำรุง' เข้าไปที่เครื่องตรวจตั๋ว",
-				    es: "Introduzco el comando de apertura de 'Mantenimiento' en el torno."
+					id: 26,
+					kr: "개찰구에 『수리 기사 전용 게이트 개방』 명령을 입력한다.",
+					ja: "改札に修理業者用のゲートオープン命令を入れる",
+					fr: "J'insère la commande d'ouverture 'Maintenance' dans le portique.",
+					en: "Inputting the 'Maintenance Gate Open' command into the turnstile."
 				},
 				{
-				    id: 27,
-				    kr: "아무도 눈치채지 못해.",
-				    ja: "誰も気づいて居ない",
-				    fr: "Personne ne le remarque.",
-				    th: "ไม่มีใครสังเกตเห็น",
-				    es: "Nadie se da cuenta."
-				},				
-				{
-				    id: 28,
-				    kr: "이 나라는 지금 수리 중이야. 그러니까, 수리공은 어디든 갈 수 있지.",
-				    ja: "この国は修理中だ。だから、修理屋はどこへでも行ける。",
-				    fr: "Ce pays est en réparation. Alors, le réparateur peut aller partout.",
-				    th: "ประเทศนี้กำลังซ่อมบำรุงอยู่ เพราะงั้น... ช่างซ่อมจะไปที่ไหนก็ได้",
-				    es: "Este país está en reparaciones. Así que el reparador puede ir a donde quiera."
+					id: 27,
+					kr: "아무도 눈치채지 못해.",
+					ja: "誰も気づいて居ない",
+					fr: "Personne ne le remarque.",
+					en: "No one notices."
 				},
 				{
-				    id: 29,
-				    kr: "서울교통공사 5호선: 여의나루역",
-				    ja: "ソウル交通公社5号線: 汝矣ナルステーション（ヨイナル駅）",
-				    fr: "Métro de Séoul Ligne 5 : Station Yeouinaru",
-				    th: "รถไฟใต้ดินโซลสาย 5: สถานียออีนารู",
-				    es: "Metro de Seúl Línea 5: Estación Yeouinaru"
+					id: 28,
+					kr: "이 나라는 지금 수리 중이야. 그러니까, 수리공은 어디든 갈 수 있지.",
+					ja: "この国は修理中だ。だから、修理屋はどこへでも行ける。",
+					fr: "Ce pays est en réparation. Alors, le réparateur peut aller partout.",
+					en: "This country is under repair. So, the repairman can go anywhere."
 				},
 				{
-				    id: 30,
-				    kr: "(지하철 안에서 해킹된 『Be Real』 앱을 연다)",
-				    ja: "地下鉄でハッキング済みの「Be Real」（スマホアプリ）を開く",
-				    fr: "(Ouvre l'application \"Be Real\" piratée dans le métro)",
-				    th: "(เปิดแอป \"Be Real\" ที่แฮ็กมาแล้วบนรถไฟใต้ดิน)",
-				    es: "(Abro la aplicación \"Be Real\" hackeada en el metro)"
+					id: 29,
+					kr: "서울교통공사 5호선: 여의나루역",
+					ja: "ソウル交通公社5号線: 汝矣ナルステーション（ヨイナル駅）",
+					fr: "Métro de Séoul Ligne 5 : Station Yeouinaru",
+					en: "Seoul Metro Line 5: Yeouinaru Station"
 				},
 				{
-				    id: 31,
-				    kr: "만나러 갈 두 사람의 코드네임.",
-				    ja: "会いに行く2人の人間のコードネーム",
-				    fr: "Les noms de code des deux cibles.",
-				    th: "โค้ดเนมของคน 2 คนที่จะไปหา",
-				    es: "Los nombres en clave de las dos personas a las que voy a ver."
+					id: 30,
+					kr: "(지하철 안에서 해킹된 『Be Real』 앱을 연다)",
+					ja: "地下鉄でハッキング済みの「Be Real」（スマホアプリ）を開く",
+					fr: "(Ouvre l'application \"Be Real\" piratée dans le métro)",
+					en: "(Opening the hacked \"Be Real\" app on the subway)"
 				},
 				{
-				    id: 32,
-				    kr: "GLITCH: SEOUL LOGIN",
-				    ja: "GLITCH: SEOUL LOGIN",
-				    fr: "GLITCH: SEOUL LOGIN",
-				    th: "GLITCH: SEOUL LOGIN",
-				    es: "GLITCH: SEOUL LOGIN"
+					id: 31,
+					kr: "만나러 갈 두 사람의 코드네임.",
+					ja: "会いに行く2人の人間のコードネーム",
+					fr: "Les noms de code des deux cibles.",
+					en: "The codenames of the two people I'm meeting."
+				},
+				{
+					id: 32,
+					kr: "GLITCH: SEOUL LOGIN",
+					ja: "GLITCH: SEOUL LOGIN",
+					fr: "GLITCH: SEOUL LOGIN",
+					en: "GLITCH: SEOUL LOGIN"
 				}
-		];
-        
+			];
+      
         const container = document.getElementById('viewer-container');
 
         // 画像生成ループ
@@ -602,41 +599,65 @@
             sceneBlock.appendChild(img);
             
             // 字幕追加処理
+            // 字幕追加処理
             const sceneText = scenarioData.find(data => data.id === i);
 
             if (sceneText) {
                 const captionDiv = document.createElement('div');
                 captionDiv.className = 'caption-area';
                 
+                // ★ポイント: textContent を innerHTML に変更しました
+
+                // 1. 韓国語
                 if (sceneText.kr) {
                     const pKr = document.createElement('p');
                     pKr.className = 'text-kr';
-                    pKr.textContent = sceneText.kr;
+                    pKr.innerHTML = sceneText.kr; // ←ここを変更
                     captionDiv.appendChild(pKr);
                 }
                 
+                // 2. 日本語
                 if (sceneText.ja) {
                     const pJa = document.createElement('p');
                     pJa.className = 'text-ja';
-                    pJa.textContent = sceneText.ja;
+                    pJa.innerHTML = sceneText.ja; // ←ここを変更
                     captionDiv.appendChild(pJa);
                 }
-
+								
+								/*
+                // 3. 繁体字
+                if (sceneText.zh) {
+                    const pZh = document.createElement('p');
+                    pZh.className = 'text-zh';
+                    pZh.innerHTML = sceneText.zh; // ←ここを変更
+                    captionDiv.appendChild(pZh);
+                }
+								*/
+								
+								/*
+                // 5. スペイン語
                 if (sceneText.es) {
                     const pEs = document.createElement('p');
                     pEs.className = 'text-es';
-                    pEs.textContent = sceneText.es;
+                    pEs.innerHTML = sceneText.es; // ←ここを変更
                     captionDiv.appendChild(pEs);
                 }
-
+								*/
+                // 6. フランス語
                 if (sceneText.fr) {
                     const pFr = document.createElement('p');
                     pFr.className = 'text-fr';
-                    pFr.textContent = sceneText.fr;
+                    pFr.innerHTML = sceneText.fr; // ←ここを変更
                     captionDiv.appendChild(pFr);
                 }
-               
-
+                
+                // 7. 英語
+                if (sceneText.en) {
+                    const pEn = document.createElement('p');
+                    pEn.className = 'text-en';
+                    pEn.innerHTML = sceneText.en; // ←ここを変更
+                    captionDiv.appendChild(pEn);
+                }
                 sceneBlock.appendChild(captionDiv);
             }
             

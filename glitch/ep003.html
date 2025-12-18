@@ -42,48 +42,76 @@
             background-color: #111;
         }
         
-        /* 字幕エリア */
+        /* 字幕エリア全体の設定 */
         .caption-area {
             padding: 24px 16px 40px;
             background-color: #000;
             text-align: center;
         }
 
-        /* --- Webtoon Trilingual Style --- */
-        /* 1. 韓国語：メイン */
+        /* --- Webtoon Multilingual Style --- */
+        /* ■ GROUP 1: メイン（韓国語） */
         .text-kr {
             font-size: 18px;
             font-weight: 700;
             line-height: 1.5;
-            color: #ffffff;
-            margin-bottom: 6px;
+            color: #ffffff;        /* 完全な白 */
+            margin-bottom: 8px;
             letter-spacing: 0.02em;
         }
 
-        /* 2. 日本語：サブ */
+        /* ■ GROUP 2: サブ・アジア（日・繁） */
+        /* 日本語 */
         .text-ja {
             font-size: 14px;
             font-weight: 400;
-            line-height: 1.4;
-            color: #cccccc;
-            margin-bottom: 12px;
+            line-height: 1.5;
+            color: #d0d0d0;        /* 明るめのグレー */
+            margin-bottom: 4px;    /* 繁体字との間隔は狭めに */
         }
         
-        /* 3. スペイン語：サブ */
-        .text-es {
-            font-size: 12px;
-            color: #808080; /* 少し暗めに戻しました（視認性のため） */
-            font-style: italic;
-            font-family: 'Georgia', serif;
-            opacity: 0.8;
+        /* 【追加】中国語（繁体字） */
+        .text-zh {
+            font-size: 14px;       /* 漢字は画数が多いので日本語と同じサイズを維持 */
+            font-weight: 400;
+            line-height: 1.5;
+            color: #b0b0b0;        /* 日本語よりわずかに暗くして階層を作る */
+            margin-bottom: 12px;   /* 欧米言語グループとの区切り */
+            font-family: "Microsoft JhengHei", "Traditional Chinese", sans-serif;
         }
 
-        /* 4. フランス語：サブ */
+        /* ■ GROUP 3: ブリッジ（英語） */
+
+        /* ■ GROUP 4: アトモスフィア（西・仏） */
+        /* スペイン語 */
+        .text-es {
+            display: block;        /* 独立したブロックとして表示 */
+            font-size: 13px;       /* 日本語より少し小さく、欧州言語より大きく */
+            color: #999999;        /* 中間的なグレー */
+            font-family: "Helvetica Neue", Arial, sans-serif; /* 読みやすいサンセリフ体 */
+            line-height: 1.4;
+            margin-bottom: 8px;    /* 装飾言語との区切り */
+            letter-spacing: 0.03em;
+        }
+
+        /* フランス語 */
         .text-fr {
-            font-size: 11px;
-            color: #666666; /* 少し暗めに戻しました（視認性のため） */
+            font-size: 12px;
+            color: #777777;        /* 背景に馴染ませる */
+            font-style: italic;    /* 斜体で雰囲気重視 */
+            font-family: 'Georgia', serif;
+            line-height: 1.4;
+            margin-bottom: 2px;    /* フランス語と近づける */
+            opacity: 0.9;
+        }
+
+        /* 【追加】英語 */
+        .text-en {
+            font-size: 11px;       /* 一番小さく */
+            color: #666666;        /* 最も暗く */
             font-style: italic;
             font-family: 'Georgia', serif;
+            line-height: 1.4;
             opacity: 0.8;
         }
 
@@ -291,7 +319,7 @@
     
     <script>
     		// true にすると表紙をスキップします。本番公開時は false にしてください。
-        const DEBUG_MODE = false;
+        const DEBUG_MODE = true;
     
         // 1. 表紙の制御
         const coverScreen = document.getElementById('cover-screen');
@@ -324,275 +352,351 @@
         
         // 字幕データ (必要に応じて追加)
         // (※ ここに字幕データ scenarioData があれば入れる)
+        // 字幕データ (修正済み)
         const scenarioData = [
-				{
-					id: 1,
-					kr: "밤의 한강",
-					ja: "夜の漢江(ハンガン)",
-					es: "El río Han por la noche",
-					fr: "Le fleuve Han, la nuit"
-				},
-				{
-					id: 2,
-					kr: "신호가 끊긴 구역",
-					ja: "信号が途切れたエリア",
-					es: "Zona sin señal",
-					fr: "Zone hors réseau"
-				},
-				{
-					id: 3,
-					kr: "전파 공백지대",
-					ja: "電波的空洞",
-					es: "Vacío de radiofrecuencia",
-					fr: "Vide radioélectrique"
-				},
-				{
-					id: 4,
-					kr: "무언가 작업 중인 노인",
-					ja: "何か作業をしている老人",
-					es: "Un anciano trabajando en algo",
-					fr: "Un vieil homme en train de travailler"
-				},
-				{
-					id: 5,
-					kr: "**철컥**",
-					ja: "**カチリ**",
-					es: "**Clic**",
-					fr: "**Clic**"
-				},
-				{
-					id: 6,
-					kr: "네 이놈, 어디로 들어왔어!",
-					ja: "貴様、何処から入ってきた！",
-					es: "¡Maldito! ¿¡Por dónde has entrado!?",
-					fr: "Enfoiré ! Par où t'es rentré ?!"
-				},
-				{
-					id: 7,
-					kr: "진정해요, 악수부터 합시다. 선배님.",
-					ja: "落ち着け、まず握手をさせてくれ、先輩（ソンベ）。",
-					es: "Cálmate. Primero, estrechemos las manos, veterano.",
-					fr: "Calme-toi. D'abord, serrons-nous la main, l'Ancien."
-				},
-				{
-					id: 8,
-					kr: "훌륭한 네트워크군요. 이래선 아무도 역추적 못 하겠어.",
-					ja: "見事なネットワークだ。これじゃ誰も逆探知できない。",
-					es: "Impresionante red. Así nadie podrá rastrearnos.",
-					fr: "Quel réseau impressionnant. Impossible de nous tracer avec ça."
-				},
-				{
-					id: 9,
-					kr: "……너 같은 애송이가 내 우회 경로(라우팅)를 평가하지 마라.",
-					ja: "……お前みたいな若造が、ワシのリルティング(経路迂回)を評価するな。",
-					es: "……Un mocoso como tú no tiene derecho a juzgar mi enrutamiento.",
-					fr: "……Un morveux comme toi n'a pas à juger mon routage."
-				},
-				{
-					id: 10,
-					kr: "이 나라 역사도 모르는 놈이 거들먹거리지 마.",
-					ja: "この国の歴史も知らんのに偉そうな口を叩くな。",
-					es: "No te hagas el listo cuando ni siquiera conoces la historia de este país.",
-					fr: "Ne fais pas le malin alors que tu ne connais même pas l'histoire de ce pays."
-				},
-				{
-					id: 11,
-					kr: "**삐이이—**",
-					ja: "**ピィー**",
-					es: "**Piii**",
-					fr: "**Bip**"
-				},
-				{
-					id: 12,
-					kr: "『(합성음) 시민 여러분, 안녕하십니까. 행정안전부 생활안전국입니다. 현재 『안전 점검』을 실시하고 있습니다.』",
-					ja: "『(合成音声)市民の皆様、こんにちは。行政安全部、生活安全局です。現在、『安全点検』を実施しております。』",
-					es: "『(Voz sintética) Ciudadanos, buenas tardes. Habla la Oficina de Seguridad del Ministerio del Interior. Estamos realizando una \"Inspección de Seguridad\".』",
-					fr: "『(Voix synthétique) Bonjour à tous. Ici le Bureau de la Sécurité du Ministère de l'Intérieur. Nous effectuons actuellement un \"Contrôle de Sécurité\".』"
-				},
-				{
-					id: 13,
-					kr: "쳇, 행안부 놈들의 『안전 점검』이다. 입 다물어!",
-					ja: "チッ、行政安全部の『安全点検』だ。口を閉じろ！",
-					es: "Tsk, es la \"Inspección de Seguridad\" del Ministerio. ¡Cierra la boca!",
-					fr: "Tss, le \"Contrôle de Sécurité\" du Ministère. Ferme-la !"
-				},
-				{
-					id: 14,
-					kr: "허튼 짓 하면 『위험 인물』로 찍힌다. 돌이 되어라. 숨도 쉬지 마!",
-					ja: "下手に動けば『危険人物』だ。石になれ。呼吸も止めろ！",
-					es: "Si te mueves mal, te marcarán como \"Sujeto Peligroso\". Conviértete en piedra. ¡Deja de respirar!",
-					fr: "Un faux mouvement et tu es classé \"Individu Dangereux\". Change-toi en pierre. Arrête de respirer !"
-				},
-				{
-					id: 15,
-					kr: "노인의 책상",
-					ja: "老人の机",
-					es: "El escritorio del anciano",
-					fr: "Le bureau du vieil homme"
-				},
-				{
-					id: 16,
-					kr: "Nvidia H200",
-					ja: "Nvidia H200",
-					es: "Nvidia H200",
-					fr: "Nvidia H200"
-				},
-				{
-					id: 17,
-					kr: "저기 선배님, 그 돌멩이, 위험한데요.",
-					ja: "なぁソンベ(先輩)、その石コロ、ヤバイぞ。",
-					es: "Oye, veterano, esa piedrita es peligrosa.",
-					fr: "Hé l'Ancien, ce caillou est dangereux."
-				},
-				{
-					id: 18,
-					kr: "불법 GPU로 지정됐어요. 4시간 전에.",
-					ja: "違法GPUに指定された。4時間前だ。",
-					es: "Fue designada como GPU ilegal. Hace 4 horas.",
-					fr: "Ça a été classé GPU illégal. Il y a 4 heures."
-				},
-				{
-					id: 19,
-					kr: "뭐라고?",
-					ja: "なんだと？",
-					es: "¿Qué has dicho?",
-					fr: "Quoi ?"
-				},
-				{
-					id: 20,
-					kr: "이거 써요.",
-					ja: "これ使え。",
-					es: "Usa esto.",
-					fr: "Prends ça."
-				},
-				{
-					id: 21,
-					kr: "**탁**",
-					ja: "**バサッ**",
-					es: "**Zas**",
-					fr: "**Vlan**"
-				},
-				{
-					id: 22,
-					kr: "재벌 ID인가……?",
-					ja: "財閥(チェボル)のIDか……？",
-					es: "¿Una identificación de Chaebol……?",
-					fr: "Une ID de Chaebol…… ?"
-				},
-				{
-					id: 23,
-					kr: "그냥 플라스틱 쪼가리예요.",
-					ja: "ただのプラスチックだ。",
-					es: "Es solo plástico.",
-					fr: "C'est juste du plastique."
-				},
-				{
-					id: 24,
-					kr: "어느 쪽인지는 행안부에 물어봐야 알겠죠.",
-					ja: "どっちなのか行政安全部に聞くしかないな。",
-					es: "Tendremos que preguntar al Ministerio cuál de los dos es.",
-					fr: "Faudra demander au Ministère pour savoir ce qu'il en est."
-				},
-				{
-					id: 25,
-					kr: "이봐요……! 이쪽을 봐요! 여긴 완전히 『안전』하다고요!",
-					ja: "おい……！こっちを見ろ！ここは完全に『安全』だ！",
-					es: "¡Oye……! ¡Mírame! ¡Aquí es totalmente \"seguro\"!",
-					fr: "Hé…… ! Regarde-moi ! Ici, c'est totalement \"sûr\" !"
-				},
-				{
-					id: 26,
-					kr: "ID 카드의 칩을 스캔하는 드론",
-					ja: "IDカードのチップを精査するドローン",
-					es: "Dron escaneando el chip de la tarjeta de identificación",
-					fr: "Drone scannant la puce de la carte d'identité"
-				},
-				{
-					id: 27,
-					kr: "흩어져서 달아나는 드론들",
-					ja: "散らばって逃げるドローン",
-					es: "Los drones se dispersan y huyen",
-					fr: "Les drones se dispersent et fuient"
-				},
-				{
-					id: 28,
-					kr: "진짜 현행 버전이야? 어디서 구했어?",
-					ja: "本物の現行版かよ？どこで手に入れた？",
-					es: "¿Es una versión actual auténtica? ¿Dónde la has conseguido?",
-					fr: "C'est une vraie version actuelle ? Où t'as eu ça ?"
-				},
-				{
-					id: 29,
-					kr: "면접에서 떨어진 회사에서 훔쳤죠.",
-					ja: "面接に落ちた会社から盗んだ。",
-					es: "Lo robé de la empresa que me rechazó en la entrevista.",
-					fr: "Je l'ai volé à la boîte qui m'a recalé à l'entretien."
-				},
-				{
-					id: 30,
-					kr: "저기, 선배님. 만약 인생이 게임이라면……",
-					ja: "なぁ、ソンベ(先輩)。もし人生がゲームだとしたら……",
-					es: "Oye, veterano. Si la vida fuera un juego……",
-					fr: "Dis, l'Ancien. Si la vie était un jeu……"
-				},
-				{
-					id: 31,
-					kr: "전 개발자 쪽으로 가고 싶거든요.",
-					ja: "俺はデベロッパー側に行きたいんだ。",
-					es: "Yo quiero estar del lado de los desarrolladores.",
-					fr: "Moi, je veux être du côté des développeurs."
-				},
-				{
-					id: 32,
-					kr: "……이봐 애송이. 하나만 말해두지.",
-					ja: "……おい若造。一つ言っておこう。",
-					es: "……Oye, mocoso. Te diré una cosa.",
-					fr: "……Hé le morveux. Laisse-moi te dire un truc."
-				},
-				{
-					id: 33,
-					kr: "원래 우리가 만든 거야. 우리가 지향했던 나라라고.",
-					ja: "元々、俺達が作ったんだ。俺達が指向した国だ。",
-					es: "Nosotros lo construimos originalmente. Es el país que nosotros diseñamos.",
-					fr: "C'est nous qui l'avons construit à l'origine. C'est le pays qu'on a voulu."
-				},
-				{
-					id: 34,
-					kr: "디버깅이 먼저다, 애송이.",
-					ja: "デバッグが先だ、若造。",
-					es: "Primero hay que depurar, mocoso.",
-					fr: "D'abord le débogage, gamin."
-				},
-				{
-					id: 35,
-					kr: "저공 비행 중인 드론",
-					ja: "低空飛行のドローン",
-					es: "Dron en vuelo rasante",
-					fr: "Drone en vol rase-mottes"
-				},
-				{
-					id: 36,
-					kr: "드론에 탑재된 고정밀 카메라",
-					ja: "ドローンに搭載されている高精度カメラ",
-					es: "Cámara de alta precisión montada en el dron",
-					fr: "Caméra haute précision embarquée sur le drone"
-				},
-				{
-					id: 37,
-					kr: "모니터를 응시하는 험프리스 기지 제501정보여단 정보관",
-					ja: "モニターを見つめるハンフリーズ基地第501ブリゲード情報官",
-					es: "Oficial de Inteligencia de la Brigada 501 de la Base Humphreys mirando el monitor",
-					fr: "Officier du renseignement de la 501e Brigade de la base Humphreys fixant l'écran"
-				},
-				{
-			    id: 38,
-			    kr: "GLITCH: SEOUL LOGIN",
-			    ja: "GLITCH: SEOUL LOGIN",
-			    fr: "GLITCH: SEOUL LOGIN",
-			    th: "GLITCH: SEOUL LOGIN",
-			    es: "GLITCH: SEOUL LOGIN"
-				}
-			];
+            {
+                id: 1,
+                kr: "밤의 한강",
+                en: "Han River at night", // us -> en に変更
+                zh: "夜晚的漢江",       // ch -> zh に変更
+                ja: "夜の漢江(ハンガン)",
+                es: "El río Han por la noche",
+                fr: "Le fleuve Han, la nuit"
+            },
+            {
+                id: 2,
+                kr: "신호가 끊긴 구역",
+                en: "Signal dead zone",
+                zh: "訊號中斷區域",
+                ja: "信号が途切れたエリア",
+                es: "Zona sin señal",
+                fr: "Zone hors réseau"
+            },
+            {
+                id: 3,
+                kr: "전파적 허수 공간",
+                en: "Radio-frequency imaginary space",
+                zh: "電波虛數空間",
+                ja: "電波的虚数空間",
+                es: "Espacio imaginario de radiofrecuencia",
+                fr: "Espace imaginaire radioélectrique"
+            },
+            {
+                id: 4,
+                kr: "노숙자 거주 구역",
+                en: "Homeless encampment zone",
+                zh: "露宿者居住區",
+                ja: "ホームレス居住ゾーン",
+                es: "Zona de asentamiento de personas sin hogar",
+                fr: "Zone de campement de sans-abris"
+            },
+            {
+                id: 5,
+                kr: "**철컥**",
+                en: "**Click**",
+                zh: "**喀嚓**",
+                ja: "**カチリ**",
+                es: "**Clic**",
+                fr: "**Clic**"
+            },
+            {
+                id: 6,
+                kr: "네 이놈, 어디로 기어들어 온 거야!",
+                en: "You bastard! Where did you get in?!",
+                zh: "你這傢伙，是從哪裡進來的！",
+                ja: "貴様、何処から入ってきた！",
+                es: "¡Maldito! ¿¡Por dónde has entrado!?",
+                fr: "Enfoiré ! Par où t'es rentré ?!"
+            },
+            {
+                id: 7,
+                kr: "진정해요, 악수부터 합시다. 선배님.",
+                en: "Chill out. Let's shake hands first, Senior.",
+                zh: "冷靜點，先握個手吧，前輩。",
+                ja: "落ち着け、まず握手をさせてくれ、先輩（ソンベ）。",
+                es: "Cálmate. Primero, estrechemos las manos, veterano.",
+                fr: "Du calme. D'abord, serrons-nous la main, l'Ancien."
+            },
+            {
+                id: 8,
+                kr: "훌륭한 네트워크군요. 이래선 아무도 역추적 못 하겠어.",
+                en: "Impressive network. No one can backtrace this.",
+                zh: "很棒的網絡。這樣誰也無法反向追蹤了。",
+                ja: "見事なネットワークだ。これじゃ誰も逆探知できない。",
+                es: "Impresionante red. Así nadie podrá rastrearnos.",
+                fr: "Quel réseau impressionnant. Impossible de nous tracer avec ça."
+            },
+            {
+                id: 9,
+                kr: "……너 같은 애송이가 내 라우팅(우회 경로)을 평가질이야?",
+                en: "……Don't let a greenhorn like you judge my rerouting.",
+                zh: "……像你這種毛頭小子，少對我的路由路徑指手畫腳。",
+                ja: "……お前みたいな若造が、ワシのリルティング(経路迂回)を評価するな。",
+                es: "……Un mocoso como tú no tiene derecho a juzgar mi enrutamiento.",
+                fr: "……Un morveux comme toi n'a pas à juger mon routage."
+            },
+            {
+                id: 10,
+                kr: "여긴 역사에 묻힌 고물(Legacy)이야. 당장 잊고 꺼져.",
+                en: "This place is just buried legacy garbage. Forget it and get lost.",
+                zh: "這裡是埋沒在歷史裡的破銅爛鐵(Legacy)。馬上忘了這裡滾出去。",
+                ja: "ここは歴史に埋もれたガラクタ(Legacy)だ。今すぐ忘れて立ち去れ。",
+                es: "Este lugar es chatarra (Legacy) enterrada en la historia. Olvídalo y lárgate.",
+                fr: "C'est juste un tas de ferraille (Legacy) enfoui dans l'histoire. Oublie ça et tire-toi."
+            },
+            {
+                id: 11,
+                kr: "**삐이이—**",
+                en: "**Beeeep—**",
+                zh: "**嗶——**",
+                ja: "**ピィー**",
+                es: "**Piii—**",
+                fr: "**Biiip—**"
+            },
+            {
+                id: 12,
+                kr: "<i><code>『『(합성음) 시민 여러분, 안녕하십니까. 행정안전부 생활안전국입니다. 현재 『안전 점검』을 실시하고 있습니다.』</code></i>",
+                en: "<i><code>『『(Synth Voice) Greetings, citizens. This is the Safety Bureau of the Ministry of the Interior. We are currently conducting a 'Safety Inspection'.』</code></i>",
+                zh: "<i><code>『『(合成語音) 各位市民，大家好。這裡是行政安全部生活安全局。目前正在進行『安全檢查』。』</code></i>",
+                ja: "<i><code>『(合成音声)市民の皆様、こんにちは。行政安全部、生活安全局です。現在、『安全点検』を実施しております。』</code></i>",
+                es: "<i><code>『『(Voz sintética) Ciudadanos, saludos. Habla la Oficina de Seguridad del Ministerio del Interior. Estamos realizando una 'Inspección de Seguridad'.』</code></i>",
+                fr: "<i><code>『『(Voix synthétique) Bonjour à tous. Ici le Bureau de la Sécurité du Ministère de l'Intérieur. Nous effectuons actuellement un 'Contrôle de Sécurité'.』</code></i>"
+            },
+            {
+                id: 13,
+                kr: "쳇, 행안부 놈들의 『안전 점검』이다. 입 다물어!",
+                en: "Tch, it's the Ministry's 'Safety Inspection'. Shut your mouth!",
+                zh: "切，是行政安全部那些傢伙的『安全檢查』。閉嘴！",
+                ja: "チッ、ホームレスいじめの『安全点検』だ。口を閉じろ！",
+                es: "Tsk, es la 'Inspección de Seguridad' del Ministerio. ¡Cierra la boca!",
+                fr: "Tss, le 'Contrôle de Sécurité' du Ministère. Ferme-la !"
+            },
+            {
+                id: 14,
+                kr: "허튼짓 하면 『위험 인물』로 찍힌다. 돌이 되어라. 숨도 쉬지 마!",
+                en: "One wrong move and you're marked as a 'Hostile'. Turn into stone. Don't even breathe!",
+                zh: "敢亂動就會被標記為『危險人物』。變成石頭吧。連呼吸都別做！",
+                ja: "下手に動けば『危険人物』だ。石になれ。呼吸も止めろ！",
+                es: "Si te mueves mal, te marcarán como 'Sujeto Peligroso'. Conviértete en piedra. ¡Deja de respirar!",
+                fr: "Un faux mouvement et tu es classé 'Individu Dangereux'. Change-toi en pierre. Arrête de respirer !"
+            },
+            {
+                id: 15,
+                kr: "노인의 책상",
+                en: "The old man's desk",
+                zh: "老人的桌子",
+                ja: "老人の机",
+                es: "El escritorio del anciano",
+                fr: "Le bureau du vieil homme"
+            },
+            {
+                id: 16,
+                kr: "엔비디아 H200",
+                en: "Nvidia H200",
+                zh: "輝達 (Nvidia) H200",
+                ja: "Nvidia H200",
+                es: "Nvidia H200",
+                fr: "Nvidia H200"
+            },
+            {
+                id: 17,
+                kr: "저기 선배님, 그 돌멩이, 위험한데요.",
+                en: "Hey Senior, that rock... it's dangerous.",
+                zh: "那個，前輩。那塊石頭……很危險喔。",
+                ja: "なぁソンベ(先輩)、その石コロ、ヤバイぞ。",
+                es: "Oye, veterano, esa piedrita es peligrosa.",
+                fr: "Hé l'Ancien, ce caillou est dangereux."
+            },
+            {
+                id: 18,
+                kr: "공산권 밀수출 막으려고 불법 GPU로 지정됐어요. 4시간 전에.",
+                en: "It was designated as an illegal GPU to stop smuggling to the communist bloc. 4 hours ago.",
+                zh: "為了防止走私到共產圈，剛被指定為非法GPU了。就在4小時前。",
+                ja: "共産圏への蜜輸出を止めるために違法GPUに指定された。4時間前だ。",
+                es: "Fue designada como GPU ilegal para detener el contrabando al bloque comunista. Hace 4 horas.",
+                fr: "Ça a été classé GPU illégal pour empêcher la contrebande vers le bloc de l'Est. Il y a 4 heures."
+            },
+            {
+                id: 19,
+                kr: "뭐라고?",
+                en: "What?",
+                zh: "你說什麼？",
+                ja: "なんだと？",
+                es: "¿Qué has dicho?",
+                fr: "Quoi ?"
+            },
+            {
+                id: 20,
+                kr: "이거 써요.",
+                en: "Use this.",
+                zh: "用這個。",
+                ja: "これ使え。",
+                es: "Usa esto.",
+                fr: "Prends ça."
+            },
+            {
+                id: 21,
+                kr: "**탁**",
+                en: "**Thud**",
+                zh: "**啪**",
+                ja: "**バサッ**",
+                es: "**Zas**",
+                fr: "**Vlan**"
+            },
+            {
+                id: 22,
+                kr: "재벌 ID인가……?",
+                en: "A Chaebol ID...?",
+                zh: "財閥的ID嗎……？",
+                ja: "財閥(チェボル)のIDか……？",
+                es: "¿Una identificación de Chaebol...?",
+                fr: "Une ID de Chaebol... ?"
+            },
+            {
+                id: 23,
+                kr: "그냥 플라스틱 조각이에요.",
+                en: "It's just a piece of plastic.",
+                zh: "只是塊塑膠罷了。",
+                ja: "ただのプラスチックだ。",
+                es: "Es solo un trozo de plástico.",
+                fr: "C'est juste un bout de plastique."
+            },
+            {
+                id: 24,
+                kr: "『삼성 공화국』이 어디까지 진짜인지 확인해 봐야죠.",
+                en: "We have to see just how real this 'Samsung Republic' actually is.",
+                zh: "總得確認一下『三星共和國』到底是不是真的吧。",
+                ja: "『サムスン共和国』がどこまで本当か確かめるしかないな。",
+                es: "Tendremos que comprobar hasta qué punto es real la 'República Samsung'.",
+                fr: "Il faut bien vérifier à quel point la « République Samsung » est réelle."
+            },
+            {
+                id: 25,
+                kr: "이봐요……! 이쪽을 봐요! 여긴 완전히 『안전』하다고요!",
+                en: "Hey...! Look over here! This place is totally 'Safe'!",
+                zh: "喂……！看這邊！這裡完全是『安全』的喔！",
+                ja: "おい……！こっちを見ろ！ここは完全に『安全』だ！",
+                es: "¡Oye...! ¡Mírame! ¡Aquí es totalmente 'seguro'!",
+                fr: "Hé... ! Regarde-moi ! Ici, c'est totalement « sûr » !"
+            },
+            {
+                id: 26,
+                kr: "ID 카드의 칩을 스캔하는 드론",
+                en: "Drone scanning the ID card chip",
+                zh: "正在掃描ID卡晶片的無人機",
+                ja: "IDカードのチップを精査するドローン",
+                es: "Dron escaneando el chip de la tarjeta de identificación",
+                fr: "Drone scannant la puce de la carte d'identité"
+            },
+            {
+                id: 27,
+                kr: "흩어져서 달아나는 드론들",
+                en: "Drones scattering and fleeing",
+                zh: "四散逃竄的無人機",
+                ja: "散らばって逃げるドローン",
+                es: "Los drones se dispersan y huyen",
+                fr: "Les drones se dispersent et fuient"
+            },
+            {
+                id: 28,
+                kr: "『삼성 공화국』인 건 진짜군. 이걸 어디서 구했나?",
+                en: "So the 'Samsung Republic' thing is real. Where did you get this?",
+                zh: "『三星共和國』還真是名不虛傳。這東西哪弄來的？",
+                ja: "『サムスン共和国』なのは本当だな、これをどこで手に入れた？",
+                es: "Así que la 'República Samsung' es real. ¿Dónde has conseguido esto?",
+                fr: "La « République Samsung » est bien réelle, alors. Où t'as eu ça ?"
+            },
+            {
+                id: 29,
+                kr: "면접에서 떨어진 회사 기념품이죠. 칩은 제가 다시 썼지만.",
+                en: "Souvenir from a company I failed an interview at. I rewrote the chip though.",
+                zh: "面試落榜的公司給的紀念品。不過晶片被我改寫過了。",
+                ja: "面接に行った会社の記念品だ。中のICチップは書き換えた。",
+                es: "Un recuerdo de la empresa que me rechazó en la entrevista. Aunque reescribí el chip.",
+                fr: "Un souvenir de la boîte qui m'a recalé à l'entretien. Mais j'ai réécrit la puce."
+            },
+            {
+                id: 30,
+                kr: "저기, 선배님. 만약 인생이 게임이라면……",
+                en: "Hey, Senior. If life were a game...",
+                zh: "那個，前輩。如果人生是一場遊戲的話……",
+                ja: "なぁ、ソンベ(先輩)。もし人生がゲームだとしたら……",
+                es: "Oye, veterano. Si la vida fuera un juego...",
+                fr: "Dis, l'Ancien. Si la vie était un jeu..."
+            },
+            {
+                id: 31,
+                kr: "전 개발자 편에 서고 싶거든요.",
+                en: "I'd want to be on the developers' side.",
+                zh: "我想站在開發者那邊。",
+                ja: "デベロッパーにご挨拶したいんだ。",
+                es: "Yo quiero estar del lado de los desarrolladores.",
+                fr: "Moi, je veux être du côté des développeurs."
+            },
+            {
+                id: 32,
+                kr: "……이봐 애송이. 하나만 말해두지.",
+                en: "......Listen kid. Let me tell you one thing.",
+                zh: "……喂，小子。我就告訴你一件事。",
+                ja: "……おい若造。一つ言っておこう。",
+                es: "......Oye, mocoso. Te diré una cosa.",
+                fr: "......Hé le morveux. Laisse-moi te dire un truc."
+            },
+            {
+                id: 33,
+                kr: "원래 우리가 만든 거야. 우리가 지향했던 나라라고.",
+                en: "We built this originally. This is the country we aimed for.",
+                zh: "這原本是我們創造的。是我們所嚮往的國家。",
+                ja: "元々、俺達が作った国だ。俺達が指向した国だ。",
+                es: "Nosotros lo construimos originalmente. Es el país que nosotros diseñamos.",
+                fr: "C'est nous qui l'avons construit à l'origine. C'est le pays qu'on a voulu."
+            },
+            {
+                id: 34,
+                kr: "책임자를 탓하지 마라. 디버깅이 먼저다, 애송이.",
+                en: "Don't blame the admin. Debugging comes first, kid.",
+                zh: "別怪負責人。先除錯(Debug)要緊，小子。",
+                ja: "責任者を責めるな、デバッグが先だ、若造。",
+                es: "No culpes al responsable. Primero hay que depurar, mocoso.",
+                fr: "Ne blâme pas le responsable. D'abord le débogage, gamin."
+            },
+            {
+                id: 35,
+                kr: "저공비행 중인 드론",
+                en: "Drone flying at low altitude",
+                zh: "低空飛行的無人機",
+                ja: "低空飛行のドローン",
+                es: "Dron en vuelo rasante",
+                fr: "Drone en vol rase-mottes"
+            },
+            {
+                id: 36,
+                kr: "드론에 탑재된 고정밀 카메라",
+                en: "High-precision camera mounted on the drone",
+                zh: "無人機搭載的高精度鏡頭",
+                ja: "ドローンに搭載されている高精度カメラ",
+                es: "Cámara de alta precisión montada en el dron",
+                fr: "Caméra haute précision embarquée sur le drone"
+            },
+            {
+                id: 37,
+                kr: "모니터를 응시하는 주한미군 정보관",
+                en: "USFK intelligence officer staring at a monitor",
+                zh: "注視著螢幕的駐韓美軍情報官",
+                ja: "モニターを見つめる在韓米軍の情報官",
+                es: "Oficial de inteligencia de las USFK mirando el monitor",
+                fr: "Officier du renseignement des USFK fixant l'écran"
+            },
+            {
+                id: 38,
+                kr: "GLITCH: SEOUL LOGIN",
+                en: "GLITCH: SEOUL LOGIN",
+                zh: "GLITCH: SEOUL LOGIN",
+                ja: "GLITCH: SEOUL LOGIN",
+                es: "GLITCH: SEOUL LOGIN",
+                fr: "GLITCH: SEOUL LOGIN"
+            }
+        ];
       
         const container = document.getElementById('viewer-container');
 
@@ -613,41 +717,65 @@
             sceneBlock.appendChild(img);
             
             // 字幕追加処理
+            // 字幕追加処理
             const sceneText = scenarioData.find(data => data.id === i);
 
             if (sceneText) {
                 const captionDiv = document.createElement('div');
                 captionDiv.className = 'caption-area';
                 
+                // ★ポイント: textContent を innerHTML に変更しました
+
+                // 1. 韓国語
                 if (sceneText.kr) {
                     const pKr = document.createElement('p');
                     pKr.className = 'text-kr';
-                    pKr.textContent = sceneText.kr;
+                    pKr.innerHTML = sceneText.kr; // ←ここを変更
                     captionDiv.appendChild(pKr);
                 }
                 
+                // 2. 日本語
                 if (sceneText.ja) {
                     const pJa = document.createElement('p');
                     pJa.className = 'text-ja';
-                    pJa.textContent = sceneText.ja;
+                    pJa.innerHTML = sceneText.ja; // ←ここを変更
                     captionDiv.appendChild(pJa);
                 }
-
+								
+								/*
+                // 3. 繁体字
+                if (sceneText.zh) {
+                    const pZh = document.createElement('p');
+                    pZh.className = 'text-zh';
+                    pZh.innerHTML = sceneText.zh; // ←ここを変更
+                    captionDiv.appendChild(pZh);
+                }
+								*/
+								
+								/*
+                // 5. スペイン語
                 if (sceneText.es) {
                     const pEs = document.createElement('p');
                     pEs.className = 'text-es';
-                    pEs.textContent = sceneText.es;
+                    pEs.innerHTML = sceneText.es; // ←ここを変更
                     captionDiv.appendChild(pEs);
                 }
-
+								*/
+                // 6. フランス語
                 if (sceneText.fr) {
                     const pFr = document.createElement('p');
                     pFr.className = 'text-fr';
-                    pFr.textContent = sceneText.fr;
+                    pFr.innerHTML = sceneText.fr; // ←ここを変更
                     captionDiv.appendChild(pFr);
                 }
-               
-
+                
+                // 7. 英語
+                if (sceneText.en) {
+                    const pEn = document.createElement('p');
+                    pEn.className = 'text-en';
+                    pEn.innerHTML = sceneText.en; // ←ここを変更
+                    captionDiv.appendChild(pEn);
+                }
                 sceneBlock.appendChild(captionDiv);
             }
             
