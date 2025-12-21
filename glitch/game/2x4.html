@@ -5,11 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Glitch: Seoul Login - Beginner Mode</title>
     <style>
+        /* =========================================
+           1. CSS VARIABLES & RESET
+           ========================================= */
         :root {
             --bg-color: #000;
+            --container-bg: #050505;
             --neon-cyan: #00FFFF;
             --neon-magenta: #FF00FF;
             --neon-green: #00FF00;
+            --text-color: #fff;
             --ui-font: 'Courier New', Courier, monospace;
         }
 
@@ -29,893 +34,792 @@
         }
 
         /* =========================================
-           STAGE WRAPPER (The Container)
-           全ての要素をこの「箱」の中に閉じ込める
+           2. STAGE & LAYOUT
            ========================================= */
-        #stage-wrapper {
-            position: relative;
-            background-color: #050505;
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.15);
-            /* width/height は JSで動的に決定される */
-            margin: 0 auto;
-            overflow: hidden; /* はみ出し防止 */
-        }
-
-        /* =========================================
-           LAYERS (Canvas & UI)
-           箱のサイズ(100%)に合わせてピッタリ重なる
-           ========================================= */
-        canvas {
-            display: block;
+        #game-container {
             width: 100%;
             height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #stage-wrapper {
+            position: relative;
+            background-color: var(--container-bg);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.15);
+            margin: 0 auto;
+            overflow: hidden;
+            /* width/height はJSで動的に設定 */
+        }
+
+        canvas {
+            display: block;
             background-color: #000;
         }
 
         .scanline {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
             background-size: 100% 4px;
-            pointer-events: none;
-            z-index: 5;
-            opacity: 0.3;
-        }
-
-        #ui-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none; /* UIはクリック透過 */
-            
-            /* Flexboxで上下配置 */
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            
-            /* 内部の余白設定（重要） */
-            padding: 0;
-            box-sizing: border-box; 
-            z-index: 10;
+            pointer-events: none; z-index: 5; opacity: 0.3;
         }
 
         /* =========================================
-           UI COMPONENTS
+           3. UI LAYER (HUD)
            ========================================= */
+        #ui-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            display: flex; flex-direction: column; justify-content: space-between;
+            padding: 0; box-sizing: border-box; z-index: 10;
+        }
+
+        /* Top HUD */
         .hud-top {
-            /* 高さを固定して確保する */
-            padding: 0px; /* 内側の余白 */
-            box-sizing: border-box;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
+            width: 100%; display: flex; justify-content: space-between; align-items: flex-start;
             text-shadow: 0 0 5px var(--neon-cyan);
-            font-weight: bold;
-            font-size: 14px; /* スマホ向けに少し調整 */
+            font-weight: bold; font-size: 14px;
+            padding: 5px; box-sizing: border-box;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
         }
 
-        .status-block {
-            flex: 1;
-        }
-        
-        .status-center {
-            text-align: center;
-            width: 60px; /* 固定幅でズレ防止 */
-        }
+        .status-block { flex: 1; }
+        .status-center { text-align: center; width: 60px; }
+        .chain-val { color: yellow; font-size: 18px; }
 
+        /* HP Bars */
         .bar-container {
-            width: 100%;
-            height: 8px;
-            background: #333;
-            margin-top: 4px;
-            border: 1px solid #555;
-            position: relative;
+            width: 100%; height: 8px; background: #333; margin-top: 4px;
+            border: 1px solid #555; position: relative;
         }
-
-        .hp-bar {
-            height: 100%;
-            transition: width 0.3s ease;
-        }
-
+        .hp-bar { height: 100%; transition: width 0.3s ease; }
         .p-hp { background-color: var(--neon-cyan); box-shadow: 0 0 8px var(--neon-cyan); }
         .e-hp { background-color: var(--neon-magenta); box-shadow: 0 0 8px var(--neon-magenta); }
 
-        #log-console {
+        /* Bottom UI (Log & Tutorial) */
+        .hud-bottom {
             width: 100%;
-            height: 80px;
-            background: rgba(0, 0, 0, 0.6);
+        }
+
+        #tutorial-msg {
+            text-align: center; font-size: 12px; font-weight: bold;
+            color: var(--text-color); text-shadow: 0 0 5px var(--text-color);
+            margin-bottom: 5px;
+            animation: pulse-text 2s infinite;
+        }
+
+        #log-console {
+            width: 100%; height: 80px;
+            background: rgba(0, 0, 0, 0.7);
             border-top: 1px solid #333;
-            color: var(--neon-green);
-            font-size: 11px;
-            padding: 5px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column-reverse; /* 新しいログが下から */
+            color: var(--neon-green); font-size: 11px;
+            padding: 5px; box-sizing: border-box;
+            display: flex; flex-direction: column-reverse; /* 新しいログを下から積む場合、または上から */
             overflow: hidden;
             text-shadow: 0 0 2px var(--neon-green);
-            pointer-events: none;
-        }
-        
-        #tutorial-msg {
-            text-align: center;
-            font-size: 12px;
-            font-weight: bold;
-            color: #FFF;
-            text-shadow: 0 0 5px #FFF;
-            animation: pulse-text 2s infinite;
-            margin-bottom: 5px;
         }
 
-        @keyframes pulse-text {
-            0% { opacity: 0.5; }
-            50% { opacity: 1.0; }
-            100% { opacity: 0.5; }
-        }
-
+        /* Combo Display */
         #combo-display {
-            position: absolute;
-            top: 50%;
-            left: 50%;
+            position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 80px;
-            font-weight: 900;
+            font-size: 80px; font-weight: 900; font-family: sans-serif;
             color: rgba(0, 255, 255, 0.2);
             text-shadow: 0 0 50px rgba(0, 255, 255, 0.5);
-            opacity: 0;
-            transition: opacity 0.2s, transform 0.1s;
-            z-index: 2;
-            font-family: sans-serif;
+            opacity: 0; transition: opacity 0.2s, transform 0.1s;
+            z-index: 2; pointer-events: none;
         }
-
-        #combo-display.high-combo {
-            color: rgba(255, 0, 255, 0.3);
-        }
+        #combo-display.high-combo { color: rgba(255, 0, 255, 0.3); }
 
         /* =========================================
-           GAME OVER OVERLAY
+           4. GAME OVER SCREEN
            ========================================= */
         #game-over-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.9);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            pointer-events: auto; /* ここだけクリック有効 */
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 100; pointer-events: auto;
             transition: opacity 0.3s;
         }
-
-        #game-over-screen.hidden {
-            display: none;
-            opacity: 0;
-        }
+        #game-over-screen.hidden { display: none; opacity: 0; }
 
         #game-result-title {
-            font-size: 32px;
-            margin-bottom: 20px;
+            font-size: 32px; margin-bottom: 20px; text-align: center; line-height: 1.2;
             text-shadow: 0 0 10px currentColor;
-            text-align: center;
-            line-height: 1.2;
         }
 
         #reboot-btn {
-            background: transparent;
-            border: 2px solid var(--neon-cyan);
-            color: var(--neon-cyan);
-            padding: 12px 30px;
-            font-family: var(--ui-font);
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 0 15px var(--neon-cyan);
-            transition: all 0.2s;
+            background: transparent; border: 2px solid var(--neon-cyan); color: var(--neon-cyan);
+            padding: 12px 30px; font-family: var(--ui-font); font-size: 18px; font-weight: bold;
+            cursor: pointer; box-shadow: 0 0 15px var(--neon-cyan); transition: all 0.2s;
         }
+        #reboot-btn:hover { background: var(--neon-cyan); color: #000; }
 
-        #reboot-btn:hover {
-            background: var(--neon-cyan);
-            color: #000;
+        /* Animations */
+        @keyframes pulse-text {
+            0% { opacity: 0.5; } 50% { opacity: 1.0; } 100% { opacity: 0.5; }
         }
     </style>
 </head>
 <body>
 
-<div id="game-container">
-    <div id="stage-wrapper">
-        
-        <canvas id="gameCanvas"></canvas>
-        
-        <div class="scanline"></div>
-        
-        <div id="ui-layer">
-            <div class="hud-top">
-                <div class="status-block">
-                    PLAYER
-                    <div class="bar-container"><div id="p-bar" class="hp-bar p-hp" style="width: 100%"></div></div>
+    <div id="game-container">
+        <div id="stage-wrapper">
+            
+            <canvas id="gameCanvas"></canvas>
+            
+            <div class="scanline"></div>
+            
+            <div id="ui-layer">
+                <div class="hud-top">
+                    <div class="status-block">
+                        PLAYER
+                        <div class="bar-container"><div id="p-bar" class="hp-bar p-hp" style="width: 100%"></div></div>
+                    </div>
+                    
+                    <div class="status-center">
+                        CHN<br>
+                        <span id="chain-count" class="chain-val">0</span>
+                    </div>
+                    
+                    <div class="status-block" style="text-align: right;">
+                        DAEMON
+                        <div class="bar-container"><div id="e-bar" class="hp-bar e-hp" style="width: 100%"></div></div>
+                    </div>
                 </div>
                 
-                <div class="status-center">
-                    CHN<br>
-                    <span id="chain-count" style="color: yellow; font-size: 18px;">0</span>
-                </div>
+                <div id="combo-display">0</div>
                 
-                <div class="status-block" style="text-align: right;">
-                    DAEMON
-                    <div class="bar-container"><div id="e-bar" class="hp-bar e-hp" style="width: 100%"></div></div>
+                <div class="hud-bottom">
+                    <div id="tutorial-msg">
+                        <span style="color:var(--neon-cyan)">DRAG</span> to Connect<br>
+                        <span style="color:var(--neon-magenta)">TAP SELF</span> to Reboot
+                    </div>
+                    <div id="log-console">
+                        <div>> System Initialized...</div>
+                        <div>> Waiting for Neural Link...</div>
+                    </div>
                 </div>
             </div>
-            
-            <div id="combo-display">0</div>
-            
-            <div>
-                <div id="tutorial-msg">
-                    <span style="color:#00FFFF">DRAG</span> to Connect<br>
-                    <span style="color:#FF00FF">TAP SELF</span> to Reboot
-                </div>
-                <div id="log-console">
-                    <div>> System Initialized...</div>
-                    <div>> Waiting for Neural Link...</div>
-                </div>
-            </div>
-        </div>
 
-        <div id="game-over-screen" class="hidden">
-            <h1 id="game-result-title">SYSTEM HALTED</h1>
-            <button id="reboot-btn">REBOOT SYSTEM</button>
+            <div id="game-over-screen" class="hidden">
+                <h1 id="game-result-title">SYSTEM HALTED</h1>
+                <button id="reboot-btn">REBOOT SYSTEM</button>
+            </div>
         </div>
     </div>
-</div>
 
-<script>
-/**
- * GLITCH: SEOUL LOGIN - GAME ENGINE (Fixed Layout Ver.)
- */
+    <script>
+        /**
+         * GLITCH: SEOUL LOGIN - GAME ENGINE (Refactored)
+         */
 
-const CONFIG = {
-    GRID_W: 2, 
-    GRID_H: 4, 
-    COLORS: ['#00FFFF', '#FF00FF', '#00FF00', '#FFFF00'], 
-    TILE_TYPES: [0, 1, 2, 3],
-    PLAYER_HP: 100,
-    ENEMY_HP: 10, 
-    GLITCH_THRESHOLD: 0.7, 
-    BASE_DMG: 10,
-    ENEMY_DMG: 10
-};
-
-const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-const getDistance = (a, b) => Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
-
-class InputHandler {
-    constructor(canvas, game) {
-        this.canvas = canvas;
-        this.game = game;
-        this.isDragging = false;
-
-        this.canvas.addEventListener('mousedown', this.handleStart.bind(this));
-        this.canvas.addEventListener('mousemove', this.handleMove.bind(this));
-        window.addEventListener('mouseup', this.handleEnd.bind(this));
-
-        this.canvas.addEventListener('touchstart', this.handleStart.bind(this), {passive: false});
-        this.canvas.addEventListener('touchmove', this.handleMove.bind(this), {passive: false});
-        window.addEventListener('touchend', this.handleEnd.bind(this));
-    }
-
-    getPos(e) {
-        const rect = this.canvas.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        return { x: clientX - rect.left, y: clientY - rect.top };
-    }
-
-    handleStart(e) {
-        if (this.game.state.isGameOver || this.game.state.turn !== 'player') return;
-        if (e.cancelable) e.preventDefault();
-        
-        const pos = this.getPos(e);
-        const gridPos = this.game.renderer.pixelToGrid(pos.x, pos.y);
-
-        if (this.game.isValidStart(gridPos)) {
-            this.isDragging = true;
-            this.game.startPath(gridPos);
-        }
-    }
-
-    handleMove(e) {
-        if (!this.isDragging) return;
-        if (e.cancelable) e.preventDefault();
-        const pos = this.getPos(e);
-        const gridPos = this.game.renderer.pixelToGrid(pos.x, pos.y);
-        this.game.updatePath(gridPos);
-    }
-
-    handleEnd(e) {
-        if (!this.isDragging) return;
-        this.isDragging = false;
-        this.game.finalizeMove();
-    }
-}
-
-class Renderer {
-    constructor(canvas, game) {
-        this.canvas = canvas;
-        this.ctx = canvas.getContext('2d');
-        this.game = game;
-        this.cellSize = 0;
-        this.padding = 0; // ラッパー方式にしたのでCanvas内余白はゼロでOK（CSSでpadding管理）
-        this.glitchIntensity = 0;
-        this.shake = 0;
-        
-        this.resize();
-    }
-
-    resize() {
-        // ---------------------------------------------------------
-        // 【修正版リサイズロジック】
-        // 1. 画面サイズを取得し、少し余白(90%〜95%)を持たせる
-        // ---------------------------------------------------------
-        const maxWidth = window.innerWidth * 0.92;
-        const maxHeight = window.innerHeight * 0.92;
-
-        // 2. グリッド数からセルサイズを逆算
-        const cellW = maxWidth / CONFIG.GRID_W;
-        const cellH = maxHeight / CONFIG.GRID_H;
-        this.cellSize = Math.min(cellW, cellH);
-
-        // 3. 確定した「箱」のサイズ
-        const finalWidth = this.cellSize * CONFIG.GRID_W;
-        const finalHeight = this.cellSize * CONFIG.GRID_H;
-
-        // 4. Stage Wrapperにサイズを適用
-        const stageWrapper = document.getElementById('stage-wrapper');
-        if (stageWrapper) {
-            stageWrapper.style.width = `${finalWidth}px`;
-            stageWrapper.style.height = `${finalHeight}px`;
-        }
-
-        // 5. Canvas解像度を箱に合わせる
-        this.canvas.width = finalWidth;
-        this.canvas.height = finalHeight;
-
-        // ※ UIパーツのサイズ調整は不要（CSSの width: 100% が効くため）
-    }
-
-    pixelToGrid(x, y) {
-        const gx = Math.floor(x / this.cellSize);
-        const gy = Math.floor(y / this.cellSize);
-        if (gx >= 0 && gx < CONFIG.GRID_W && gy >= 0 && gy < CONFIG.GRID_H) {
-            return { x: gx, y: gy };
-        }
-        return null;
-    }
-
-    gridToPixel(gx, gy) {
-        return {
-            x: gx * this.cellSize + this.cellSize / 2,
-            y: gy * this.cellSize + this.cellSize / 2
+        // ==========================================
+        // 1. CONFIGURATION
+        // ==========================================
+        const CONFIG = {
+            GRID_W: 2, 
+            GRID_H: 4, 
+            COLORS: ['#00FFFF', '#FF00FF', '#00FF00', '#FFFF00'], 
+            TILE_TYPES: [0, 1, 2, 3],
+            PLAYER_HP: 100,
+            ENEMY_HP: 10, 
+            GLITCH_THRESHOLD: 0.7, 
+            BASE_DMG: 10,
+            ENEMY_DMG: 10
         };
-    }
 
-    draw() {
-        this.ctx.fillStyle = '#050505';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        const UTILS = {
+            randomInt: (min, max) => Math.floor(Math.random() * (max - min + 1)) + min,
+            getDistance: (a, b) => Math.abs(a.x - b.x) + Math.abs(a.y - b.y)
+        };
 
-        this.ctx.save();
-        if (this.shake > 0) {
-            const dx = (Math.random() - 0.5) * this.shake;
-            const dy = (Math.random() - 0.5) * this.shake;
-            this.ctx.translate(dx, dy);
-            this.shake *= 0.9;
-            if (this.shake < 0.5) this.shake = 0;
-        }
+        // ==========================================
+        // 2. INPUT HANDLER
+        // ==========================================
+        class InputHandler {
+            constructor(canvas, game) {
+                this.canvas = canvas;
+                this.game = game;
+                this.isDragging = false;
 
-        this.drawGrid();
-        this.drawHints();
-        if (this.game.state.currentPath.length > 0) this.drawPath();
-        this.drawEntities();
+                // Mouse Events
+                this.canvas.addEventListener('mousedown', this.handleStart.bind(this));
+                this.canvas.addEventListener('mousemove', this.handleMove.bind(this));
+                window.addEventListener('mouseup', this.handleEnd.bind(this));
 
-        if (this.glitchIntensity > 0) {
-            this.drawGlitch();
-            this.glitchIntensity *= 0.9;
-            if (this.glitchIntensity < 0.1) this.glitchIntensity = 0;
-        }
+                // Touch Events
+                this.canvas.addEventListener('touchstart', this.handleStart.bind(this), {passive: false});
+                this.canvas.addEventListener('touchmove', this.handleMove.bind(this), {passive: false});
+                window.addEventListener('touchend', this.handleEnd.bind(this));
+            }
 
-        this.ctx.restore();
-    }
+            getPos(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return { x: clientX - rect.left, y: clientY - rect.top };
+            }
 
-    drawGrid() {
-        for (let y = 0; y < CONFIG.GRID_H; y++) {
-            for (let x = 0; x < CONFIG.GRID_W; x++) {
-                const tile = this.game.state.grid[y][x];
-                const pos = this.gridToPixel(x, y);
-                const size = this.cellSize * 0.9; // 少し隙間を空ける
+            handleStart(e) {
+                if (this.game.state.isGameOver || this.game.state.turn !== 'player') return;
+                if (e.cancelable) e.preventDefault();
+                
+                const pos = this.getPos(e);
+                const gridPos = this.game.renderer.pixelToGrid(pos.x, pos.y);
 
-                this.ctx.fillStyle = CONFIG.COLORS[tile.type];
-                this.ctx.globalAlpha = 0.2;
-                this.ctx.fillRect(pos.x - size/2, pos.y - size/2, size, size);
-                this.ctx.globalAlpha = 1.0;
-                this.ctx.strokeStyle = CONFIG.COLORS[tile.type];
-                this.ctx.lineWidth = 2;
-                this.ctx.strokeRect(pos.x - size/2, pos.y - size/2, size, size);
+                if (this.game.isValidStart(gridPos)) {
+                    this.isDragging = true;
+                    this.game.startPath(gridPos);
+                }
+            }
+
+            handleMove(e) {
+                if (!this.isDragging) return;
+                if (e.cancelable) e.preventDefault();
+                const pos = this.getPos(e);
+                const gridPos = this.game.renderer.pixelToGrid(pos.x, pos.y);
+                this.game.updatePath(gridPos);
+            }
+
+            handleEnd() {
+                if (!this.isDragging) return;
+                this.isDragging = false;
+                this.game.finalizeMove();
             }
         }
-    }
 
-    drawHints() {
-        if (this.game.state.turn !== 'player') return;
-
-        const game = this.game;
-        let currentHead = game.state.player;
-        const path = game.state.currentPath;
-        if (path.length > 0) {
-            currentHead = path[path.length - 1];
-        }
-
-        const headTile = game.state.grid[currentHead.y][currentHead.x];
-        const directions = [
-            {x: 0, y: -1}, {x: 0, y: 1}, {x: -1, y: 0}, {x: 1, y: 0}
-        ];
-
-        const offset = Math.sin(Date.now() / 150) * 5;
-
-        this.ctx.save();
-        this.ctx.shadowBlur = 10;
-
-        directions.forEach(dir => {
-            const tx = currentHead.x + dir.x;
-            const ty = currentHead.y + dir.y;
-
-            if (tx >= 0 && tx < CONFIG.GRID_W && ty >= 0 && ty < CONFIG.GRID_H) {
-                const targetTile = game.state.grid[ty][tx];
-                const isVisited = path.some(p => p.x === tx && p.y === ty);
+        // ==========================================
+        // 3. RENDERER (View)
+        // ==========================================
+        class Renderer {
+            constructor(canvas, game) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.game = game;
+                this.cellSize = 0;
+                this.glitchIntensity = 0;
+                this.shake = 0;
                 
-                if (targetTile.type === headTile.type && !isVisited) {
-                    const startPos = this.gridToPixel(currentHead.x, currentHead.y);
-                    const angle = Math.atan2(dir.y, dir.x);
-                    const dist = this.cellSize * 0.4 + offset; // ヒント位置調整
-                    
-                    const arrowX = startPos.x + Math.cos(angle) * dist;
-                    const arrowY = startPos.y + Math.sin(angle) * dist;
+                this.resize();
+            }
 
-                    this.ctx.translate(arrowX, arrowY);
-                    this.ctx.rotate(angle);
-                    
-                    this.ctx.fillStyle = '#FFFFFF';
+            resize() {
+                // 画面サイズに対し90%程度の余白を持たせる
+                const maxWidth = window.innerWidth * 0.92;
+                const maxHeight = window.innerHeight * 0.92;
+
+                const cellW = maxWidth / CONFIG.GRID_W;
+                const cellH = maxHeight / CONFIG.GRID_H;
+                this.cellSize = Math.min(cellW, cellH);
+
+                const finalWidth = this.cellSize * CONFIG.GRID_W;
+                const finalHeight = this.cellSize * CONFIG.GRID_H;
+
+                // Stage Wrapperのサイズ調整
+                const stageWrapper = document.getElementById('stage-wrapper');
+                if (stageWrapper) {
+                    stageWrapper.style.width = `${finalWidth}px`;
+                    stageWrapper.style.height = `${finalHeight}px`;
+                }
+
+                this.canvas.width = finalWidth;
+                this.canvas.height = finalHeight;
+            }
+
+            pixelToGrid(x, y) {
+                const gx = Math.floor(x / this.cellSize);
+                const gy = Math.floor(y / this.cellSize);
+                if (gx >= 0 && gx < CONFIG.GRID_W && gy >= 0 && gy < CONFIG.GRID_H) {
+                    return { x: gx, y: gy };
+                }
+                return null;
+            }
+
+            gridToPixel(gx, gy) {
+                return {
+                    x: gx * this.cellSize + this.cellSize / 2,
+                    y: gy * this.cellSize + this.cellSize / 2
+                };
+            }
+
+            draw() {
+                // Clear
+                this.ctx.fillStyle = '#050505';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                this.ctx.save();
+                
+                // Shake Effect
+                if (this.shake > 0) {
+                    const dx = (Math.random() - 0.5) * this.shake;
+                    const dy = (Math.random() - 0.5) * this.shake;
+                    this.ctx.translate(dx, dy);
+                    this.shake *= 0.9;
+                    if (this.shake < 0.5) this.shake = 0;
+                }
+
+                // Layers
+                this.drawGrid();
+                this.drawHints();
+                if (this.game.state.currentPath.length > 0) this.drawPath();
+                this.drawEntities();
+
+                // Glitch Effect
+                if (this.glitchIntensity > 0) {
+                    this.drawGlitch();
+                    this.glitchIntensity *= 0.9;
+                    if (this.glitchIntensity < 0.1) this.glitchIntensity = 0;
+                }
+
+                this.ctx.restore();
+            }
+
+            drawGrid() {
+                for (let y = 0; y < CONFIG.GRID_H; y++) {
+                    for (let x = 0; x < CONFIG.GRID_W; x++) {
+                        const tile = this.game.state.grid[y][x];
+                        const pos = this.gridToPixel(x, y);
+                        const size = this.cellSize * 0.9;
+
+                        this.ctx.fillStyle = CONFIG.COLORS[tile.type];
+                        this.ctx.globalAlpha = 0.2;
+                        this.ctx.fillRect(pos.x - size/2, pos.y - size/2, size, size);
+                        this.ctx.globalAlpha = 1.0;
+                        this.ctx.strokeStyle = CONFIG.COLORS[tile.type];
+                        this.ctx.lineWidth = 2;
+                        this.ctx.strokeRect(pos.x - size/2, pos.y - size/2, size, size);
+                    }
+                }
+            }
+
+            drawHints() {
+                if (this.game.state.turn !== 'player') return;
+                const game = this.game;
+                let currentHead = game.state.currentPath.length > 0 
+                    ? game.state.currentPath[game.state.currentPath.length - 1] 
+                    : game.state.player;
+
+                const headTile = game.state.grid[currentHead.y][currentHead.x];
+                const directions = [{x:0, y:-1}, {x:0, y:1}, {x:-1, y:0}, {x:1, y:0}];
+                const offset = Math.sin(Date.now() / 150) * 5;
+
+                this.ctx.save();
+                this.ctx.shadowBlur = 10;
+                directions.forEach(dir => {
+                    const tx = currentHead.x + dir.x;
+                    const ty = currentHead.y + dir.y;
+                    if (tx >= 0 && tx < CONFIG.GRID_W && ty >= 0 && ty < CONFIG.GRID_H) {
+                        const targetTile = game.state.grid[ty][tx];
+                        const isVisited = game.state.currentPath.some(p => p.x === tx && p.y === ty);
+                        
+                        if (targetTile.type === headTile.type && !isVisited) {
+                            const startPos = this.gridToPixel(currentHead.x, currentHead.y);
+                            const angle = Math.atan2(dir.y, dir.x);
+                            const dist = this.cellSize * 0.4 + offset;
+                            
+                            const arrowX = startPos.x + Math.cos(angle) * dist;
+                            const arrowY = startPos.y + Math.sin(angle) * dist;
+
+                            this.ctx.translate(arrowX, arrowY);
+                            this.ctx.rotate(angle);
+                            this.ctx.fillStyle = '#FFFFFF';
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(0, 0);
+                            this.ctx.lineTo(-6, -4);
+                            this.ctx.lineTo(-6, 4);
+                            this.ctx.fill();
+                            this.ctx.rotate(-angle);
+                            this.ctx.translate(-arrowX, -arrowY);
+                        }
+                    }
+                });
+                this.ctx.restore();
+            }
+
+            drawPath() {
+                const path = this.game.state.currentPath;
+                if (path.length < 2) return;
+
+                this.ctx.beginPath();
+                this.ctx.lineCap = 'round';
+                this.ctx.lineJoin = 'round';
+                this.ctx.lineWidth = 6;
+                this.ctx.shadowBlur = 15;
+                this.ctx.shadowColor = CONFIG.COLORS[this.game.state.grid[path[0].y][path[0].x].type];
+                this.ctx.strokeStyle = '#FFFFFF';
+
+                const start = this.gridToPixel(path[0].x, path[0].y);
+                this.ctx.moveTo(start.x, start.y);
+
+                for (let i = 1; i < path.length; i++) {
+                    const p = this.gridToPixel(path[i].x, path[i].y);
+                    this.ctx.lineTo(p.x, p.y);
+                }
+                this.ctx.stroke();
+                this.ctx.shadowBlur = 0;
+            }
+
+            drawEntities() {
+                const { player, enemy } = this.game.state;
+                const pPos = this.gridToPixel(player.x, player.y);
+                
+                // Draw Player
+                this.ctx.fillStyle = '#FFFFFF';
+                this.ctx.shadowBlur = 10;
+                this.ctx.shadowColor = CONFIG.COLORS[0];
+                this.ctx.beginPath();
+                this.ctx.moveTo(pPos.x, pPos.y - 12);
+                this.ctx.lineTo(pPos.x + 10, pPos.y + 8);
+                this.ctx.lineTo(pPos.x - 10, pPos.y + 8);
+                this.ctx.fill();
+
+                // Draw Enemy
+                if (enemy.hp > 0) {
+                    const ePos = this.gridToPixel(enemy.x, enemy.y);
+                    this.ctx.fillStyle = '#FF0055';
+                    this.ctx.shadowColor = '#FF0055';
                     this.ctx.beginPath();
-                    this.ctx.moveTo(0, 0);
-                    this.ctx.lineTo(-6, -4);
-                    this.ctx.lineTo(-6, 4);
+                    this.ctx.moveTo(ePos.x, ePos.y - 12);
+                    this.ctx.lineTo(ePos.x + 12, ePos.y);
+                    this.ctx.lineTo(ePos.x, ePos.y + 12);
+                    this.ctx.lineTo(ePos.x - 12, ePos.y);
                     this.ctx.fill();
-
-                    this.ctx.rotate(-angle);
-                    this.ctx.translate(-arrowX, -arrowY);
                 }
+                this.ctx.shadowBlur = 0;
             }
-        });
-        this.ctx.restore();
-    }
 
-    drawPath() {
-        const path = this.game.state.currentPath;
-        if (path.length < 2) return;
-
-        this.ctx.beginPath();
-        this.ctx.lineCap = 'round';
-        this.ctx.lineJoin = 'round';
-        this.ctx.lineWidth = 6;
-        this.ctx.shadowBlur = 15;
-        this.ctx.shadowColor = CONFIG.COLORS[this.game.state.grid[path[0].y][path[0].x].type];
-        this.ctx.strokeStyle = '#FFFFFF';
-
-        const start = this.gridToPixel(path[0].x, path[0].y);
-        this.ctx.moveTo(start.x, start.y);
-
-        for (let i = 1; i < path.length; i++) {
-            const p = this.gridToPixel(path[i].x, path[i].y);
-            this.ctx.lineTo(p.x, p.y);
-        }
-        this.ctx.stroke();
-        this.ctx.shadowBlur = 0;
-    }
-
-    drawEntities() {
-        const player = this.game.state.player;
-        const enemy = this.game.state.enemy;
-
-        const pPos = this.gridToPixel(player.x, player.y);
-        this.ctx.fillStyle = '#FFFFFF';
-        this.ctx.shadowBlur = 10;
-        this.ctx.shadowColor = CONFIG.COLORS[0];
-        
-        // Player (Triangle)
-        this.ctx.beginPath();
-        this.ctx.moveTo(pPos.x, pPos.y - 12);
-        this.ctx.lineTo(pPos.x + 10, pPos.y + 8);
-        this.ctx.lineTo(pPos.x - 10, pPos.y + 8);
-        this.ctx.fill();
-
-        if (enemy.hp > 0) {
-            const ePos = this.gridToPixel(enemy.x, enemy.y);
-            this.ctx.fillStyle = '#FF0055';
-            this.ctx.shadowColor = '#FF0055';
-            
-            // Enemy (Diamond)
-            this.ctx.beginPath();
-            this.ctx.moveTo(ePos.x, ePos.y - 12);
-            this.ctx.lineTo(ePos.x + 12, ePos.y);
-            this.ctx.lineTo(ePos.x, ePos.y + 12);
-            this.ctx.lineTo(ePos.x - 12, ePos.y);
-            this.ctx.fill();
-        }
-        this.ctx.shadowBlur = 0;
-    }
-
-    drawGlitch() {
-        const strips = 10;
-        const h = this.canvas.height / strips;
-        for(let i=0; i<strips; i++) {
-            if(Math.random() < 0.5) {
-                const offset = (Math.random() - 0.5) * 20 * this.glitchIntensity;
-                this.ctx.drawImage(
-                    this.canvas, 
-                    0, i*h, this.canvas.width, h, 
-                    offset, i*h, this.canvas.width, h
-                );
-            }
-        }
-    }
-
-    triggerGlitch(intensity) {
-        this.glitchIntensity = intensity;
-        this.shake = intensity * 5; 
-    }
-}
-
-class Game {
-    constructor() {
-        this.canvas = document.getElementById('gameCanvas');
-        this.state = {
-            grid: [],
-            player: { x: 0, y: 0, hp: CONFIG.PLAYER_HP, maxHp: CONFIG.PLAYER_HP },
-            enemy: { x: CONFIG.GRID_W-1, y: CONFIG.GRID_H-1, hp: CONFIG.ENEMY_HP, maxHp: CONFIG.ENEMY_HP },
-            currentPath: [],
-            turn: 'player', 
-            isGameOver: false
-        };
-
-        this.renderer = new Renderer(this.canvas, this);
-        this.input = new InputHandler(this.canvas, this);
-        this.ui = {
-            //pHp: document.getElementById('p-hp-val'),
-            pBar: document.getElementById('p-bar'),
-            //eHp: document.getElementById('e-hp-val'),
-            eBar: document.getElementById('e-bar'),
-            chain: document.getElementById('chain-count'),
-            log: document.getElementById('log-console')
-        };
-        
-        document.getElementById('reboot-btn').onclick = () => this.restart();
-
-        this.initGrid();
-        
-        const loop = () => {
-            this.renderer.draw();
-            requestAnimationFrame(loop);
-        };
-        requestAnimationFrame(loop);
-
-        window.addEventListener('resize', () => this.renderer.resize());
-        this.log("System: Link Start (Beginner Mode).");
-    }
-
-    initGrid() {
-        this.state.grid = [];
-        let startType = null; 
-
-        for (let y = 0; y < CONFIG.GRID_H; y++) {
-            const row = [];
-            for (let x = 0; x < CONFIG.GRID_W; x++) {
-                let type;
-                if (x < 2 && y < 2) {
-                    if (x === 0 && y === 0) {
-                        type = CONFIG.TILE_TYPES[randomInt(0, CONFIG.TILE_TYPES.length - 1)];
-                        startType = type;
-                    } else {
-                        type = startType;
-                    }
-                } 
-                else {
-                    const neighbors = [];
-                    if (x > 0) neighbors.push(row[x - 1].type);
-                    if (y > 0) neighbors.push(this.state.grid[y - 1][x].type);
-
-                    if (neighbors.length === 0 || Math.random() < 0.3) {
-                        type = CONFIG.TILE_TYPES[randomInt(0, CONFIG.TILE_TYPES.length - 1)];
-                    } else {
-                        type = neighbors[randomInt(0, neighbors.length - 1)];
+            drawGlitch() {
+                const strips = 10;
+                const h = this.canvas.height / strips;
+                for(let i=0; i<strips; i++) {
+                    if(Math.random() < 0.5) {
+                        const offset = (Math.random() - 0.5) * 20 * this.glitchIntensity;
+                        this.ctx.drawImage(
+                            this.canvas, 
+                            0, i*h, this.canvas.width, h, 
+                            offset, i*h, this.canvas.width, h
+                        );
                     }
                 }
-                row.push({ type: type, x: x, y: y });
             }
-            this.state.grid.push(row);
+
+            triggerGlitch(intensity) {
+                this.glitchIntensity = intensity;
+                this.shake = intensity * 5; 
+            }
         }
 
-        this.state.player.x = 0;
-        this.state.player.y = 0;
-    }
+        // ==========================================
+        // 4. GAME LOGIC (Controller)
+        // ==========================================
+        class Game {
+            constructor() {
+                this.canvas = document.getElementById('gameCanvas');
+                
+                this.state = {
+                    grid: [],
+                    player: { x: 0, y: 0, hp: CONFIG.PLAYER_HP, maxHp: CONFIG.PLAYER_HP },
+                    enemy: { x: CONFIG.GRID_W-1, y: CONFIG.GRID_H-1, hp: CONFIG.ENEMY_HP, maxHp: CONFIG.ENEMY_HP },
+                    currentPath: [],
+                    turn: 'player', 
+                    isGameOver: false
+                };
 
-    shuffleGrid() {
-        for (let y = 0; y < CONFIG.GRID_H; y++) {
-            for (let x = 0; x < CONFIG.GRID_W; x++) {
-                const neighbors = [];
-                if (x > 0) neighbors.push(this.state.grid[y][x - 1].type);
-                if (y > 0) neighbors.push(this.state.grid[y - 1][x].type); 
+                this.renderer = new Renderer(this.canvas, this);
+                this.input = new InputHandler(this.canvas, this);
+                
+                // UI Elements Cache
+                this.ui = {
+                    pBar: document.getElementById('p-bar'),
+                    eBar: document.getElementById('e-bar'),
+                    chain: document.getElementById('chain-count'),
+                    log: document.getElementById('log-console'),
+                    combo: document.getElementById('combo-display'),
+                    gameOver: document.getElementById('game-over-screen'),
+                    resultTitle: document.getElementById('game-result-title')
+                };
+                
+                document.getElementById('reboot-btn').onclick = () => this.restart();
+                window.addEventListener('resize', () => this.renderer.resize());
 
-                let type;
-                if (neighbors.length === 0 || Math.random() < 0.3) {
-                    type = CONFIG.TILE_TYPES[randomInt(0, CONFIG.TILE_TYPES.length - 1)];
+                this.initGrid();
+                this.startLoop();
+                this.log("System: Link Start (Beginner Mode).");
+            }
+
+            startLoop() {
+                const loop = () => {
+                    this.renderer.draw();
+                    requestAnimationFrame(loop);
+                };
+                requestAnimationFrame(loop);
+            }
+
+            initGrid() {
+                this.state.grid = [];
+                let startType = null; 
+
+                for (let y = 0; y < CONFIG.GRID_H; y++) {
+                    const row = [];
+                    for (let x = 0; x < CONFIG.GRID_W; x++) {
+                        let type;
+                        if (x < 2 && y < 2) {
+                            if (x === 0 && y === 0) {
+                                type = CONFIG.TILE_TYPES[UTILS.randomInt(0, CONFIG.TILE_TYPES.length - 1)];
+                                startType = type;
+                            } else {
+                                type = startType; // 開始地点周辺は同色
+                            }
+                        } else {
+                            type = CONFIG.TILE_TYPES[UTILS.randomInt(0, CONFIG.TILE_TYPES.length - 1)];
+                        }
+                        row.push({ type: type, x: x, y: y });
+                    }
+                    this.state.grid.push(row);
+                }
+                this.state.player.x = 0;
+                this.state.player.y = 0;
+            }
+
+            // Shuffle Grid (Used on Reboot/Self-Tap)
+            shuffleGrid() {
+                for (let y = 0; y < CONFIG.GRID_H; y++) {
+                    for (let x = 0; x < CONFIG.GRID_W; x++) {
+                        // 簡易的な生成ロジック
+                        this.state.grid[y][x].type = CONFIG.TILE_TYPES[UTILS.randomInt(0, CONFIG.TILE_TYPES.length - 1)];
+                    }
+                }
+                // 安全地帯確保
+                const px = this.state.player.x;
+                const py = this.state.player.y;
+                const safeColor = CONFIG.TILE_TYPES[UTILS.randomInt(0, CONFIG.TILE_TYPES.length - 1)];
+                
+                this.state.grid[py][px].type = safeColor;
+                if (px < CONFIG.GRID_W - 1) this.state.grid[py][px + 1].type = safeColor;
+                if (py < CONFIG.GRID_H - 1) this.state.grid[py + 1][px].type = safeColor;
+            }
+
+            // --- UI Updates ---
+            log(msg) {
+                const div = document.createElement('div');
+                div.textContent = `> ${msg}`;
+                this.ui.log.prepend(div);
+                if (this.ui.log.children.length > 5) this.ui.log.lastChild.remove();
+            }
+
+            updateUI() {
+                const pPct = (this.state.player.hp / this.state.player.maxHp) * 100;
+                const ePct = (this.state.enemy.hp / this.state.enemy.maxHp) * 100;
+                
+                this.ui.pBar.style.width = `${Math.max(0, pPct)}%`;
+                this.ui.eBar.style.width = `${Math.max(0, ePct)}%`;
+
+                const count = this.state.currentPath.length;
+                this.ui.chain.textContent = count;
+
+                // Combo Animation
+                if (count > 1) {
+                    this.ui.combo.textContent = count;
+                    this.ui.combo.style.opacity = '1';
+                    const scale = 1 + (count * 0.05); 
+                    this.ui.combo.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                    
+                    if (count > 5) this.ui.combo.classList.add('high-combo');
+                    else this.ui.combo.classList.remove('high-combo');
                 } else {
-                    type = neighbors[randomInt(0, neighbors.length - 1)];
+                    this.ui.combo.style.opacity = '0';
+                    this.ui.combo.style.transform = `translate(-50%, -50%) scale(1)`;
                 }
-                this.state.grid[y][x].type = type;
             }
-        }
 
-        const px = this.state.player.x;
-        const py = this.state.player.y;
-        const safeColor = CONFIG.TILE_TYPES[randomInt(0, CONFIG.TILE_TYPES.length - 1)];
-        
-        this.state.grid[py][px].type = safeColor;
-        // Ensure some safe moves
-        if (px < CONFIG.GRID_W - 1) this.state.grid[py][px + 1].type = safeColor;
-        if (py < CONFIG.GRID_H - 1) this.state.grid[py + 1][px].type = safeColor;
-    }
-
-    log(msg) {
-        const div = document.createElement('div');
-        div.textContent = `> ${msg}`;
-        this.ui.log.prepend(div);
-        if (this.ui.log.children.length > 5) this.ui.log.lastChild.remove();
-    }
-
-    updateUI() {
-        const pPct = (this.state.player.hp / this.state.player.maxHp) * 100;
-        const ePct = (this.state.enemy.hp / this.state.enemy.maxHp) * 100;
-        
-        //this.ui.pHp.textContent = Math.max(0, Math.ceil(this.state.player.hp));
-        this.ui.pBar.style.width = `${Math.max(0, pPct)}%`;
-        
-        //this.ui.eHp.textContent = Math.max(0, this.state.enemy.hp);
-        this.ui.eBar.style.width = `${Math.max(0, ePct)}%`;
-
-        const count = this.state.currentPath.length;
-        this.ui.chain.textContent = count;
-
-        const comboEl = document.getElementById('combo-display');
-        
-        if (count > 1) {
-            comboEl.textContent = count;
-            comboEl.style.opacity = '1';
-            const scale = 1 + (count * 0.05); 
-            comboEl.style.transform = `translate(-50%, -50%) scale(${scale})`;
-            
-            if (count > 5) comboEl.classList.add('high-combo');
-            else comboEl.classList.remove('high-combo');
-        } else {
-            comboEl.style.opacity = '0';
-            comboEl.style.transform = `translate(-50%, -50%) scale(1)`;
-        }
-    }
-
-    isValidStart(pos) {
-        if (!pos) return false;
-        return pos.x === this.state.player.x && pos.y === this.state.player.y;
-    }
-
-    startPath(pos) {
-        this.state.currentPath = [pos];
-        this.updateUI();
-    }
-
-    updatePath(pos) {
-        if (!pos) return;
-        const path = this.state.currentPath;
-        const last = path[path.length - 1];
-
-        if (path.length > 1 && path[path.length - 2].x === pos.x && path[path.length - 2].y === pos.y) {
-            path.pop();
-            this.updateUI();
-            return;
-        }
-
-        if (Math.abs(pos.x - last.x) + Math.abs(pos.y - last.y) === 1) {
-            const tile = this.state.grid[pos.y][pos.x];
-            const startTile = this.state.grid[path[0].y][path[0].x];
-            
-            if (tile.type !== startTile.type) return;
-            if (path.some(p => p.x === pos.x && p.y === pos.y)) return;
-
-            path.push(pos);
-            this.updateUI();
-        }
-    }
-
-    finalizeMove() {
-        const path = this.state.currentPath;
-        
-        if (path.length === 1) {
-            this.log("SYSTEM REBOOT: Refactoring...");
-            this.renderer.triggerGlitch(0.3);
-            this.shuffleGrid();
-            this.state.currentPath = [];
-            this.updateUI();
-            this.state.turn = 'enemy';
-            setTimeout(() => this.enemyTurn(), 500);
-            return;
-        }
-
-        if (path.length < 1) {
-            this.state.currentPath = [];
-            return;
-        }
-
-        const endPos = path[path.length - 1];
-        this.state.player.x = endPos.x;
-        this.state.player.y = endPos.y;
-
-        let shakeIntensity = path.length * 0.05; 
-        let damage = path.length * CONFIG.BASE_DMG;
-        
-        if (path.length > 5) {
-            damage = Math.floor(damage * 2.0);
-            this.log(`>> CHAIN BOOST ACTIVATED! (x2.0) <<`);
-            shakeIntensity += 0.2; 
-        }
-
-        const totalTiles = CONFIG.GRID_W * CONFIG.GRID_H;
-        if (path.length >= totalTiles * CONFIG.GLITCH_THRESHOLD) {
-            damage = path.length * CONFIG.BASE_DMG * 4.0;
-            this.log("!!! GLITCH BREAK INITIATED !!!");
-            shakeIntensity = 1.5; 
-        }
-
-        this.renderer.triggerGlitch(shakeIntensity);
-
-        this.state.enemy.hp -= damage;
-        this.log(`Upload: ${path.length} Nodes. Total Dmg: ${damage}`);
-
-        if (this.state.enemy.hp <= 0) {
-            this.state.enemy.hp = 0;
-            this.updateUI();
-            this.endGame('win');
-            return;
-        }
-
-        this.respawnTiles(path);
-        this.state.currentPath = [];
-        this.updateUI();
-
-        this.state.turn = 'enemy';
-        setTimeout(() => this.enemyTurn(), 800);
-    }
-
-    respawnTiles(path) {
-        path.forEach(p => {
-            const neighbors = [];
-            const gx = p.x;
-            const gy = p.y;
-            if (gx > 0) neighbors.push(this.state.grid[gy][gx-1].type);
-            if (gx < CONFIG.GRID_W-1) neighbors.push(this.state.grid[gy][gx+1].type);
-            if (gy > 0) neighbors.push(this.state.grid[gy-1][gx].type);
-            if (gy < CONFIG.GRID_H-1) neighbors.push(this.state.grid[gy+1][gx].type);
-
-            if (neighbors.length > 0 && Math.random() < 0.8) {
-                this.state.grid[gy][gx].type = neighbors[randomInt(0, neighbors.length - 1)];
-            } else {
-                this.state.grid[gy][gx].type = CONFIG.TILE_TYPES[randomInt(0, CONFIG.TILE_TYPES.length - 1)];
+            // --- Game Logic ---
+            isValidStart(pos) {
+                if (!pos) return false;
+                return pos.x === this.state.player.x && pos.y === this.state.player.y;
             }
-        });
-    }
 
-    enemyTurn() {
-        if (this.state.isGameOver) return;
-
-        const ex = this.state.enemy.x;
-        const ey = this.state.enemy.y;
-        const px = this.state.player.x;
-        const py = this.state.player.y;
-
-        let moves = [
-            {x: ex+1, y: ey}, {x: ex-1, y: ey},
-            {x: ex, y: ey+1}, {x: ex, y: ey-1}
-        ];
-
-        moves = moves.filter(m => 
-            m.x >= 0 && m.x < CONFIG.GRID_W &&
-            m.y >= 0 && m.y < CONFIG.GRID_H &&
-            !(m.x === px && m.y === py)
-        );
-
-        if (moves.length > 0) {
-            moves.sort((a, b) => {
-                const da = Math.abs(a.x - px) + Math.abs(a.y - py);
-                const db = Math.abs(b.x - px) + Math.abs(b.y - py);
-                return da - db;
-            });
-            this.state.enemy.x = moves[0].x;
-            this.state.enemy.y = moves[0].y;
-        }
-
-        if (getDistance(this.state.player, this.state.enemy) === 1) {
-            this.state.player.hp -= CONFIG.ENEMY_DMG;
-            this.log(`WARNING: Firewall Counter-Attack! -${CONFIG.ENEMY_DMG} HP`);
-            this.renderer.triggerGlitch(0.8);
-            
-            if (this.state.player.hp <= 0) {
-                this.state.player.hp = 0;
-                this.endGame('lose');
+            startPath(pos) {
+                this.state.currentPath = [pos];
+                this.updateUI();
             }
-        }
 
-        this.updateUI();
-        this.state.turn = 'player';
-    }
+            updatePath(pos) {
+                if (!pos) return;
+                const path = this.state.currentPath;
+                const last = path[path.length - 1];
 
-    // Gameクラス内
-    endGame(result) {
-        this.state.isGameOver = true;
-        
-        setTimeout(() => {
-            const screen = document.getElementById('game-over-screen');
-            const title = document.getElementById('game-result-title');
-            
-            screen.classList.remove('hidden');
-            
-            if (result === 'win') {
-                title.textContent = "PROTOCOL BREACH SUCCESS";
-                title.style.color = "#00FFFF";
+                // Backtrack (Undo)
+                if (path.length > 1 && path[path.length - 2].x === pos.x && path[path.length - 2].y === pos.y) {
+                    path.pop();
+                    this.updateUI();
+                    return;
+                }
+
+                // Add Node
+                if (Math.abs(pos.x - last.x) + Math.abs(pos.y - last.y) === 1) {
+                    const tile = this.state.grid[pos.y][pos.x];
+                    const startTile = this.state.grid[path[0].y][path[0].x];
+                    
+                    if (tile.type !== startTile.type) return; // 色違い
+                    if (path.some(p => p.x === pos.x && p.y === pos.y)) return; // 訪問済み
+
+                    path.push(pos);
+                    this.updateUI();
+                }
+            }
+
+            finalizeMove() {
+                const path = this.state.currentPath;
                 
-                // ▼▼▼ 追加: 親ページにクリア信号を送る ▼▼▼
-                // 0.5秒待ってからカバーを戻す（余韻を残すため）
-                setTimeout(() => {
-                    window.parent.postMessage('GAME_CLEAR', '*');
-                }, 500); 
-                // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+                // Reboot (Tap Self)
+                if (path.length === 1) {
+                    this.log("SYSTEM REBOOT: Refactoring...");
+                    this.renderer.triggerGlitch(0.3);
+                    this.shuffleGrid();
+                    this.state.currentPath = [];
+                    this.updateUI();
+                    this.state.turn = 'enemy';
+                    setTimeout(() => this.enemyTurn(), 500);
+                    return;
+                }
+
+                if (path.length < 1) {
+                    this.state.currentPath = [];
+                    return;
+                }
+
+                // Attack Execution
+                const endPos = path[path.length - 1];
+                this.state.player.x = endPos.x;
+                this.state.player.y = endPos.y;
+
+                let shakeIntensity = path.length * 0.05; 
+                let damage = path.length * CONFIG.BASE_DMG;
                 
-            } else {
-                title.textContent = "CONNECTION TERMINATED";
-                title.style.color = "#FF0055";
+                if (path.length > 5) {
+                    damage = Math.floor(damage * 2.0);
+                    this.log(`>> CHAIN BOOST ACTIVATED! (x2.0) <<`);
+                    shakeIntensity += 0.2; 
+                }
+
+                // Glitch Break
+                const totalTiles = CONFIG.GRID_W * CONFIG.GRID_H;
+                if (path.length >= totalTiles * CONFIG.GLITCH_THRESHOLD) {
+                    damage = path.length * CONFIG.BASE_DMG * 4.0;
+                    this.log("!!! GLITCH BREAK INITIATED !!!");
+                    shakeIntensity = 1.5; 
+                }
+
+                this.renderer.triggerGlitch(shakeIntensity);
+                this.state.enemy.hp -= damage;
+                this.log(`Upload: ${path.length} Nodes. Total Dmg: ${damage}`);
+
+                if (this.state.enemy.hp <= 0) {
+                    this.state.enemy.hp = 0;
+                    this.updateUI();
+                    this.endGame('win');
+                    return;
+                }
+
+                // Respawn Tiles
+                this.respawnTiles(path);
+                this.state.currentPath = [];
+                this.updateUI();
+
+                this.state.turn = 'enemy';
+                setTimeout(() => this.enemyTurn(), 800);
             }
-        }, 1000);
-    }
 
-    restart() {
-        document.getElementById('game-over-screen').classList.add('hidden');
-        this.state.isGameOver = false;
-        this.state.turn = 'player';
-        this.state.player.hp = CONFIG.PLAYER_HP;
-        this.state.enemy.hp = CONFIG.ENEMY_HP;
-        this.state.currentPath = [];
-        this.ui.log.innerHTML = '';
-        this.log("System Rebooted... Ready.");
-        this.initGrid();
-        this.updateUI();
-    }
-}
+            respawnTiles(path) {
+                path.forEach(p => {
+                    this.state.grid[p.y][p.x].type = CONFIG.TILE_TYPES[UTILS.randomInt(0, CONFIG.TILE_TYPES.length - 1)];
+                });
+            }
 
-window.onload = () => {
-    const game = new Game();
-};
-</script>
+            enemyTurn() {
+                if (this.state.isGameOver) return;
+                const { enemy, player } = this.state;
+                const ex = enemy.x; const ey = enemy.y;
+                const px = player.x; const py = player.y;
+
+                // Simple AI: Move towards player
+                let moves = [
+                    {x: ex+1, y: ey}, {x: ex-1, y: ey},
+                    {x: ex, y: ey+1}, {x: ex, y: ey-1}
+                ].filter(m => 
+                    m.x >= 0 && m.x < CONFIG.GRID_W &&
+                    m.y >= 0 && m.y < CONFIG.GRID_H &&
+                    !(m.x === px && m.y === py)
+                );
+
+                if (moves.length > 0) {
+                    moves.sort((a, b) => {
+                        const da = Math.abs(a.x - px) + Math.abs(a.y - py);
+                        const db = Math.abs(b.x - px) + Math.abs(b.y - py);
+                        return da - db;
+                    });
+                    this.state.enemy.x = moves[0].x;
+                    this.state.enemy.y = moves[0].y;
+                }
+
+                // Attack Check
+                if (UTILS.getDistance(this.state.player, this.state.enemy) === 1) {
+                    this.state.player.hp -= CONFIG.ENEMY_DMG;
+                    this.log(`WARNING: Firewall Counter-Attack! -${CONFIG.ENEMY_DMG} HP`);
+                    this.renderer.triggerGlitch(0.8);
+                    
+                    if (this.state.player.hp <= 0) {
+                        this.state.player.hp = 0;
+                        this.endGame('lose');
+                    }
+                }
+
+                this.updateUI();
+                this.state.turn = 'player';
+            }
+
+            endGame(result) {
+                this.state.isGameOver = true;
+                this.ui.gameOver.classList.remove('hidden');
+                
+                if (result === 'win') {
+                    this.ui.resultTitle.textContent = "PROTOCOL BREACH SUCCESS";
+                    this.ui.resultTitle.style.color = CONFIG.COLORS[0];
+                    
+                    // ★ IMPORTANT: Signal to Parent Window
+                    setTimeout(() => {
+                        window.parent.postMessage('GAME_CLEAR', '*');
+                    }, 500); 
+                    
+                } else {
+                    this.ui.resultTitle.textContent = "CONNECTION TERMINATED";
+                    this.ui.resultTitle.style.color = "#FF0055";
+                }
+            }
+
+            restart() {
+                this.ui.gameOver.classList.add('hidden');
+                this.state.isGameOver = false;
+                this.state.turn = 'player';
+                this.state.player.hp = CONFIG.PLAYER_HP;
+                this.state.enemy.hp = CONFIG.ENEMY_HP;
+                this.state.currentPath = [];
+                this.ui.log.innerHTML = '';
+                this.log("System Rebooted... Ready.");
+                this.initGrid();
+                this.updateUI();
+            }
+        }
+
+        // ==========================================
+        // 5. BOOTSTRAP
+        // ==========================================
+        window.onload = () => {
+            const game = new Game();
+        };
+
+    </script>
 </body>
 </html>

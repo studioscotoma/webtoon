@@ -6,24 +6,34 @@
     <title>Glitch: Seoul Login EP.003 - First Encounter</title>
     <style>
         /* =========================================
-           1. Base Layout & Reset
+           1. BASE LAYOUT & RESET
            ========================================= */
+        :root {
+            --color-bg: #000;
+            --color-text: #fff;
+            --color-cyan: #00FFFF;
+            --color-magenta: #FF0055;
+            --font-ui: 'Courier New', sans-serif;
+        }
+
         body {
             margin: 0;
             padding: 0;
-            background-color: #000;
-            color: #fff;
+            background-color: var(--color-bg);
+            color: var(--color-text);
             font-family: sans-serif;
             display: flex;
             justify-content: center;
         }
 
-        /* ビューワー本体（中央カラム） */
+        /* =========================================
+           2. VIEWER CONTAINER
+           ========================================= */
         #viewer-container {
             width: 100%;
             max-width: 690px;
-            background-color: #000;
-            display: none; /* 表紙表示中は非表示 */
+            background-color: var(--color-bg);
+            display: none; /* 初期状態は非表示（カバー表示中） */
         }
         
         #viewer-container.active {
@@ -33,249 +43,190 @@
         .scene-block {
             display: flex;
             flex-direction: column;
+            position: relative;
             margin: 0;
-            position: relative; /* ゲーム挿入時の配置用 */
         }
 
         .comic-image {
             display: block;
             width: 100%;
             height: auto;
-            border: none;
             background-color: #111;
             transition: opacity 0.5s;
         }
-        
-        /* 字幕エリア全体 */
+
+        /* =========================================
+           3. CAPTION STYLES (Multilingual)
+           ========================================= */
         .caption-area {
             padding: 24px 16px 40px;
-            background-color: #000;
+            background-color: var(--color-bg);
             text-align: center;
         }
 
-        /* =========================================
-           2. Webtoon Multilingual Text Styles
-           ========================================= */
-        .text-kr {
-            font-size: 18px;
-            font-weight: 700;
-            line-height: 1.5;
-            color: #ffffff;
-            margin: 0 0 8px 0;
-            letter-spacing: 0.02em;
-        }
-
-        .text-ja {
-            font-size: 14px;
-            font-weight: 400;
-            line-height: 1.5;
-            color: #d0d0d0;
-            margin: 0 0 4px 0;
-        }
-
-        .text-fr {
-            font-size: 12px;
-            color: #777777;
-            font-style: italic;
-            font-family: 'Georgia', serif;
-            line-height: 1.4;
-            margin: 0 0 2px 0;
-            opacity: 0.9;
-        }
-
-        .text-en {
-            font-size: 11px;
-            color: #666666;
-            font-style: italic;
-            font-family: 'Georgia', serif;
-            line-height: 1.4;
-            opacity: 0.8;
-            margin: 0;
-        }
+        .text-kr { font-size: 18px; font-weight: 700; line-height: 1.5; color: #fff; margin-bottom: 8px; letter-spacing: 0.02em; }
+        .text-ja { font-size: 14px; font-weight: 400; line-height: 1.5; color: #d0d0d0; margin-bottom: 4px; }
+        .text-fr { font-size: 12px; color: #777; font-style: italic; font-family: 'Georgia', serif; margin-bottom: 2px; opacity: 0.9; }
+        .text-en { font-size: 11px; color: #666; font-style: italic; font-family: 'Georgia', serif; opacity: 0.8; margin: 0; }
 
         /* =========================================
-           3. Game Iframe Styles
+           4. GAME CONTAINER & OVERLAY UI
            ========================================= */
         .game-wrapper {
             width: 100%;
-            background-color: #000;
-            
-            /* 線と余白を削除 */
-            padding: 0;
-            border: none; 
-            
             display: flex;
             justify-content: center;
+            padding: 0 0 100px 0;
+        }
+
+        .game-container {
+            position: relative;
+            width: 90%;
+            max-width: 450px;
+            height: 500px; /* ゲーム画面の高さ */
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
         }
 
         iframe.game-frame {
             width: 100%;
-            height: 600px; /* ゲーム画面の高さ確保 */
-            border: 2px solid #00FFFF; /* ネオンボーダー */
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            height: 100%;
+            border: 2px solid var(--color-cyan);
             background-color: #050505;
+            display: block;
+            pointer-events: none; /* 初期はクリック無効 */
+            transition: all 0.3s;
         }
 
-        /* =========================================
-           4. UI Components: Cover Screen
-           ========================================= */
-        #cover-screen {
-            position: fixed;
+        /* ゲーム用オーバーレイ（共通スタイル） */
+        .game-overlay {
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100vh;
-            z-index: 9999;
-            background-color: #000;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px; 
-            box-sizing: border-box;
-            transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
-            opacity: 1;
-            visibility: visible;
-        }
-
-        #cover-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        #cover-image {
-            width: 100%;
-            max-width: 690px;
-            height: auto;
-            max-height: 60vh;
-            object-fit: contain;
-            margin-bottom: 40px;
-            box-shadow: 0 0 30px rgba(255, 0, 255, 0.2); /* EP3はマゼンタ基調 */
-        }
-
-        #start-button {
-            padding: 16px 48px;
-            font-size: 18px;
-            font-weight: bold;
-            letter-spacing: 0.1em;
-            color: #f0f;
-            background-color: transparent;
-            border: 2px solid #f0f;
+            z-index: 10;
+            backdrop-filter: blur(3px);
             cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
-            text-shadow: 0 0 5px rgba(255, 0, 255, 0.8);
-            margin-bottom: 20px;
+            transition: all 0.5s ease;
         }
 
-        #start-button:hover {
-            background-color: rgba(255, 0, 255, 0.1);
-            box-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
+        .overlay-content {
+            text-align: center;
+            font-family: var(--font-ui);
+            width: 90%;
+        }
+
+        /* 状態A: WARNING (初期) */
+        .game-overlay .status-msg { color: var(--color-magenta); }
+        .game-overlay .main-title { 
+            font-size: 24px; font-weight: 900; margin-bottom: 20px; color: var(--color-magenta);
+            animation: blink-text 1.5s infinite; 
+        }
+        .game-overlay .action-btn {
+            display: inline-block;
+            font-size: 14px; font-weight: bold; padding: 10px 20px;
+            color: #000; background-color: var(--color-magenta);
+            animation: pulse-border 2s infinite;
+            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+        }
+
+        /* 状態B: HACKED (クリア後) */
+        .game-overlay.hacked {
+            background-color: rgba(0, 0, 0, 0.85);
+            pointer-events: auto !important; /* オーバーレイを表示状態に固定 */
+        }
+        .game-overlay.hacked .status-msg { color: var(--color-cyan); }
+        .game-overlay.hacked .main-title {
+            color: var(--color-cyan);
+            text-shadow: 0 0 20px var(--color-cyan);
+            animation: none; /* 点滅停止 */
+        }
+        .game-overlay.hacked .action-btn {
+            background-color: var(--color-cyan);
+            box-shadow: 0 0 20px rgba(0,255,255,0.5);
+            animation: none;
+            cursor: default;
+        }
+
+        /* Animations */
+        @keyframes blink-text {
+            0% { opacity: 1; text-shadow: 0 0 10px var(--color-magenta); }
+            50% { opacity: 0.6; text-shadow: 0 0 20px var(--color-magenta); }
+            100% { opacity: 1; text-shadow: 0 0 10px var(--color-magenta); }
+        }
+        @keyframes pulse-border {
+            0% { transform: scale(1); box-shadow: 0 0 0 rgba(255,0,85,0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,0,85,0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 rgba(255,0,85,0); }
         }
 
         /* =========================================
-           5. UI Components: Navigation Footer
+           5. UI COMPONENTS: COVER & NAV
            ========================================= */
-        .next-episode-area {
-            padding: 60px 10px 40px;
-            text-align: center;
-            background-color: #000;
+        #cover-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            z-index: 9999; background-color: #000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px; box-sizing: border-box;
+            transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+        }
+        #cover-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+        
+        #cover-image {
+            width: 100%; max-width: 690px; height: auto; max-height: 60vh;
+            object-fit: contain; margin-bottom: 40px;
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.2);
         }
 
-        .next-button {
-            display: inline-flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 90%;
-            max-width: 300px;
-            padding: 20px;
-            border: 1px solid #333;
-            background-color: #050505;
-            color: #fff;
-            text-decoration: none;
+        #start-button {
+            padding: 16px 48px; font-size: 18px; font-weight: bold; letter-spacing: 0.1em;
+            color: #f0f; background: transparent; border: 2px solid #f0f;
+            cursor: pointer; text-transform: uppercase;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.5); text-shadow: 0 0 5px rgba(255, 0, 255, 0.8);
             transition: all 0.3s ease;
         }
+        #start-button:hover { background-color: rgba(255, 0, 255, 0.1); box-shadow: 0 0 20px rgba(255, 0, 255, 0.8); }
 
-        .next-button:hover {
-            border-color: #f0f;
-            box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
+        /* Footer */
+        .next-episode-area { padding: 60px 10px 40px; text-align: center; background-color: #000; }
+        .next-button {
+            display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 90%; max-width: 300px; padding: 20px;
+            border: 1px solid #333; background-color: #050505; color: #fff; text-decoration: none;
+            transition: all 0.3s ease;
         }
-
-        .next-label {
-            font-size: 10px;
-            color: #666;
-            letter-spacing: 0.2em;
-            margin-bottom: 5px;
-        }
-
-        .next-title {
-            font-size: 20px;
-            font-weight: bold;
-            letter-spacing: 0.1em;
-            font-family: 'Courier New', sans-serif;
-            color: #ddd;
-        }
+        .next-button:hover { border-color: #f0f; box-shadow: 0 0 15px rgba(255, 0, 255, 0.3); }
+        .next-label { font-size: 10px; color: #666; letter-spacing: 0.2em; margin-bottom: 5px; }
+        .next-title { font-size: 20px; font-weight: bold; font-family: 'Courier New', sans-serif; color: #ddd; }
 
         .nav-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            background-color: #0a0a0a;
-            border-top: 1px solid #222;
-            margin-top: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px; background-color: #0a0a0a; border-top: 1px solid #222; margin-top: 20px;
         }
-
-        .nav-link {
-            font-size: 12px;
-            color: #888;
-            text-decoration: none;
-            font-weight: bold;
-            letter-spacing: 0.1em;
-            padding: 10px;
-            transition: color 0.3s;
-        }
-
-        .nav-link:hover {
-            color: #f0f;
-        }
-
-        .ep-select-wrapper {
-            position: relative;
-        }
-
+        .nav-link { font-size: 12px; color: #888; text-decoration: none; font-weight: bold; padding: 10px; transition: color 0.3s; }
+        .nav-link:hover { color: #f0f; }
+        
+        /* Select Box */
+        .ep-select-wrapper { position: relative; }
         .ep-select-wrapper select {
-            appearance: none;
-            background-color: #000;
-            color: #f0f;
-            border: 1px solid #333;
-            padding: 5px 30px 5px 15px;
-            font-size: 14px;
-            font-family: 'Courier New', monospace;
-            cursor: pointer;
-            border-radius: 4px;
+            appearance: none; background-color: #000; color: #f0f;
+            border: 1px solid #333; padding: 5px 30px 5px 15px;
+            font-size: 14px; font-family: 'Courier New', monospace; border-radius: 4px; cursor: pointer;
         }
-
         .ep-select-wrapper::after {
-            content: '▼';
-            font-size: 8px;
-            color: #f0f;
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            pointer-events: none;
+            content: '▼'; font-size: 8px; color: #f0f;
+            position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none;
         }
-
     </style>
 </head>
 <body>
 
     <div id="cover-screen">
-        <img id="cover-image" src="ep003/cover.webp" alt="Glitch: Seoul Login EP.003 Cover" onerror="this.src='https://placehold.co/690x1000/000000/FF00FF?text=EP.003+Cover'">
+        <img id="cover-image" src="ep001/cover.webp" alt="Glitch: Seoul Login EP.003 Cover" onerror="this.src='https://placehold.co/690x1000/000000/FF00FF?text=EP.003+Cover'">
         <button id="start-button">INITIALIZE EP.03</button>
     </div>
     
@@ -291,7 +242,6 @@
         
         <div class="nav-footer">
             <a href="ep002.html" class="nav-link">&lt; PREV</a>
-            
             <div class="ep-select-wrapper">
                 <select onchange="if(this.value) location.href=this.value">
                     <option value="index.html">EP.01</option>
@@ -299,7 +249,6 @@
                     <option value="#" selected>EP.03</option>
                 </select>
             </div>
-
             <a href="../index.html" class="nav-link">STUDIO &gt;</a>
         </div>
     </div>
@@ -308,23 +257,20 @@
         // ==========================================
         // 1. CONFIG & DATA
         // ==========================================
-        
-        const DEBUG_MODE = true;
-        
         const CONFIG = {
-            filePrefix: 'ep001/scene', // EP3用のパス
-            fileExtension: '.webp'
+            debugMode: true,
+            filePrefix: 'ep001/scene', 
+            fileExtension: '.webp',
+            gamePath: 'game/2x4.html' // 読み込んだゲームファイルのパス
         };
 
-        // シナリオデータ（画像とゲームの混合リスト）
-        // type: 'image' | 'game'
         const scenarioData = [
-            // --- Intro: 覚醒直後の混乱 ---
+            // --- Intro ---
+            { type: 'image', id: 1, kr: "...", ja: "...", fr: "...", en: "..." }, // Dummy Intro
             
-            // --- Battle Start: ゲーム挿入ポイント ---
+            // --- Battle Entry ---
             {
-                type: 'image',
-                id: 1,
+                type: 'image', id: 2,
                 kr: "[전투 프로토콜]을 개시합니다. 연결하시겠습니까?",
                 ja: "[戦闘プロトコル]を開始します。接続しますか？",
                 fr: "Lancement du [Protocole de Combat]. Connexion ?",
@@ -335,15 +281,13 @@
             {
                 type: 'game',
                 id: 'GAME_VS_DAEMON',
-                src: 'game/2x4.html', // 以前作成したゲームファイルのパス
-                height: '640px'        // 少し余裕を持たせる
+                src: CONFIG.gamePath
             },
             // ▲▲▲ GAME END ▲▲▲
 
-            // --- Post Battle: 戦闘後 ---
+            // --- Post Battle ---
             {
-                type: 'image',
-                id: 8,
+                type: 'image', id: 3,
                 kr: "해치웠나...?",
                 ja: "やったか……？",
                 fr: "Je l'ai eu... ?",
@@ -352,277 +296,177 @@
         ];
 
         // ==========================================
-        // 2. MAIN LOGIC
+        // 2. DOM ELEMENTS
+        // ==========================================
+        const els = {
+            cover: document.getElementById('cover-screen'),
+            startBtn: document.getElementById('start-button'),
+            viewer: document.getElementById('viewer-container'),
+            content: document.getElementById('comic-content')
+        };
+
+        // ==========================================
+        // 3. MAIN LOGIC
         // ==========================================
         
-        const coverScreen = document.getElementById('cover-screen');
-        const startButton = document.getElementById('start-button');
-        const viewerContainer = document.getElementById('viewer-container');
-        const comicContent = document.getElementById('comic-content');
+        const initViewer = () => {
+            if (CONFIG.debugMode) {
+                startWebtoon();
+            } else {
+                els.startBtn.addEventListener('click', startWebtoon);
+            }
+        };
 
         const startWebtoon = () => {
-            coverScreen.classList.add('hidden');
-            viewerContainer.classList.add('active');
+            els.cover.classList.add('hidden');
+            els.viewer.classList.add('active');
             window.scrollTo(0, 0);
         };
 
-        if (DEBUG_MODE) {
-            startWebtoon();
-        } else {
-            startButton.addEventListener('click', startWebtoon);
-        }
-
-        // レンダリングエンジンの刷新
-        // scenarioDataをループの主体とし、typeに応じて描画を切り替える
+        // シーンレンダリング
         const renderWebtoon = () => {
             const fragment = document.createDocumentFragment();
-            
-            // 画像ファイル名のカウンター（ゲームは画像枚数に含まないため分離）
             let imageCounter = 1;
 
             scenarioData.forEach(scene => {
                 const sceneBlock = document.createElement('div');
                 sceneBlock.className = 'scene-block';
 
-                // --- A. IFRAME (Game) リサイズ版 ---
-                // ▼▼▼ このブロックを丸ごと上書きしてください ▼▼▼
                 if (scene.type === 'game') {
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'game-wrapper';
-                    
-                    // レイアウト設定（中央揃え）
-                    wrapper.style.width = '100%';
-                    wrapper.style.display = 'flex';
-                    wrapper.style.justifyContent = 'center';
-                    wrapper.style.alignItems = 'center';
-                    
-                    // ★ 下の余白（ここで調整可能）
-                    wrapper.style.padding = '0 0 100px 0'; 
-
-                    // コンテナ（iframe + overlay をまとめる箱）
-                    const container = document.createElement('div');
-                    container.style.position = 'relative';
-                    container.style.width = '90%';        // 幅90%
-                    container.style.maxWidth = '450px';   // 最大450px
-                    container.style.height = '500px';     // 高さ500px
-                    container.style.boxShadow = '0 0 20px rgba(0, 255, 255, 0.1)'; 
-
-                    // 1. iframe本体
-                    const iframe = document.createElement('iframe');
-                    iframe.src = scene.src;
-                    iframe.className = 'game-frame'; // ★クラス名重要
-                    
-                    iframe.style.width = '100%';
-                    iframe.style.height = '100%';
-                    iframe.style.border = '2px solid #00FFFF';
-                    iframe.style.display = 'block'; // 隙間防止
-                    iframe.style.boxSizing = 'border-box';
-                    
-                    iframe.loading = 'lazy';
-                    iframe.sandbox = 'allow-scripts allow-same-origin allow-popups';
-                    iframe.title = `Interactive Content: ${scene.id}`;
-                    iframe.style.pointerEvents = 'none'; // 初期ロック
-                    iframe.style.transition = 'all 0.3s';
-
-                    // 2. オーバーレイ（カバー）
-                    const overlay = document.createElement('div');
-                    overlay.className = 'game-overlay'; // ★★★ 修正箇所：この行が抜けていました ★★★
-                    
-                    // オーバーレイのスタイル
-                    Object.assign(overlay.style, {
-                        position: 'absolute',
-                        top: '0',
-                        left: '0',
-                        width: '100%',
-                        height: '100%',
-                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        zIndex: '10',
-                        backdropFilter: 'blur(3px)'
-                    });
-
-                    // 点滅アニメーション定義（初回のみ追加）
-                    const blinkKeyframes = `
-                        @keyframes blink-text {
-                            0% { opacity: 1; text-shadow: 0 0 10px #FF0055; }
-                            50% { opacity: 0.6; text-shadow: 0 0 20px #FF0055; }
-                            100% { opacity: 1; text-shadow: 0 0 10px #FF0055; }
-                        }
-                        @keyframes pulse-border {
-                            0% { transform: scale(1); box-shadow: 0 0 0 rgba(255,0,85,0.4); }
-                            70% { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,0,85,0); }
-                            100% { transform: scale(1); box-shadow: 0 0 0 rgba(255,0,85,0); }
-                        }
-                    `;
-                    const styleSheet = document.createElement("style");
-                    styleSheet.innerText = blinkKeyframes;
-                    if (!document.getElementById('anim-style')) {
-                        styleSheet.id = 'anim-style';
-                        document.head.appendChild(styleSheet);
-                    }
-
-                    // オーバーレイの中身（初期状態）
-                    overlay.innerHTML = `
-                        <div style="
-                            text-align:center; 
-                            color: #FF0055; 
-                            font-family: 'Courier New', sans-serif; 
-                            width: 90%;
-                        ">
-                            <div style="font-size: 12px; margin-bottom: 5px; color: #fff;">WARNING: FIREWALL DETECTED</div>
-                            <div style="font-size: 24px; font-weight: 900; margin-bottom: 20px; animation: blink-text 1.5s infinite;">BATTLE START</div>
-                            <div style="
-                                display: inline-block;
-                                font-size: 14px; 
-                                font-weight: bold;
-                                color: #000;
-                                background-color: #FF0055;
-                                padding: 10px 20px;
-                                animation: pulse-border 2s infinite;
-                                clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
-                            ">
-                                [ INITIATE BREACH ]
-                            </div>
-                        </div>
-                    `;
-
-                    // クリック時の挙動
-                    overlay.addEventListener('click', function() {
-                        this.style.display = 'none';
-                        iframe.style.pointerEvents = 'auto';
-                        iframe.style.boxShadow = '0 0 30px rgba(0, 255, 255, 0.5)';
-                    });
-
-                    container.appendChild(iframe);
-                    container.appendChild(overlay);
-                    wrapper.appendChild(container);
-                    
-                    sceneBlock.appendChild(wrapper);
-                }
-                // --- B. IMAGE (Comic) ---
-                else {
-                    // 画像
-                    const fileNumber = imageCounter.toString().padStart(2, '0');
-                    const img = document.createElement('img');
-                    
-                    // 実際の画像ファイルがない場合のダミー生成（placeholder.coを使用）
-                    // 本番環境では this.src のエラーハンドラは削除してください
-                    img.src = `${CONFIG.filePrefix}${fileNumber}${CONFIG.fileExtension}`;
-                    img.onerror = function() {
-                        // ダミー画像の生成
-                        this.src = `https://placehold.co/690x800/111/fff?text=EP.03+Scene+${fileNumber}`;
-                        this.onerror = null; // ループ防止
-                    };
-                    
-                    img.className = 'comic-image';
-                    img.loading = 'lazy';
-                    img.alt = `Scene ${scene.id}`;
-                    sceneBlock.appendChild(img);
+                    // --- Game Render ---
+                    sceneBlock.appendChild(createGameElement(scene));
+                } else {
+                    // --- Image Render ---
+                    sceneBlock.appendChild(createImageElement(scene, imageCounter));
                     imageCounter++;
-
-                    // 字幕生成
-                    const captionDiv = document.createElement('div');
-                    captionDiv.className = 'caption-area';
-                    
-                    const appendText = (cls, text) => {
-                        if (!text) return;
-                        const p = document.createElement('p');
-                        p.className = cls;
-                        p.innerHTML = text;
-                        captionDiv.appendChild(p);
-                    };
-
-                    appendText('text-kr', scene.kr);
-                    appendText('text-ja', scene.ja);
-                    appendText('text-fr', scene.fr);
-                    appendText('text-en', scene.en);
-
-                    sceneBlock.appendChild(captionDiv);
                 }
-                
                 fragment.appendChild(sceneBlock);
             });
             
-            comicContent.appendChild(fragment);
+            els.content.appendChild(fragment);
         };
 
-        renderWebtoon();
-    
-        // ゲームからのメッセージを監視
-        // Webtoonビューワー側の <script> 末尾
+        // 画像要素生成
+        const createImageElement = (scene, counter) => {
+            const wrapper = document.createDocumentFragment();
+            const fileNum = counter.toString().padStart(2, '0');
+            
+            const img = document.createElement('img');
+            img.className = 'comic-image';
+            img.loading = 'lazy';
+            img.alt = `Scene ${scene.id}`;
+            // 本番用src設定（エラーハンドラ付）
+            img.src = `${CONFIG.filePrefix}${fileNum}${CONFIG.fileExtension}`;
+            img.onerror = function() {
+                this.src = `https://placehold.co/690x800/111/fff?text=Scene+${fileNum}`;
+                this.onerror = null; 
+            };
+            wrapper.appendChild(img);
+
+            // 字幕生成
+            const captionDiv = document.createElement('div');
+            captionDiv.className = 'caption-area';
+            ['kr', 'ja', 'fr', 'en'].forEach(lang => {
+                if(scene[lang]) {
+                    const p = document.createElement('p');
+                    p.className = `text-${lang}`;
+                    p.innerHTML = scene[lang];
+                    captionDiv.appendChild(p);
+                }
+            });
+            wrapper.appendChild(captionDiv);
+
+            return wrapper;
+        };
+
+        // ゲーム要素（iframe + overlay）生成
+        const createGameElement = (scene) => {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'game-wrapper';
+
+            const container = document.createElement('div');
+            container.className = 'game-container';
+
+            // 1. Iframe
+            const iframe = document.createElement('iframe');
+            iframe.className = 'game-frame';
+            iframe.src = scene.src;
+            iframe.loading = 'lazy';
+            iframe.title = `Game: ${scene.id}`;
+
+            // 2. Overlay (初期状態: WARNING)
+            const overlay = document.createElement('div');
+            overlay.className = 'game-overlay';
+            overlay.innerHTML = `
+                <div class="overlay-content">
+                    <div class="status-msg" style="font-size: 12px; margin-bottom: 5px;">WARNING: FIREWALL DETECTED</div>
+                    <div class="main-title">BATTLE START</div>
+                    <div class="action-btn">[ INITIATE BREACH ]</div>
+                </div>
+            `;
+
+            // クリックイベント: ゲーム開始（オーバーレイ非表示＆操作ロック解除）
+            overlay.addEventListener('click', function() {
+                // ハック完了済みなら何もしない
+                if(this.classList.contains('hacked')) return;
+                
+                this.style.opacity = '0';
+                setTimeout(() => { this.style.display = 'none'; }, 500);
+                
+                iframe.style.pointerEvents = 'auto';
+                iframe.style.boxShadow = '0 0 30px rgba(0, 255, 255, 0.5)';
+            });
+
+            container.appendChild(iframe);
+            container.appendChild(overlay);
+            wrapper.appendChild(container);
+
+            return wrapper;
+        };
+
+        // ==========================================
+        // 4. EVENT LISTENERS (Message Handling)
+        // ==========================================
         window.addEventListener('message', function(event) {
-            // デバッグ用ログ：メッセージが来ているか確認
-            console.log("📨 Message received:", event.data);
-
             if (event.data === 'GAME_CLEAR') {
-                console.log("✅ Game Clear signal detected!");
-
-                // クラス名で取得（念のため document全体から探す）
-                const overlay = document.querySelector('.game-overlay');
-                const iframe = document.querySelector('iframe.game-frame'); // タグ名も指定して精度を上げる
-                
-                if (!overlay) {
-                    console.error("❌ Overlay element NOT found!");
-                    return;
-                }
-                if (!iframe) {
-                    console.error("❌ Iframe element NOT found!");
-                    return;
-                }
-
-                console.log("🔄 Restoring overlay...");
-
-                // テキスト変更（エラーが出ても止まらないようにtry-catchで囲むか、存在確認する）
-                try {
-                    // Pattern B構造の場合のセレクタ
-                    // もし構造を変えていたらここが原因かもしれないので、
-                    // 単純に innerHTML を丸ごと書き換える方式の方が確実です。
-                    
-                    overlay.innerHTML = `
-                        <div style="
-                            text-align:center; 
-                            color: #00FFFF; 
-                            font-family: 'Courier New', sans-serif; 
-                            width: 90%;
-                            background: rgba(0, 0, 0, 0.9);
-                            padding: 30px;
-                            border: 1px solid #00FFFF;
-                            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-                        ">
-                            <div style="font-size: 14px; margin-bottom: 5px; color: #fff;">SYSTEM HACKED</div>
-                            <div style="font-size: 28px; font-weight: 900; margin-bottom: 25px; text-shadow: 0 0 20px #00FFFF;">COMPLETE</div>
-                            <div style="
-                                display: inline-block;
-                                font-size: 16px; 
-                                font-weight: bold;
-                                color: #000;
-                                background-color: #00FFFF;
-                                padding: 12px 30px;
-                                box-shadow: 0 0 20px rgba(0,255,255,0.5);
-                            ">
-                                [ ACCESS GRANTED ]
-                            </div>
-                        </div>
-                    `;
-                } catch (e) {
-                    console.error("⚠️ Text update failed:", e);
-                }
-                
-                // オーバーレイを表示（flexで強制上書き）
-                overlay.style.display = 'flex';
-                
-                // iframeの操作ロック
-                iframe.style.pointerEvents = 'none';
-                iframe.style.borderColor = "#00FFFF";
-                iframe.style.boxShadow = "0 0 20px rgba(0, 255, 255, 0.4)";
+                console.log("✅ Game Clear signal received");
+                handleGameClear();
             }
         });
 
+        const handleGameClear = () => {
+            const overlay = document.querySelector('.game-overlay');
+            const iframe = document.querySelector('.game-frame');
+            
+            if (!overlay || !iframe) return;
+
+            // オーバーレイの内容とスタイルを更新
+            overlay.style.display = 'flex'; // 再表示
+            
+            // 少し遅延させてフェードイン（display:flex反映待ち）
+            requestAnimationFrame(() => {
+                overlay.style.opacity = '1';
+                overlay.classList.add('hacked'); // .hackedクラスでスタイル一括変更
+                
+                // コンテンツ書き換え
+                overlay.innerHTML = `
+                    <div class="overlay-content">
+                        <div class="status-msg" style="font-size: 14px; margin-bottom: 5px;">SYSTEM HACKED</div>
+                        <div class="main-title" style="font-size: 28px;">COMPLETE</div>
+                        <div class="action-btn">[ ACCESS GRANTED ]</div>
+                    </div>
+                `;
+            });
+
+            // iframeをロック
+            iframe.style.pointerEvents = 'none';
+            iframe.style.borderColor = "#00FFFF";
+        };
+
+        // 実行
+        initViewer();
+        renderWebtoon();
 
     </script>
-    
 </body>
 </html>
