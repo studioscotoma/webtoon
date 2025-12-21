@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Glitch: Seoul Login 001</title>
     <style>
-        /* --- 基本設定 --- */
+        /* =========================================
+           1. Base Layout & Reset
+           ========================================= */
         body {
             margin: 0;
             padding: 0;
@@ -16,12 +18,12 @@
             justify-content: center;
         }
 
-        /* --- Webtoonビューワー本体 --- */
+        /* ビューワー本体（中央カラム） */
         #viewer-container {
             width: 100%;
             max-width: 690px;
             background-color: #000;
-            display: none; 
+            display: none; /* 表紙表示中は非表示 */
         }
         
         #viewer-container.active {
@@ -39,105 +41,85 @@
             width: 100%;
             height: auto;
             border: none;
-            background-color: #111;
+            background-color: #111; /* 画像ロード前のプレースホルダー色 */
         }
         
-        /* 字幕エリア全体の設定 */
+        /* 字幕エリア全体 */
         .caption-area {
             padding: 24px 16px 40px;
             background-color: #000;
             text-align: center;
         }
 
-        /* --- Webtoon Multilingual Style --- */
-        /* ■ GROUP 1: メイン（韓国語） */
+        /* =========================================
+           2. Webtoon Multilingual Text Styles
+           ========================================= */
+        
+        /* 韓国語 (Main) */
         .text-kr {
             font-size: 18px;
             font-weight: 700;
             line-height: 1.5;
-            color: #ffffff;        /* 完全な白 */
-            margin-bottom: 8px;
+            color: #ffffff;
+            margin: 0 0 8px 0;
             letter-spacing: 0.02em;
         }
 
-        /* ■ GROUP 2: サブ・アジア（日・繁） */
-        /* 日本語 */
+        /* 日本語 (Sub) */
         .text-ja {
             font-size: 14px;
             font-weight: 400;
             line-height: 1.5;
-            color: #d0d0d0;        /* 明るめのグレー */
-            margin-bottom: 4px;    /* 繁体字との間隔は狭めに */
-        }
-        
-        /* 【追加】中国語（繁体字） */
-        .text-zh {
-            font-size: 14px;       /* 漢字は画数が多いので日本語と同じサイズを維持 */
-            font-weight: 400;
-            line-height: 1.5;
-            color: #b0b0b0;        /* 日本語よりわずかに暗くして階層を作る */
-            margin-bottom: 12px;   /* 欧米言語グループとの区切り */
-            font-family: "Microsoft JhengHei", "Traditional Chinese", sans-serif;
+            color: #d0d0d0;
+            margin: 0 0 4px 0;
         }
 
-        /* ■ GROUP 3: ブリッジ（英語） */
+        /* 中国語・繁体字 (Reserved) */
+        /* .text-zh { font-size: 14px; color: #b0b0b0; ... } */
 
-        /* ■ GROUP 4: アトモスフィア（西・仏） */
-        /* スペイン語 */
-        .text-es {
-            display: block;        /* 独立したブロックとして表示 */
-            font-size: 13px;       /* 日本語より少し小さく、欧州言語より大きく */
-            color: #999999;        /* 中間的なグレー */
-            font-family: "Helvetica Neue", Arial, sans-serif; /* 読みやすいサンセリフ体 */
-            line-height: 1.4;
-            margin-bottom: 8px;    /* 装飾言語との区切り */
-            letter-spacing: 0.03em;
-        }
-
-        /* フランス語 */
+        /* フランス語 (Atmosphere) */
         .text-fr {
             font-size: 12px;
-            color: #777777;        /* 背景に馴染ませる */
-            font-style: italic;    /* 斜体で雰囲気重視 */
+            color: #777777;
+            font-style: italic;
             font-family: 'Georgia', serif;
             line-height: 1.4;
-            margin-bottom: 2px;    /* フランス語と近づける */
+            margin: 0 0 2px 0;
             opacity: 0.9;
         }
 
-        /* 【追加】英語 */
+        /* 英語 (Bridge/Atmosphere) */
         .text-en {
-            font-size: 11px;       /* 一番小さく */
-            color: #666666;        /* 最も暗く */
+            font-size: 11px;
+            color: #666666;
             font-style: italic;
             font-family: 'Georgia', serif;
             line-height: 1.4;
             opacity: 0.8;
+            margin: 0;
         }
 
         /* =========================================
-           表紙スクリーン (Cover Screen)
+           3. UI Components: Cover Screen
            ========================================= */
         #cover-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            min-height: 80vh; /* 90vh -> 100vh にして隙間をなくしました */
-            height: auto;
+            height: 100vh; /* 全画面 */
             z-index: 9999;
             background-color: #000;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px 20px 40px; 
+            padding: 20px; 
             box-sizing: border-box;
             transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
             opacity: 1;
             visibility: visible;
             overflow-y: auto; 
-            -webkit-overflow-scrolling: touch;
         }
 
         #cover-screen.hidden {
@@ -180,10 +162,12 @@
         #start-button:active {
             transform: scale(0.98);
         }
+
+        /* =========================================
+           4. UI Components: Navigation Footer
+           ========================================= */
         
-        /* --- ナビゲーションエリアのスタイル --- */
-        
-        /* 1. NEXTボタンエリア (まだ次がないのでComing Soon表示) */
+        /* Next Episode Button Area */
         .next-episode-area {
             padding: 60px 10px 40px;
             text-align: center;
@@ -205,12 +189,11 @@
             transition: all 0.3s ease;
         }
 
-        /* Coming Soon 用の無効化スタイル */
         .next-button.disabled {
             border-color: #222;
             opacity: 0.6;
             cursor: default;
-            pointer-events: none; /* クリック不可 */
+            pointer-events: none;
         }
 
         .next-label {
@@ -228,7 +211,7 @@
             color: #888;
         }
 
-        /* 2. フッターナビゲーション (Prev / Top / Select) */
+        /* Footer Nav (Prev / Select / Studio) */
         .nav-footer {
             display: flex;
             justify-content: space-between;
@@ -253,7 +236,12 @@
             color: #0ff;
         }
 
-        /* エピソード選択プルダウン */
+        .nav-link.disabled {
+            color: #333;       /* 背景に溶け込む暗い色 */
+            pointer-events: none; /* クリック無効 */
+            cursor: default;   /* マウスカーソルを指にしない */
+        }
+
         .ep-select-wrapper {
             position: relative;
         }
@@ -284,387 +272,346 @@
     </style>
 </head>
 <body>
-		<!-- 表紙 	-->
+
     <div id="cover-screen">
-        <img id="cover-image" src="cover.webp" alt="Glitch: Seoul Login Cover">
+        <img id="cover-image" src="ep001/cover.webp" alt="Glitch: Seoul Login Cover">
         <button id="start-button">CONNECT TO SEOUL</button>
     </div>
     
-    <div id="viewer-container"></div>
+    <div id="viewer-container">
+        <div id="comic-content"></div>
 
-    <div class="next-episode-area">
-        <a href="ep002.html" class="next-button">
-            <span class="next-label">To Be Continued...</span>
-            <span class="next-title">EPISODE 02</span>
-        </a>
-    </div>
-    
-    <div class="nav-footer">
-        <a href="#" class="nav-link">
-            &lt; PREV
-        </a>
-				<div class="ep-select-wrapper">
-            <select onchange="if(this.value) location.href=this.value">
-                <option value="#" selected>EP.01</option>
-                <option value="ep002.html">EP.02</option>
-                <option value="ep003.html">EP.03</option>
-                </select>
+        <div class="next-episode-area">
+            <a href="ep002.html" class="next-button">
+                <span class="next-label">To Be Continued...</span>
+                <span class="next-title">EPISODE 02</span>
+            </a>
         </div>
+        
+        <div class="nav-footer">
+            <a href="#" class="nav-link disabled">&lt; PREV</a>
+            
+            <div class="ep-select-wrapper">
+                <select onchange="if(this.value) location.href=this.value">
+                    <option value="#" selected>EP.01</option>
+                    <option value="ep002.html">EP.02</option>
+                    <option value="ep003.html">EP.03</option>
+                </select>
+            </div>
 
-        <a href="../index.html" class="nav-link">
-            STUDIO &gt;
-        </a>
+            <a href="../index.html" class="nav-link">STUDIO &gt;</a>
+        </div>
     </div>
     
     <script>
-    		// true にすると表紙をスキップします。本番公開時は false にしてください。
+        // ==========================================
+        // 1. CONFIG & DATA
+        // ==========================================
+        
+        // true にすると表紙をスキップ（開発用）
         const DEBUG_MODE = false;
-    
-        // 1. 表紙の制御
-        const coverScreen = document.getElementById('cover-screen');
-        const startButton = document.getElementById('start-button');
-        const viewerContainer = document.getElementById('viewer-container');
-				
-				// スタート処理を関数化（使い回すため）
-        const startWebtoon = () => {
-            coverScreen.classList.add('hidden');
-            viewerContainer.classList.add('active');
-            window.scrollTo(0, 0);
-        };
-				
-				// デバッグモードの判定
-        if (DEBUG_MODE) {
-            // デバッグ中なら、クリックを待たずに即スタート
-            console.log("🔧 Debug Mode: Cover skipped.");
-            startWebtoon();
-        } else {
-            // 本番なら、ボタンクリックを待つ
-            startButton.addEventListener('click', startWebtoon);
-        }
-				
-        // 2. 本編画像の生成
+        
         const CONFIG = {
             totalImages: 31,
             filePrefix: 'ep001/scene',
             fileExtension: '.webp'
         };
-        
-        // 字幕データ (必要に応じて追加)
-        // (※ ここに字幕データ scenarioData があれば入れる)
-        // 字幕データ (修正済み)
+
         const scenarioData = [
-				{
-					id: 1,
-					kr: "인생은 게임이라고, 누군가 말했다.",
-					ja: "人生はゲームだ、と誰かが言った。",
-					fr: "Quelqu'un a dit un jour que la vie est un jeu.",
-					en: "Someone once said that life is a game."
-				},
-				{
-					id: 2,
-					kr: "그렇다면, 개발자는 어디에 있는 거지?",
-					ja: "なら、デベロッパーはどこに居るのだろう？",
-					fr: "Dans ce cas, où se cachent les développeurs ?",
-					en: "If so, where are the developers?"
-				},
-				{
-					id: 3,
-					kr: "버프니 너프니, 밸런스 꼬라지가 아주 가관이군.",
-					ja: "バフもナーフも、バランス調整がイカれてやがる。",
-					fr: "Buffs, nerfs... l'équilibrage de ce monde est complètement pété.",
-					en: "Buffs, nerfs... the game balance is totally broken."
-				},
-				{
-					id: 4,
-					kr: "귀하의 앞날에 무궁한 영광이 있기를 빕니다.",
-					ja: "あなたのご活躍をお祈りしています。",
-					fr: "Nous vous souhaitons une excellente continuation.",
-					en: "We wish you the best in your future endeavors."
-				},
-				{
-					id: 5,
-					kr: "강지훈 군. 자네 스펙(Spec)은... 고작 이게 다인가?",
-					ja: "カン・ジフン君。スペック（学歴と資格）はこれだけかね？",
-					fr: "Kang Ji-hoon. C'est tout ce que vous avez sur votre CV ?",
-					en: "Mr. Kang Ji-hoon. Is this it for your specs?"
-				},
-				{
-					id: 6,
-					kr: "......독학으로 익힌 프로그래밍. 보안 관련 대회 입상 경력이라......",
-					ja: "……独学でプログラミングを。セキュリティ関連の大会で入賞経験も……",
-					fr: "...Programmation en autodidacte. Des prix dans des concours de sécurité...",
-					en: "...Self-taught programming. Awards in security competitions..."
-				},
-				{
-					id: 7,
-					kr: "그런 건 애들 장난이야. 우리가 보는 건 부모의 직업, 출신 대학, 그리고 『신용 점수』다.",
-					ja: "そういうのは遊びだよ。我々が見ているのは、君の親の職業、出身大学、そして『信用スコア』だ。",
-					fr: "Ce ne sont que des jeux d'enfant. Nous regardons le métier de vos parents, votre université et votre « Score de Crédit ».",
-					en: "That's child's play. We look at your parents' professions, your university, and your 'Credit Score'."
-				},
-				{
-					id: 8,
-					kr: "언제까지 멍하니 서 있을 건가? 자네는 우리 시스템에 부적합해. ......나가 보게.",
-					ja: "いつまでぼーっとしてるんだ？君は、我が社のシステムに適合しない。……退出したまえ。",
-					fr: "Qu'attendez-vous ? Vous ne correspondez pas au système de notre entreprise. ...Sortez.",
-					en: "How long are you going to stand there? You don't fit our system. ...Leave."
-				},
-				{
-					id: 9,
-					kr: "이 세상은 결국 『부모 가챠(수저 계급)』다.",
-					ja: "世界は『親ガチャ』だ。",
-					fr: "Ce monde n'est qu'une « loterie de la naissance ».",
-					en: "This world is just a 'Birth Lottery'."
-				},
-				{
-					id: 10,
-					kr: "노력이 부족했던 게 아니야. 머리가 나빴던 것도 아니고.",
-					ja: "努力不足じゃない。頭が悪かったわけでもない。",
-					fr: "Ce n'est pas un manque d'efforts. Ce n'est pas non plus parce que je suis bête.",
-					en: "It wasn't a lack of effort. Nor was I stupid."
-				},
-				{
-					id: 11,
-					kr: "그저... 로그인할 서버를 잘못 골랐을 뿐일지도 몰라.",
-					ja: "ログインするサーバーを間違えただけかもしれない。",
-					fr: "Je me suis peut-être juste trompé de serveur.",
-					en: "I might have just logged into the wrong server."
-				},
-				{
-					id: 12,
-					kr: "...리셋 (Reset).",
-					ja: "…リセット",
-					fr: "...Reset.",
-					en: "...Reset."
-				},
-				{
-					id: 13,
-					kr: "할 수만 있다면.",
-					ja: "できればいいのに。",
-					fr: "Si seulement c'était possible.",
-					en: "If only I could."
-				},
-				{
-					id: 14,
-					kr: "**삐이익! 삐이익! 삐이익!**",
-					ja: "**ビーッ！ ビーッ！ ビーッ！**",
-					fr: "**Bip ! Bip ! Bip !**",
-					en: "**Beep! Beep! Beep!**"
-				},
-				{
-					id: 15,
-					kr: "정부 긴급 재난 문자......!? 지진인가? 미사일?",
-					ja: "政府緊急アラート……！？地震か？ ミサイルか？",
-					fr: "Alerte d'urgence du gouvernement... !? Un séisme ? Un missile ?",
-					en: "Government Emergency Alert...!? Earthquake? Missile?"
-				},
-				{
-					id: 16,
-					kr: "[긴급 알림] 수신자: 강지훈",
-					ja: "緊急アラート カン・ジフンへ",
-					fr: "[ALERTE URGENCE] Pour : Kang Ji-hoon",
-					en: "[Emergency Alert] To: Kang Ji-hoon"
-				},
-				{
-					id: 17,
-					kr: "뭐야 이게?",
-					ja: "何だこれ？",
-					fr: "C'est quoi ça ?",
-					en: "What is this?"
-				},
-				{
-					id: 18,
-					kr: "귀하는 『Slave(노예)』가 아닌, 『Master(지배자)』 후보입니다.",
-					ja: "貴殿は『Slave』ではない、『Master』候補だ。",
-					fr: "Vous n'êtes pas un « Slave », mais un candidat « Master ».",
-					en: "You are not a 'Slave', but a 'Master' candidate."
-				},
-				{
-					id: 19,
-					kr: "......무슨 장난이지? 이건 정부망으로만 보낼 수 있는 긴급 문자잖아?",
-					ja: "……何の冗談だ？ これは政府しか使えない緊急通信だぞ？",
-					fr: "...C'est une blague ? C'est un canal d'urgence réservé au gouvernement, non ?",
-					en: "...Is this a joke? This is a government-only emergency channel."
-				},
-				{
-					id: 20,
-					kr: "[현실 수정 패치 v2.0]을 적용하시겠습니까?",
-					ja: "現実修正パッチv2.0 を適用しますか？",
-					fr: "Appliquer le [Patch de Correction du Réel v2.0] ?",
-					en: "Apply [Reality Correction Patch v2.0]?"
-				},
-				{
-					id: 21,
-					kr: "재밌는 농담이네.",
-					ja: "面白い冗談だ。",
-					fr: "Elle est bien bonne.",
-					en: "Funny joke."
-				},
-				{
-					id: 22,
-					kr: "YES",
-					ja: "YES",
-					fr: "OUI",
-					en: "YES"
-				},
-				{
-					id: 23,
-					kr: "**파지직! 파직!**",
-					ja: "**バチバチバチ！**",
-					fr: "**Bzzzt ! Crac !**",
-					en: "**Bzzt! Crack!**"
-				},
-				{
-					id: 24,
-					kr: "눈이......!?",
-					ja: "目が……！？",
-					fr: "Mes yeux... !?",
-					en: "My eyes...!?"
-				},
-				{
-					id: 25,
-					kr: "(대량의 데이터 스트림이 시각화되어 뻗어 나간다)",
-					ja: "大量のデータストリームが可視化されて伸びている",
-					fr: "(Des flux de données massifs deviennent visibles et s'étendent)",
-					en: "(Massive data streams materialize and extend out)"
-				},
-				{
-					id: 26,
-					kr: "뭐야...... 이건......",
-					ja: "なんだ……これは……",
-					fr: "Qu'est-ce que... c'est que ça...",
-					en: "What... is this..."
-				},
-				{
-					id: 27,
-					kr: "(손 위에 반투명한 윈도우 창이 팝업 된다)",
-					ja: "手の上に、半透明のウィンドウがポップアップする",
-					fr: "(Une fenêtre semi-transparente apparaît au-dessus de sa main)",
-					en: "(A semi-transparent window pops up over his hand)"
-				},
-				{
-					id: 28,
-					kr: "(창밖을 지나가는 사람들의 다리에도 스테이터스 창이 보인다)",
-					ja: "窓の外の足にもウィンドウがポップアップするのが見える",
-					fr: "(Il voit des fenêtres apparaître sur les passants à l'extérieur)",
-					en: "(He sees windows popping up on the people outside)"
-				},
-				{
-					id: 29,
-					kr: "인생은 게임이라고, 누군가 말했다.",
-					ja: "人生はゲームだ、と誰かが言った。",
-					fr: "Quelqu'un a dit un jour que la vie est un jeu.",
-					en: "Someone once said that life is a game."
-				},
-				{
-					id: 30,
-					kr: "그렇다면, 개발자는 어디에 있는 거지?",
-					ja: "なら、デベロッパーはどこに居るのだろう？",
-					fr: "Dans ce cas, où se cachent les développeurs ?",
-					en: "If so, where are the developers?"
-				},
-				{
-					id: 31,
-					kr: "GLITCH: SEOUL LOGIN",
-					ja: "GLITCH: SEOUL LOGIN",
-					fr: "GLITCH: SEOUL LOGIN",
-					en: "GLITCH: SEOUL LOGIN"
-				}
-			];
-      
-        const container = document.getElementById('viewer-container');
-
-        // 画像生成ループ
-        for (let i = 1; i <= CONFIG.totalImages; i++) {
-            const sceneBlock = document.createElement('div');
-            sceneBlock.className = 'scene-block';
-
-            const fileNumber = i.toString().padStart(2, '0');
-            const fileName = `${CONFIG.filePrefix}${fileNumber}${CONFIG.fileExtension}`;
-
-            const img = document.createElement('img');
-            img.src = fileName;
-            img.className = 'comic-image';
-            img.loading = 'lazy';
-            img.alt = `Scene ${i}`;
-            
-            sceneBlock.appendChild(img);
-            
-            // 字幕追加処理
-            // 字幕追加処理
-            const sceneText = scenarioData.find(data => data.id === i);
-
-            if (sceneText) {
-                const captionDiv = document.createElement('div');
-                captionDiv.className = 'caption-area';
-                
-                // ★ポイント: textContent を innerHTML に変更しました
-
-                // 1. 韓国語
-                if (sceneText.kr) {
-                    const pKr = document.createElement('p');
-                    pKr.className = 'text-kr';
-                    pKr.innerHTML = sceneText.kr; // ←ここを変更
-                    captionDiv.appendChild(pKr);
-                }
-                
-                // 2. 日本語
-                if (sceneText.ja) {
-                    const pJa = document.createElement('p');
-                    pJa.className = 'text-ja';
-                    pJa.innerHTML = sceneText.ja; // ←ここを変更
-                    captionDiv.appendChild(pJa);
-                }
-								
-								/*
-                // 3. 繁体字
-                if (sceneText.zh) {
-                    const pZh = document.createElement('p');
-                    pZh.className = 'text-zh';
-                    pZh.innerHTML = sceneText.zh; // ←ここを変更
-                    captionDiv.appendChild(pZh);
-                }
-								*/
-								
-								/*
-                // 5. スペイン語
-                if (sceneText.es) {
-                    const pEs = document.createElement('p');
-                    pEs.className = 'text-es';
-                    pEs.innerHTML = sceneText.es; // ←ここを変更
-                    captionDiv.appendChild(pEs);
-                }
-								*/
-                // 6. フランス語
-                if (sceneText.fr) {
-                    const pFr = document.createElement('p');
-                    pFr.className = 'text-fr';
-                    pFr.innerHTML = sceneText.fr; // ←ここを変更
-                    captionDiv.appendChild(pFr);
-                }
-                
-                // 7. 英語
-                if (sceneText.en) {
-                    const pEn = document.createElement('p');
-                    pEn.className = 'text-en';
-                    pEn.innerHTML = sceneText.en; // ←ここを変更
-                    captionDiv.appendChild(pEn);
-                }
-                sceneBlock.appendChild(captionDiv);
+            {
+                id: 1,
+                kr: "인생은 게임이라고, 누군가 말했다.",
+                ja: "人生はゲームだ、と誰かが言った。",
+                fr: "Quelqu'un a dit un jour que la vie est un jeu.",
+                en: "Someone once said that life is a game."
+            },
+            {
+                id: 2,
+                kr: "그렇다면, 개발자는 어디에 있는 거지?",
+                ja: "なら、デベロッパーはどこに居るのだろう？",
+                fr: "Dans ce cas, où se cachent les développeurs ?",
+                en: "If so, where are the developers?"
+            },
+            {
+                id: 3,
+                kr: "버프니 너프니, 밸런스 꼬라지가 아주 가관이군.",
+                ja: "バフもナーフも、バランス調整がイカれてやがる。",
+                fr: "Buffs, nerfs... l'équilibrage de ce monde est complètement pété.",
+                en: "Buffs, nerfs... the game balance is totally broken."
+            },
+            {
+                id: 4,
+                kr: "귀하의 앞날에 무궁한 영광이 있기를 빕니다.",
+                ja: "あなたのご活躍をお祈りしています。",
+                fr: "Nous vous souhaitons une excellente continuation.",
+                en: "We wish you the best in your future endeavors."
+            },
+            {
+                id: 5,
+                kr: "강지훈 군. 자네 스펙(Spec)은... 고작 이게 다인가?",
+                ja: "カン・ジフン君。スペック（学歴と資格）はこれだけかね？",
+                fr: "Kang Ji-hoon. C'est tout ce que vous avez sur votre CV ?",
+                en: "Mr. Kang Ji-hoon. Is this it for your specs?"
+            },
+            {
+                id: 6,
+                kr: "......독학으로 익힌 프로그래밍. 보안 관련 대회 입상 경력이라......",
+                ja: "……独学でプログラミングを。セキュリティ関連の大会で入賞経験も……",
+                fr: "...Programmation en autodidacte. Des prix dans des concours de sécurité...",
+                en: "...Self-taught programming. Awards in security competitions..."
+            },
+            {
+                id: 7,
+                kr: "그런 건 애들 장난이야. 우리가 보는 건 부모의 직업, 출신 대학, 그리고 『신용 점수』다.",
+                ja: "そういうのは遊びだよ。我々が見ているのは、君の親の職業、出身大学、そして『信用スコア』だ。",
+                fr: "Ce ne sont que des jeux d'enfant. Nous regardons le métier de vos parents, votre université et votre « Score de Crédit ».",
+                en: "That's child's play. We look at your parents' professions, your university, and your 'Credit Score'."
+            },
+            {
+                id: 8,
+                kr: "언제까지 멍하니 서 있을 건가? 자네는 우리 시스템에 부적합해. ......나가 보게.",
+                ja: "いつまでぼーっとしてるんだ？君は、我が社のシステムに適合しない。……退出したまえ。",
+                fr: "Qu'attendez-vous ? Vous ne correspondez pas au système de notre entreprise. ...Sortez.",
+                en: "How long are you going to stand there? You don't fit our system. ...Leave."
+            },
+            {
+                id: 9,
+                kr: "이 세상은 결국 『부모 가챠(수저 계급)』다.",
+                ja: "世界は『親ガチャ』だ。",
+                fr: "Ce monde n'est qu'une « loterie de la naissance ».",
+                en: "This world is just a 'Birth Lottery'."
+            },
+            {
+                id: 10,
+                kr: "노력이 부족했던 게 아니야. 머리가 나빴던 것도 아니고.",
+                ja: "努力不足じゃない。頭が悪かったわけでもない。",
+                fr: "Ce n'est pas un manque d'efforts. Ce n'est pas non plus parce que je suis bête.",
+                en: "It wasn't a lack of effort. Nor was I stupid."
+            },
+            {
+                id: 11,
+                kr: "그저... 로그인할 서버를 잘못 골랐을 뿐일지도 몰라.",
+                ja: "ログインするサーバーを間違えただけかもしれない。",
+                fr: "Je me suis peut-être juste trompé de serveur.",
+                en: "I might have just logged into the wrong server."
+            },
+            {
+                id: 12,
+                kr: "...리셋 (Reset).",
+                ja: "…リセット",
+                fr: "...Reset.",
+                en: "...Reset."
+            },
+            {
+                id: 13,
+                kr: "할 수만 있다면.",
+                ja: "できればいいのに。",
+                fr: "Si seulement c'était possible.",
+                en: "If only I could."
+            },
+            {
+                id: 14,
+                kr: "**삐이익! 삐이익! 삐이익!**",
+                ja: "**ビーッ！ ビーッ！ ビーッ！**",
+                fr: "**Bip ! Bip ! Bip !**",
+                en: "**Beep! Beep! Beep!**"
+            },
+            {
+                id: 15,
+                kr: "정부 긴급 재난 문자......!? 지진인가? 미사일?",
+                ja: "政府緊急アラート……！？地震か？ ミサイルか？",
+                fr: "Alerte d'urgence du gouvernement... !? Un séisme ? Un missile ?",
+                en: "Government Emergency Alert...!? Earthquake? Missile?"
+            },
+            {
+                id: 16,
+                kr: "[긴급 알림] 수신자: 강지훈",
+                ja: "緊急アラート カン・ジフンへ",
+                fr: "[ALERTE URGENCE] Pour : Kang Ji-hoon",
+                en: "[Emergency Alert] To: Kang Ji-hoon"
+            },
+            {
+                id: 17,
+                kr: "뭐야 이게?",
+                ja: "何だこれ？",
+                fr: "C'est quoi ça ?",
+                en: "What is this?"
+            },
+            {
+                id: 18,
+                kr: "귀하는 『Slave(노예)』가 아닌, 『Master(지배자)』 후보입니다.",
+                ja: "貴殿は『Slave』ではない、『Master』候補だ。",
+                fr: "Vous n'êtes pas un « Slave », mais un candidat « Master ».",
+                en: "You are not a 'Slave', but a 'Master' candidate."
+            },
+            {
+                id: 19,
+                kr: "......무슨 장난이지? 이건 정부망으로만 보낼 수 있는 긴급 문자잖아?",
+                ja: "……何の冗談だ？ これは政府しか使えない緊急通信だぞ？",
+                fr: "...C'est une blague ? C'est un canal d'urgence réservé au gouvernement, non ?",
+                en: "...Is this a joke? This is a government-only emergency channel."
+            },
+            {
+                id: 20,
+                kr: "[현실 수정 패치 v2.0]을 적용하시겠습니까?",
+                ja: "現実修正パッチv2.0 を適用しますか？",
+                fr: "Appliquer le [Patch de Correction du Réel v2.0] ?",
+                en: "Apply [Reality Correction Patch v2.0]?"
+            },
+            {
+                id: 21,
+                kr: "재밌는 농담이네.",
+                ja: "面白い冗談だ。",
+                fr: "Elle est bien bonne.",
+                en: "Funny joke."
+            },
+            {
+                id: 22,
+                kr: "YES",
+                ja: "YES",
+                fr: "OUI",
+                en: "YES"
+            },
+            {
+                id: 23,
+                kr: "**파지직! 파직!**",
+                ja: "**バチバチバチ！**",
+                fr: "**Bzzzt ! Crac !**",
+                en: "**Bzzt! Crack!**"
+            },
+            {
+                id: 24,
+                kr: "눈이......!?",
+                ja: "目が……！？",
+                fr: "Mes yeux... !?",
+                en: "My eyes...!?"
+            },
+            {
+                id: 25,
+                kr: "(대량의 데이터 스트림이 시각화되어 뻗어 나간다)",
+                ja: "大量のデータストリームが可視化されて伸びている",
+                fr: "(Des flux de données massifs deviennent visibles et s'étendent)",
+                en: "(Massive data streams materialize and extend out)"
+            },
+            {
+                id: 26,
+                kr: "뭐야...... 이건......",
+                ja: "なんだ……これは……",
+                fr: "Qu'est-ce que... c'est que ça...",
+                en: "What... is this..."
+            },
+            {
+                id: 27,
+                kr: "(손 위에 반투명한 윈도우 창이 팝업 된다)",
+                ja: "手の上に、半透明のウィンドウがポップアップする",
+                fr: "(Une fenêtre semi-transparente apparaît au-dessus de sa main)",
+                en: "(A semi-transparent window pops up over his hand)"
+            },
+            {
+                id: 28,
+                kr: "(창밖을 지나가는 사람들의 다리에도 스테이터스 창이 보인다)",
+                ja: "窓の外の足にもウィンドウがポップアップするのが見える",
+                fr: "(Il voit des fenêtres apparaître sur les passants à l'extérieur)",
+                en: "(He sees windows popping up on the people outside)"
+            },
+            {
+                id: 29,
+                kr: "인생은 게임이라고, 누군가 말했다.",
+                ja: "人生はゲームだ、と誰かが言った。",
+                fr: "Quelqu'un a dit un jour que la vie est un jeu.",
+                en: "Someone once said that life is a game."
+            },
+            {
+                id: 30,
+                kr: "그렇다면, 개발자는 어디에 있는 거지?",
+                ja: "なら、デベロッパーはどこに居るのだろう？",
+                fr: "Dans ce cas, où se cachent les développeurs ?",
+                en: "If so, where are the developers?"
+            },
+            {
+                id: 31,
+                kr: "GLITCH: SEOUL LOGIN",
+                ja: "GLITCH: SEOUL LOGIN",
+                fr: "GLITCH: SEOUL LOGIN",
+                en: "GLITCH: SEOUL LOGIN"
             }
-            
-            container.appendChild(sceneBlock);
+        ];
+
+        // ==========================================
+        // 2. MAIN LOGIC
+        // ==========================================
+        
+        const coverScreen = document.getElementById('cover-screen');
+        const startButton = document.getElementById('start-button');
+        const viewerContainer = document.getElementById('viewer-container');
+        const comicContent = document.getElementById('comic-content'); // 画像挿入用のコンテナ
+
+        // スタート処理
+        const startWebtoon = () => {
+            coverScreen.classList.add('hidden');
+            viewerContainer.classList.add('active');
+            window.scrollTo(0, 0);
+        };
+
+        // 初期化：デバッグモード判定
+        if (DEBUG_MODE) {
+            console.log("🔧 Debug Mode: Cover skipped.");
+            startWebtoon();
+        } else {
+            startButton.addEventListener('click', startWebtoon);
         }
 
-        // ==========================================
-        // フッター要素をコンテナの最後に移動
-        // ==========================================
-        // これにより、スマホで見た時に画像の直下にボタンが配置されます
-        const nextArea = document.querySelector('.next-episode-area');
-        const navFooter = document.querySelector('.nav-footer');
-        
-        if (nextArea) container.appendChild(nextArea);
-        if (navFooter) container.appendChild(navFooter);
+        // 本編画像の生成＆DOMへの追加
+        const renderWebtoon = () => {
+            const fragment = document.createDocumentFragment();
+
+            for (let i = 1; i <= CONFIG.totalImages; i++) {
+                const sceneBlock = document.createElement('div');
+                sceneBlock.className = 'scene-block';
+
+                // 画像
+                const fileNumber = i.toString().padStart(2, '0');
+                const img = document.createElement('img');
+                img.src = `${CONFIG.filePrefix}${fileNumber}${CONFIG.fileExtension}`;
+                img.className = 'comic-image';
+                img.loading = 'lazy';
+                img.alt = `Scene ${i}`;
+                
+                sceneBlock.appendChild(img);
+                
+                // 字幕
+                const sceneText = scenarioData.find(data => data.id === i);
+                if (sceneText) {
+                    const captionDiv = document.createElement('div');
+                    captionDiv.className = 'caption-area';
+                    
+                    // 多言語レンダリング関数
+                    const appendText = (cls, text) => {
+                        if (!text) return;
+                        const p = document.createElement('p');
+                        p.className = cls;
+                        p.innerHTML = text; // マークアップ許可
+                        captionDiv.appendChild(p);
+                    };
+
+                    appendText('text-kr', sceneText.kr);
+                    appendText('text-ja', sceneText.ja);
+                    // appendText('text-zh', sceneText.zh); // 必要ならコメント解除
+                    appendText('text-fr', sceneText.fr);
+                    appendText('text-en', sceneText.en);
+
+                    sceneBlock.appendChild(captionDiv);
+                }
+                
+                fragment.appendChild(sceneBlock);
+            }
+            
+            // 一括追加（パフォーマンス向上）
+            comicContent.appendChild(fragment);
+        };
+
+        // レンダリング実行
+        renderWebtoon();
 
     </script>
     
