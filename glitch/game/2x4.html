@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Glitch: Seoul Login - Beginner Mode</title>
+    <style>
+        :root {
+            --bg-color: #050505;
+            --neon-cyan: #00FFFF;
+            --neon-magenta: #FF00FF;
+            --neon-green: #00FF00;
+            --ui-font: 'Courier New', Courier, monospace;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--neon-cyan);
+            font-family: var(--ui-font);
+            overflow: hidden;
+            touch-action: none;
+            user-select: none;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        canvas {
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+            border: 1px solid #333;
+            background-color: #000;
+        }
+
+        .scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0.3;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .hud-top {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            text-shadow: 0 0 5px var(--neon-cyan);
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .bar-container {
+            width: 120px;
+            height: 10px;
+            background: #333;
+            margin-top: 5px;
+            border: 1px solid #555;
+        }
+
+        .hp-bar {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .p-hp { background-color: var(--neon-cyan); box-shadow: 0 0 8px var(--neon-cyan); }
+        .e-hp { background-color: var(--neon-magenta); box-shadow: 0 0 8px var(--neon-magenta); }
+
+        #log-console {
+            width: 100%;
+            max-width: 600px;
+            height: 80px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #333;
+            color: var(--neon-green);
+            font-size: 12px;
+            padding: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column-reverse;
+            pointer-events: none;
+            text-shadow: 0 0 2px var(--neon-green);
+        }
+        
+        #tutorial-msg {
+            position: absolute;
+            bottom: 110px;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: #FFF;
+            text-shadow: 0 0 5px #FFF;
+            pointer-events: none;
+            animation: pulse-text 2s infinite;
+        }
+
+        @keyframes pulse-text {
+            0% { opacity: 0.5; }
+            50% { opacity: 1.0; }
+            100% { opacity: 0.5; }
+        }
+
+        #combo-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 20vw;
+            font-weight: 900;
+            color: rgba(0, 255, 255, 0.2);
+            text-shadow: 0 0 50px rgba(0, 255, 255, 0.5);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s, transform 0.1s, color 0.2s;
+            z-index: 5;
+            font-family: sans-serif;
+        }
+
+        #combo-display.high-combo {
+            color: rgba(255, 0, 255, 0.3);
+            text-shadow: 0 0 50px rgba(255, 0, 255, 0.6);
+        }
+
+        #game-over-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            pointer-events: auto;
+            transition: opacity 0.3s;
+        }
+
+        #game-over-screen.hidden {
+            display: none;
+            opacity: 0;
+        }
+
+        #game-result-title {
+            font-size: 40px;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px currentColor;
+            text-align: center;
+        }
+
+        #reboot-btn {
+            background: transparent;
+            border: 2px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 15px 40px;
+            font-family: var(--ui-font);
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 15px var(--neon-cyan);
+            transition: all 0.2s;
+        }
+
+        #reboot-btn:hover {
+            background: var(--neon-cyan);
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <canvas id="gameCanvas"></canvas>
+    <div class="scanline"></div>
+    
+    <div id="ui-layer">
+        <div class="hud-top">
+            <div>
+                PLAYER <span id="p-hp-val">100</span>%
+                <div class="bar-container"><div id="p-bar" class="hp-bar p-hp" style="width: 100%"></div></div>
+            </div>
+            <div style="text-align: center;">
+                CHAIN: <span id="chain-count" style="color: yellow">0</span>
+            </div>
+            <div style="text-align: right;">
+                DAEMON <span id="e-hp-val">100</span>%
+                <div class="bar-container"><div id="e-bar" class="hp-bar e-hp" style="width: 100%"></div></div>
+            </div>
+        </div>
+        
+        <div id="combo-display">0</div>
+        
+        <div id="tutorial-msg">
+            <span style="color:#00FFFF">DRAG</span> to Connect / <span style="color:#FF00FF">TAP SELF</span> to Reboot
+        </div>
+        
+        <div id="log-console">
+            <div>> System Initialized...</div>
+            <div>> Waiting for Neural Link...</div>
+        </div>
+    </div>
+    
+    <div id="game-over-screen" class="hidden">
+        <h1 id="game-result-title">SYSTEM HALTED</h1>
+        <button id="reboot-btn">REBOOT SYSTEM</button>
+    </div>
+</div>
+
+<script>
+/**
+ * GLITCH: SEOUL LOGIN - RECTANGLE GRID SUPPORT
+ * Support for non-square grids (e.g., 2x4)
+ */
+
+const CONFIG = {
+    // 【ここを変更しました】
+    GRID_W: 2, // 横の数 (Width)
+    GRID_H: 4, // 縦の数 (Height)
+    
+    COLORS: ['#00FFFF', '#FF00FF', '#00FF00', '#FFFF00'], 
+    TILE_TYPES: [0, 1, 2, 3],
+    PLAYER_HP: 100,
+    ENEMY_HP: 10, // 初心者用なので敵HPも少し減らしました
+    GLITCH_THRESHOLD: 0.7, 
+    BASE_DMG: 10,
+    ENEMY_DMG: 10 // 敵の攻撃力も少し優しく
+};
+
+const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+const getDistance = (a, b) => Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+
+class InputHandler {
+    constructor(canvas, game) {
+        this.canvas = canvas;
+        this.game = game;
+        this.isDragging = false;
+
+        this.canvas.addEventListener('mousedown', this.handleStart.bind(this));
+        this.canvas.addEventListener('mousemove', this.handleMove.bind(this));
+        window.addEventListener('mouseup', this.handleEnd.bind(this));
+
+        this.canvas.addEventListener('touchstart', this.handleStart.bind(this), {passive: false});
+        this.canvas.addEventListener('touchmove', this.handleMove.bind(this), {passive: false});
+        window.addEventListener('touchend', this.handleEnd.bind(this));
+    }
+
+    getPos(e) {
+        const rect = this.canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: clientX - rect.left, y: clientY - rect.top };
+    }
+
+    handleStart(e) {
+        if (this.game.state.isGameOver || this.game.state.turn !== 'player') return;
+        if (e.cancelable) e.preventDefault();
+        
+        const pos = this.getPos(e);
+        const gridPos = this.game.renderer.pixelToGrid(pos.x, pos.y);
+
+        if (this.game.isValidStart(gridPos)) {
+            this.isDragging = true;
+            this.game.startPath(gridPos);
+        }
+    }
+
+    handleMove(e) {
+        if (!this.isDragging) return;
+        if (e.cancelable) e.preventDefault();
+        const pos = this.getPos(e);
+        const gridPos = this.game.renderer.pixelToGrid(pos.x, pos.y);
+        this.game.updatePath(gridPos);
+    }
+
+    handleEnd(e) {
+        if (!this.isDragging) return;
+        this.isDragging = false;
+        this.game.finalizeMove();
+    }
+}
+
+class Renderer {
+    constructor(canvas, game) {
+        this.canvas = canvas;
+        this.ctx = canvas.getContext('2d');
+        this.game = game;
+        this.cellSize = 0;
+        this.padding = 10;
+        this.resize();
+        this.glitchIntensity = 0;
+        this.shake = 0;
+    }
+
+    resize() {
+        // 画面サイズに合わせて、縦横比を維持しつつ最大化する計算
+        const maxWidth = window.innerWidth * 0.9;
+        const maxHeight = window.innerHeight * 0.8; // UIスペース確保のため少し小さく
+
+        // 縦と横、どちらが制限になるか計算してセルサイズを決定
+        const cellW = (maxWidth - (this.padding * 2)) / CONFIG.GRID_W;
+        const cellH = (maxHeight - (this.padding * 2)) / CONFIG.GRID_H;
+        this.cellSize = Math.min(cellW, cellH);
+
+        // 決定したセルサイズからCanvasサイズを確定
+        this.canvas.width = this.cellSize * CONFIG.GRID_W + (this.padding * 2);
+        this.canvas.height = this.cellSize * CONFIG.GRID_H + (this.padding * 2);
+    }
+
+    pixelToGrid(x, y) {
+        const gx = Math.floor((x - this.padding) / this.cellSize);
+        const gy = Math.floor((y - this.padding) / this.cellSize);
+        if (gx >= 0 && gx < CONFIG.GRID_W && gy >= 0 && gy < CONFIG.GRID_H) {
+            return { x: gx, y: gy };
+        }
+        return null;
+    }
+
+    gridToPixel(gx, gy) {
+        return {
+            x: this.padding + gx * this.cellSize + this.cellSize / 2,
+            y: this.padding + gy * this.cellSize + this.cellSize / 2
+        };
+    }
+
+    draw() {
+        this.ctx.fillStyle = '#050505';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        this.ctx.save();
+        if (this.shake > 0) {
+            const dx = (Math.random() - 0.5) * this.shake;
+            const dy = (Math.random() - 0.5) * this.shake;
+            this.ctx.translate(dx, dy);
+            this.shake *= 0.9;
+            if (this.shake < 0.5) this.shake = 0;
+        }
+
+        this.drawGrid();
+        this.drawHints();
+        if (this.game.state.currentPath.length > 0) this.drawPath();
+        this.drawEntities();
+
+        if (this.glitchIntensity > 0) {
+            this.drawGlitch();
+            this.glitchIntensity *= 0.9;
+            if (this.glitchIntensity < 0.1) this.glitchIntensity = 0;
+        }
+
+        this.ctx.restore();
+    }
+
+    drawGrid() {
+        for (let y = 0; y < CONFIG.GRID_H; y++) {
+            for (let x = 0; x < CONFIG.GRID_W; x++) {
+                const tile = this.game.state.grid[y][x];
+                const pos = this.gridToPixel(x, y);
+                const size = this.cellSize * 0.85;
+
+                this.ctx.fillStyle = CONFIG.COLORS[tile.type];
+                this.ctx.globalAlpha = 0.2;
+                this.ctx.fillRect(pos.x - size/2, pos.y - size/2, size, size);
+                this.ctx.globalAlpha = 1.0;
+                this.ctx.strokeStyle = CONFIG.COLORS[tile.type];
+                this.ctx.lineWidth = 2;
+                this.ctx.strokeRect(pos.x - size/2, pos.y - size/2, size, size);
+            }
+        }
+    }
+
+    drawHints() {
+        if (this.game.state.turn !== 'player') return;
+
+        const game = this.game;
+        let currentHead = game.state.player;
+        const path = game.state.currentPath;
+        if (path.length > 0) {
+            currentHead = path[path.length - 1];
+        }
+
+        const headTile = game.state.grid[currentHead.y][currentHead.x];
+        const directions = [
+            {x: 0, y: -1}, {x: 0, y: 1}, {x: -1, y: 0}, {x: 1, y: 0}
+        ];
+
+        const offset = Math.sin(Date.now() / 150) * 5;
+
+        this.ctx.save();
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        this.ctx.shadowColor = CONFIG.COLORS[headTile.type];
+        this.ctx.shadowBlur = 10;
+
+        directions.forEach(dir => {
+            const tx = currentHead.x + dir.x;
+            const ty = currentHead.y + dir.y;
+
+            if (tx >= 0 && tx < CONFIG.GRID_W && ty >= 0 && ty < CONFIG.GRID_H) {
+                const targetTile = game.state.grid[ty][tx];
+                const isVisited = path.some(p => p.x === tx && p.y === ty);
+                
+                if (targetTile.type === headTile.type && !isVisited) {
+                    const startPos = this.gridToPixel(currentHead.x, currentHead.y);
+                    const angle = Math.atan2(dir.y, dir.x);
+                    const dist = this.cellSize * 0.35 + offset; 
+                    
+                    const arrowX = startPos.x + Math.cos(angle) * dist;
+                    const arrowY = startPos.y + Math.sin(angle) * dist;
+
+                    this.ctx.translate(arrowX, arrowY);
+                    this.ctx.rotate(angle);
+                    
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, 0);
+                    this.ctx.lineTo(-6, -4);
+                    this.ctx.lineTo(-6, 4);
+                    this.ctx.fill();
+
+                    this.ctx.rotate(-angle);
+                    this.ctx.translate(-arrowX, -arrowY);
+                }
+            }
+        });
+        this.ctx.restore();
+    }
+
+    drawPath() {
+        const path = this.game.state.currentPath;
+        if (path.length < 2) return;
+
+        this.ctx.beginPath();
+        this.ctx.lineCap = 'round';
+        this.ctx.lineJoin = 'round';
+        this.ctx.lineWidth = 6;
+        this.ctx.shadowBlur = 15;
+        this.ctx.shadowColor = CONFIG.COLORS[this.game.state.grid[path[0].y][path[0].x].type];
+        this.ctx.strokeStyle = '#FFFFFF';
+
+        const start = this.gridToPixel(path[0].x, path[0].y);
+        this.ctx.moveTo(start.x, start.y);
+
+        for (let i = 1; i < path.length; i++) {
+            const p = this.gridToPixel(path[i].x, path[i].y);
+            this.ctx.lineTo(p.x, p.y);
+        }
+        this.ctx.stroke();
+        this.ctx.shadowBlur = 0;
+    }
+
+    drawEntities() {
+        const player = this.game.state.player;
+        const enemy = this.game.state.enemy;
+
+        const pPos = this.gridToPixel(player.x, player.y);
+        this.ctx.fillStyle = '#FFFFFF';
+        this.ctx.shadowBlur = 10;
+        this.ctx.shadowColor = CONFIG.COLORS[0];
+        this.ctx.beginPath();
+        this.ctx.moveTo(pPos.x, pPos.y - 15);
+        this.ctx.lineTo(pPos.x + 12, pPos.y + 10);
+        this.ctx.lineTo(pPos.x - 12, pPos.y + 10);
+        this.ctx.fill();
+
+        if (enemy.hp > 0) {
+            const ePos = this.gridToPixel(enemy.x, enemy.y);
+            this.ctx.fillStyle = '#FF0055';
+            this.ctx.shadowColor = '#FF0055';
+            this.ctx.beginPath();
+            this.ctx.moveTo(ePos.x, ePos.y - 15);
+            this.ctx.lineTo(ePos.x + 15, ePos.y);
+            this.ctx.lineTo(ePos.x, ePos.y + 15);
+            this.ctx.lineTo(ePos.x - 15, ePos.y);
+            this.ctx.fill();
+        }
+        this.ctx.shadowBlur = 0;
+    }
+
+    drawGlitch() {
+        const strips = 10;
+        const h = this.canvas.height / strips;
+        for(let i=0; i<strips; i++) {
+            if(Math.random() < 0.5) {
+                const offset = (Math.random() - 0.5) * 20 * this.glitchIntensity;
+                this.ctx.drawImage(
+                    this.canvas, 
+                    0, i*h, this.canvas.width, h, 
+                    offset, i*h, this.canvas.width, h
+                );
+            }
+        }
+        this.ctx.globalCompositeOperation = 'lighter';
+        this.ctx.fillStyle = `rgba(255, 0, 0, ${0.2 * this.glitchIntensity})`;
+        this.ctx.fillRect(Math.random()*this.canvas.width, 0, 50, this.canvas.height);
+        this.ctx.globalCompositeOperation = 'source-over';
+    }
+
+    triggerGlitch(intensity) {
+        this.glitchIntensity = intensity;
+        this.shake = intensity * 5; 
+    }
+}
+
+class Game {
+    constructor() {
+        this.canvas = document.getElementById('gameCanvas');
+        this.state = {
+            grid: [],
+            player: { x: 0, y: 0, hp: CONFIG.PLAYER_HP, maxHp: CONFIG.PLAYER_HP },
+            // 敵は右下に配置
+            enemy: { x: CONFIG.GRID_W-1, y: CONFIG.GRID_H-1, hp: CONFIG.ENEMY_HP, maxHp: CONFIG.ENEMY_HP },
+            currentPath: [],
+            turn: 'player', 
+            isGameOver: false
+        };
+
+        this.renderer = new Renderer(this.canvas, this);
+        this.input = new InputHandler(this.canvas, this);
+        this.ui = {
+            pHp: document.getElementById('p-hp-val'),
+            pBar: document.getElementById('p-bar'),
+            eHp: document.getElementById('e-hp-val'),
+            eBar: document.getElementById('e-bar'),
+            chain: document.getElementById('chain-count'),
+            log: document.getElementById('log-console')
+        };
+        
+        document.getElementById('reboot-btn').onclick = () => this.restart();
+
+        this.initGrid();
+        
+        const loop = () => {
+            this.renderer.draw();
+            requestAnimationFrame(loop);
+        };
+        requestAnimationFrame(loop);
+
+        window.addEventListener('resize', () => this.renderer.resize());
+        this.log("System: Link Start (Beginner Mode).");
+    }
+
+    initGrid() {
+        this.state.grid = [];
+        let startType = null; 
+
+        for (let y = 0; y < CONFIG.GRID_H; y++) {
+            const row = [];
+            for (let x = 0; x < CONFIG.GRID_W; x++) {
+                let type;
+                // Safe Zone at start (2x2)
+                if (x < 2 && y < 2) {
+                    if (x === 0 && y === 0) {
+                        type = CONFIG.TILE_TYPES[randomInt(0, CONFIG.TILE_TYPES.length - 1)];
+                        startType = type;
+                    } else {
+                        type = startType;
+                    }
+                } 
+                else {
+                    const neighbors = [];
+                    if (x > 0) neighbors.push(row[x - 1].type);
+                    if (y > 0) neighbors.push(this.state.grid[y - 1][x].type);
+
+                    if (neighbors.length === 0 || Math.random() < 0.3) {
+                        type = CONFIG.TILE_TYPES[randomInt(0, CONFIG.TILE_TYPES.length - 1)];
+                    } else {
+                        type = neighbors[randomInt(0, neighbors.length - 1)];
+                    }
+                }
+                row.push({ type: type, x: x, y: y });
+            }
+            this.state.grid.push(row);
+        }
+
+        this.state.player.x = 0;
+        this.state.player.y = 0;
+    }
+
+    shuffleGrid() {
+        for (let y = 0; y < CONFIG.GRID_H; y++) {
+            for (let x = 0; x < CONFIG.GRID_W; x++) {
+                const neighbors = [];
+                if (x > 0) neighbors.push(this.state.grid[y][x - 1].type);
+                if (y > 0) neighbors.push(this.state.grid[y - 1][x].type); 
+
+                let type;
+                if (neighbors.length === 0 || Math.random() < 0.3) {
+                    type = CONFIG.TILE_TYPES[randomInt(0, CONFIG.TILE_TYPES.length - 1)];
+                } else {
+                    type = neighbors[randomInt(0, neighbors.length - 1)];
+                }
+                this.state.grid[y][x].type = type;
+            }
+        }
+
+        const px = this.state.player.x;
+        const py = this.state.player.y;
+        const safeColor = CONFIG.TILE_TYPES[randomInt(0, CONFIG.TILE_TYPES.length - 1)];
+        
+        this.state.grid[py][px].type = safeColor;
+
+        if (px < CONFIG.GRID_W - 1) this.state.grid[py][px + 1].type = safeColor;
+        if (py < CONFIG.GRID_H - 1) this.state.grid[py + 1][px].type = safeColor;
+        if (px < CONFIG.GRID_W - 1 && py < CONFIG.GRID_H - 1) {
+            this.state.grid[py + 1][px + 1].type = safeColor;
+        }
+
+        if (px > 0) this.state.grid[py][px - 1].type = safeColor;
+        if (py > 0) this.state.grid[py - 1][px].type = safeColor;
+    }
+
+    log(msg) {
+        const div = document.createElement('div');
+        div.textContent = `> ${msg}`;
+        this.ui.log.prepend(div);
+        if (this.ui.log.children.length > 5) this.ui.log.lastChild.remove();
+    }
+
+    updateUI() {
+        const pPct = (this.state.player.hp / this.state.player.maxHp) * 100;
+        const ePct = (this.state.enemy.hp / this.state.enemy.maxHp) * 100;
+        
+        this.ui.pHp.textContent = Math.max(0, Math.ceil(this.state.player.hp));
+        this.ui.pBar.style.width = `${Math.max(0, pPct)}%`;
+        
+        this.ui.eHp.textContent = Math.max(0, this.state.enemy.hp);
+        this.ui.eBar.style.width = `${Math.max(0, ePct)}%`;
+
+        const count = this.state.currentPath.length;
+        this.ui.chain.textContent = count;
+
+        const comboEl = document.getElementById('combo-display');
+        
+        if (count > 1) {
+            comboEl.textContent = count;
+            comboEl.style.opacity = '1';
+            
+            const scale = 1 + (count * 0.05); 
+            comboEl.style.transform = `translate(-50%, -50%) scale(${scale})`;
+
+            if (count > 5) {
+                comboEl.classList.add('high-combo');
+            } else {
+                comboEl.classList.remove('high-combo');
+            }
+        } else {
+            comboEl.style.opacity = '0';
+            comboEl.style.transform = `translate(-50%, -50%) scale(1)`;
+        }
+    }
+
+    isValidStart(pos) {
+        if (!pos) return false;
+        return pos.x === this.state.player.x && pos.y === this.state.player.y;
+    }
+
+    startPath(pos) {
+        this.state.currentPath = [pos];
+        this.updateUI();
+    }
+
+    updatePath(pos) {
+        if (!pos) return;
+        const path = this.state.currentPath;
+        const last = path[path.length - 1];
+
+        if (path.length > 1 && path[path.length - 2].x === pos.x && path[path.length - 2].y === pos.y) {
+            path.pop();
+            this.updateUI();
+            return;
+        }
+
+        if (Math.abs(pos.x - last.x) + Math.abs(pos.y - last.y) === 1) {
+            const tile = this.state.grid[pos.y][pos.x];
+            const startTile = this.state.grid[path[0].y][path[0].x];
+            
+            if (tile.type !== startTile.type) return;
+            if (path.some(p => p.x === pos.x && p.y === pos.y)) return;
+
+            path.push(pos);
+            this.updateUI();
+        }
+    }
+
+    finalizeMove() {
+        const path = this.state.currentPath;
+        
+        if (path.length === 1) {
+            this.log("SYSTEM REBOOT: Refactoring...");
+            this.renderer.triggerGlitch(0.3);
+            this.shuffleGrid();
+            this.state.currentPath = [];
+            this.updateUI();
+            this.state.turn = 'enemy';
+            setTimeout(() => this.enemyTurn(), 500);
+            return;
+        }
+
+        if (path.length < 1) {
+            this.state.currentPath = [];
+            return;
+        }
+
+        const endPos = path[path.length - 1];
+        this.state.player.x = endPos.x;
+        this.state.player.y = endPos.y;
+
+        let shakeIntensity = path.length * 0.05; 
+
+        let damage = path.length * CONFIG.BASE_DMG;
+        
+        if (path.length > 5) {
+            damage = Math.floor(damage * 2.0);
+            this.log(`>> CHAIN BOOST ACTIVATED! (x2.0) <<`);
+            shakeIntensity += 0.2; 
+        }
+
+        // Glitch Break Threshold needs to adjust for smaller board
+        const totalTiles = CONFIG.GRID_W * CONFIG.GRID_H;
+        if (path.length >= totalTiles * CONFIG.GLITCH_THRESHOLD) {
+            damage = path.length * CONFIG.BASE_DMG * 4.0;
+            this.log("!!! GLITCH BREAK INITIATED !!!");
+            shakeIntensity = 1.5; 
+        }
+
+        this.renderer.triggerGlitch(shakeIntensity);
+
+        this.state.enemy.hp -= damage;
+        this.log(`Upload: ${path.length} Nodes. Total Dmg: ${damage}`);
+
+        if (this.state.enemy.hp <= 0) {
+            this.state.enemy.hp = 0;
+            this.updateUI();
+            this.endGame('win');
+            return;
+        }
+
+        this.respawnTiles(path);
+        this.state.currentPath = [];
+        this.updateUI();
+
+        this.state.turn = 'enemy';
+        setTimeout(() => this.enemyTurn(), 800);
+    }
+
+    respawnTiles(path) {
+        path.forEach(p => {
+            const neighbors = [];
+            const gx = p.x;
+            const gy = p.y;
+
+            if (gx > 0) neighbors.push(this.state.grid[gy][gx-1].type);
+            if (gx < CONFIG.GRID_W-1) neighbors.push(this.state.grid[gy][gx+1].type);
+            if (gy > 0) neighbors.push(this.state.grid[gy-1][gx].type);
+            if (gy < CONFIG.GRID_H-1) neighbors.push(this.state.grid[gy+1][gx].type);
+
+            if (neighbors.length > 0 && Math.random() < 0.8) {
+                this.state.grid[gy][gx].type = neighbors[randomInt(0, neighbors.length - 1)];
+            } else {
+                this.state.grid[gy][gx].type = CONFIG.TILE_TYPES[randomInt(0, CONFIG.TILE_TYPES.length - 1)];
+            }
+        });
+    }
+
+    enemyTurn() {
+        if (this.state.isGameOver) return;
+
+        const ex = this.state.enemy.x;
+        const ey = this.state.enemy.y;
+        const px = this.state.player.x;
+        const py = this.state.player.y;
+
+        let moves = [
+            {x: ex+1, y: ey}, {x: ex-1, y: ey},
+            {x: ex, y: ey+1}, {x: ex, y: ey-1}
+        ];
+
+        moves = moves.filter(m => 
+            m.x >= 0 && m.x < CONFIG.GRID_W &&
+            m.y >= 0 && m.y < CONFIG.GRID_H &&
+            !(m.x === px && m.y === py)
+        );
+
+        if (moves.length > 0) {
+            moves.sort((a, b) => {
+                const da = Math.abs(a.x - px) + Math.abs(a.y - py);
+                const db = Math.abs(b.x - px) + Math.abs(b.y - py);
+                return da - db;
+            });
+            this.state.enemy.x = moves[0].x;
+            this.state.enemy.y = moves[0].y;
+        }
+
+        if (getDistance(this.state.player, this.state.enemy) === 1) {
+            this.state.player.hp -= CONFIG.ENEMY_DMG;
+            this.log(`WARNING: Firewall Counter-Attack! -${CONFIG.ENEMY_DMG} HP`);
+            this.renderer.triggerGlitch(0.8);
+            
+            if (this.state.player.hp <= 0) {
+                this.state.player.hp = 0;
+                this.endGame('lose');
+            }
+        }
+
+        this.updateUI();
+        this.state.turn = 'player';
+    }
+
+    endGame(result) {
+        this.state.isGameOver = true;
+        
+        setTimeout(() => {
+            const screen = document.getElementById('game-over-screen');
+            const title = document.getElementById('game-result-title');
+            
+            screen.classList.remove('hidden');
+            
+            if (result === 'win') {
+                title.textContent = "PROTOCOL BREACH SUCCESS";
+                title.style.color = "#00FFFF";
+            } else {
+                title.textContent = "CONNECTION TERMINATED";
+                title.style.color = "#FF0055";
+            }
+        }, 1000);
+    }
+
+    restart() {
+        document.getElementById('game-over-screen').classList.add('hidden');
+        
+        this.state.isGameOver = false;
+        this.state.turn = 'player';
+        this.state.player.hp = CONFIG.PLAYER_HP;
+        this.state.enemy.hp = CONFIG.ENEMY_HP;
+        this.state.currentPath = [];
+        
+        this.ui.log.innerHTML = '';
+        this.log("System Rebooted... Ready.");
+        
+        this.initGrid();
+        this.updateUI();
+    }
+}
+
+window.onload = () => {
+    const game = new Game();
+};
+</script>
+</body>
+</html>

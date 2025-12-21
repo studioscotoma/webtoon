@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glitch: Seoul Login EP.003 - First Encounter</title>
+    <style>
+        /* =========================================
+           1. Base Layout & Reset
+           ========================================= */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #fff;
+            font-family: sans-serif;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* ビューワー本体（中央カラム） */
+        #viewer-container {
+            width: 100%;
+            max-width: 690px;
+            background-color: #000;
+            display: none; /* 表紙表示中は非表示 */
+        }
+        
+        #viewer-container.active {
+            display: block;
+        }
+
+        .scene-block {
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            position: relative; /* ゲーム挿入時の配置用 */
+        }
+
+        .comic-image {
+            display: block;
+            width: 100%;
+            height: auto;
+            border: none;
+            background-color: #111;
+            transition: opacity 0.5s;
+        }
+        
+        /* 字幕エリア全体 */
+        .caption-area {
+            padding: 24px 16px 40px;
+            background-color: #000;
+            text-align: center;
+        }
+
+        /* =========================================
+           2. Webtoon Multilingual Text Styles
+           ========================================= */
+        .text-kr {
+            font-size: 18px;
+            font-weight: 700;
+            line-height: 1.5;
+            color: #ffffff;
+            margin: 0 0 8px 0;
+            letter-spacing: 0.02em;
+        }
+
+        .text-ja {
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.5;
+            color: #d0d0d0;
+            margin: 0 0 4px 0;
+        }
+
+        .text-fr {
+            font-size: 12px;
+            color: #777777;
+            font-style: italic;
+            font-family: 'Georgia', serif;
+            line-height: 1.4;
+            margin: 0 0 2px 0;
+            opacity: 0.9;
+        }
+
+        .text-en {
+            font-size: 11px;
+            color: #666666;
+            font-style: italic;
+            font-family: 'Georgia', serif;
+            line-height: 1.4;
+            opacity: 0.8;
+            margin: 0;
+        }
+
+        /* =========================================
+           3. Game Iframe Styles
+           ========================================= */
+        .game-wrapper {
+            width: 100%;
+            background-color: #000;
+            padding: 20px 0;
+            box-sizing: border-box;
+            border-top: 1px solid #333;
+            border-bottom: 1px solid #333;
+            display: flex;
+            justify-content: center;
+        }
+
+        iframe.game-frame {
+            width: 100%;
+            height: 600px; /* ゲーム画面の高さ確保 */
+            border: 2px solid #00FFFF; /* ネオンボーダー */
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            background-color: #050505;
+        }
+
+        /* =========================================
+           4. UI Components: Cover Screen
+           ========================================= */
+        #cover-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 9999;
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px; 
+            box-sizing: border-box;
+            transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #cover-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        #cover-image {
+            width: 100%;
+            max-width: 690px;
+            height: auto;
+            max-height: 60vh;
+            object-fit: contain;
+            margin-bottom: 40px;
+            box-shadow: 0 0 30px rgba(255, 0, 255, 0.2); /* EP3はマゼンタ基調 */
+        }
+
+        #start-button {
+            padding: 16px 48px;
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 0.1em;
+            color: #f0f;
+            background-color: transparent;
+            border: 2px solid #f0f;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+            text-shadow: 0 0 5px rgba(255, 0, 255, 0.8);
+            margin-bottom: 20px;
+        }
+
+        #start-button:hover {
+            background-color: rgba(255, 0, 255, 0.1);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
+        }
+
+        /* =========================================
+           5. UI Components: Navigation Footer
+           ========================================= */
+        .next-episode-area {
+            padding: 60px 10px 40px;
+            text-align: center;
+            background-color: #000;
+        }
+
+        .next-button {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 90%;
+            max-width: 300px;
+            padding: 20px;
+            border: 1px solid #333;
+            background-color: #050505;
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .next-button:hover {
+            border-color: #f0f;
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.3);
+        }
+
+        .next-label {
+            font-size: 10px;
+            color: #666;
+            letter-spacing: 0.2em;
+            margin-bottom: 5px;
+        }
+
+        .next-title {
+            font-size: 20px;
+            font-weight: bold;
+            letter-spacing: 0.1em;
+            font-family: 'Courier New', sans-serif;
+            color: #ddd;
+        }
+
+        .nav-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background-color: #0a0a0a;
+            border-top: 1px solid #222;
+            margin-top: 20px;
+        }
+
+        .nav-link {
+            font-size: 12px;
+            color: #888;
+            text-decoration: none;
+            font-weight: bold;
+            letter-spacing: 0.1em;
+            padding: 10px;
+            transition: color 0.3s;
+        }
+
+        .nav-link:hover {
+            color: #f0f;
+        }
+
+        .ep-select-wrapper {
+            position: relative;
+        }
+
+        .ep-select-wrapper select {
+            appearance: none;
+            background-color: #000;
+            color: #f0f;
+            border: 1px solid #333;
+            padding: 5px 30px 5px 15px;
+            font-size: 14px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .ep-select-wrapper::after {
+            content: '▼';
+            font-size: 8px;
+            color: #f0f;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="cover-screen">
+        <img id="cover-image" src="ep003/cover.webp" alt="Glitch: Seoul Login EP.003 Cover" onerror="this.src='https://placehold.co/690x1000/000000/FF00FF?text=EP.003+Cover'">
+        <button id="start-button">INITIALIZE EP.03</button>
+    </div>
+    
+    <div id="viewer-container">
+        <div id="comic-content"></div>
+
+        <div class="next-episode-area">
+            <a href="#" class="next-button">
+                <span class="next-label">Next Operation</span>
+                <span class="next-title">EPISODE 04 (Coming Soon)</span>
+            </a>
+        </div>
+        
+        <div class="nav-footer">
+            <a href="ep002.html" class="nav-link">&lt; PREV</a>
+            
+            <div class="ep-select-wrapper">
+                <select onchange="if(this.value) location.href=this.value">
+                    <option value="index.html">EP.01</option>
+                    <option value="ep002.html">EP.02</option>
+                    <option value="#" selected>EP.03</option>
+                </select>
+            </div>
+
+            <a href="../index.html" class="nav-link">STUDIO &gt;</a>
+        </div>
+    </div>
+    
+    <script>
+        // ==========================================
+        // 1. CONFIG & DATA
+        // ==========================================
+        
+        const DEBUG_MODE = true;
+        
+        const CONFIG = {
+            filePrefix: 'ep001/scene', // EP3用のパス
+            fileExtension: '.webp'
+        };
+
+        // シナリオデータ（画像とゲームの混合リスト）
+        // type: 'image' | 'game'
+        const scenarioData = [
+            // --- Intro: 覚醒直後の混乱 ---
+            {
+                type: 'image',
+                id: 1,
+                kr: "......시스템 동기화 완료.",
+                ja: "……システム同期、完了。",
+                fr: "......Synchronisation du système terminée.",
+                en: "......System synchronization complete."
+            },
+            {
+                type: 'image',
+                id: 2,
+                kr: "보인다... 모든 것이 데이터로 보여.",
+                ja: "見える……すべてがデータに見える。",
+                fr: "Je vois... tout sous forme de données.",
+                en: "I can see it... everything as data."
+            },
+            {
+                type: 'image',
+                id: 3,
+                kr: "저 녀석들은 평범한 회사원이 아니야. 'NPC'였어.",
+                ja: "あいつらはただの会社員じゃない。『NPC』だったんだ。",
+                fr: "Ce ne sont pas des employés ordinaires. C'étaient des 'PNJ'.",
+                en: "They aren't just office workers. They were 'NPCs'."
+            },
+            
+            // --- Encounter: 敵の出現 ---
+            {
+                type: 'image',
+                id: 4,
+                kr: "**[경고] 불법 접속자 감지.**",
+                ja: "**[警告] 不正アクセス者を検知。**",
+                fr: "**[ALERTE] Intrusion détectée.**",
+                en: "**[WARNING] Illegal connection detected.**"
+            },
+            {
+                type: 'image',
+                id: 5,
+                kr: "저건 뭐지? 방화벽(Firewall)... 아니, 괴물인가!?",
+                ja: "なんだあれは？ ファイアウォール……いや、怪物か！？",
+                fr: "Qu'est-ce que c'est ? Un pare-feu... non, un monstre !?",
+                en: "What is that? A Firewall... no, a monster!?"
+            },
+            {
+                type: 'image',
+                id: 6,
+                kr: "놈이 온다! 피할 수 없어!",
+                ja: "来るぞ！ 避けられない！",
+                fr: "Il arrive ! Impossible d'esquiver !",
+                en: "It's coming! Can't dodge!"
+            },
+            
+            // --- Battle Start: ゲーム挿入ポイント ---
+            {
+                type: 'image',
+                id: 7,
+                kr: "[전투 프로토콜]을 개시합니다. 연결하시겠습니까?",
+                ja: "[戦闘プロトコル]を開始します。接続しますか？",
+                fr: "Lancement du [Protocole de Combat]. Connexion ?",
+                en: "Initiating [Combat Protocol]. Connect?"
+            },
+
+            // ▼▼▼ GAME INSERTION ▼▼▼
+            {
+                type: 'game',
+                id: 'GAME_VS_DAEMON',
+                src: 'game/2x4.html', // 以前作成したゲームファイルのパス
+                height: '640px'        // 少し余裕を持たせる
+            },
+            // ▲▲▲ GAME END ▲▲▲
+
+            // --- Post Battle: 戦闘後 ---
+            {
+                type: 'image',
+                id: 8,
+                kr: "해치웠나...?",
+                ja: "やったか……？",
+                fr: "Je l'ai eu... ?",
+                en: "Did I get it...?"
+            },
+            {
+                type: 'image',
+                id: 9,
+                kr: "**[시스템] 위협 제거 확인. 경험치를 획득했습니다.**",
+                ja: "**[システム] 脅威の排除を確認。経験値を獲得しました。**",
+                fr: "**[SYSTEM] Menace éliminée. Expérience acquise.**",
+                en: "**[SYSTEM] Threat eliminated. EXP acquired.**"
+            },
+            {
+                type: 'image',
+                id: 10,
+                kr: "이제 시작이야. 이 망할 게임을 뒤집어 엎어주겠어.",
+                ja: "これからだ。このクソゲーをひっくり返してやる。",
+                fr: "Ça ne fait que commencer. Je vais retourner ce jeu pourri.",
+                en: "This is just the start. I'm going to overturn this trash game."
+            }
+        ];
+
+        // ==========================================
+        // 2. MAIN LOGIC
+        // ==========================================
+        
+        const coverScreen = document.getElementById('cover-screen');
+        const startButton = document.getElementById('start-button');
+        const viewerContainer = document.getElementById('viewer-container');
+        const comicContent = document.getElementById('comic-content');
+
+        const startWebtoon = () => {
+            coverScreen.classList.add('hidden');
+            viewerContainer.classList.add('active');
+            window.scrollTo(0, 0);
+        };
+
+        if (DEBUG_MODE) {
+            startWebtoon();
+        } else {
+            startButton.addEventListener('click', startWebtoon);
+        }
+
+        // レンダリングエンジンの刷新
+        // scenarioDataをループの主体とし、typeに応じて描画を切り替える
+        const renderWebtoon = () => {
+            const fragment = document.createDocumentFragment();
+            
+            // 画像ファイル名のカウンター（ゲームは画像枚数に含まないため分離）
+            let imageCounter = 1;
+
+            scenarioData.forEach(scene => {
+                const sceneBlock = document.createElement('div');
+                sceneBlock.className = 'scene-block';
+
+                // --- A. IFRAME (Game) ---
+                if (scene.type === 'game') {
+                    const wrapper = document.createElement('div');
+                    wrapper.className = 'game-wrapper';
+                    
+                    const iframe = document.createElement('iframe');
+                    iframe.src = scene.src;
+                    iframe.className = 'game-frame';
+                    iframe.style.height = scene.height || '600px';
+                    
+                    // 2025年基準のセキュリティ & パフォーマンス設定
+                    iframe.loading = 'lazy';
+                    // allow-scripts: ゲーム実行に必須
+                    // allow-same-origin: ローカルデータの保存などに必要（不要なら外す）
+                    // allow-popups: 念のため許可
+                    iframe.sandbox = 'allow-scripts allow-same-origin allow-popups'; 
+                    iframe.title = `Interactive Content: ${scene.id}`;
+                    
+                    wrapper.appendChild(iframe);
+                    sceneBlock.appendChild(wrapper);
+                } 
+                // --- B. IMAGE (Comic) ---
+                else {
+                    // 画像
+                    const fileNumber = imageCounter.toString().padStart(2, '0');
+                    const img = document.createElement('img');
+                    
+                    // 実際の画像ファイルがない場合のダミー生成（placeholder.coを使用）
+                    // 本番環境では this.src のエラーハンドラは削除してください
+                    img.src = `${CONFIG.filePrefix}${fileNumber}${CONFIG.fileExtension}`;
+                    img.onerror = function() {
+                        // ダミー画像の生成
+                        this.src = `https://placehold.co/690x800/111/fff?text=EP.03+Scene+${fileNumber}`;
+                        this.onerror = null; // ループ防止
+                    };
+                    
+                    img.className = 'comic-image';
+                    img.loading = 'lazy';
+                    img.alt = `Scene ${scene.id}`;
+                    sceneBlock.appendChild(img);
+                    imageCounter++;
+
+                    // 字幕生成
+                    const captionDiv = document.createElement('div');
+                    captionDiv.className = 'caption-area';
+                    
+                    const appendText = (cls, text) => {
+                        if (!text) return;
+                        const p = document.createElement('p');
+                        p.className = cls;
+                        p.innerHTML = text;
+                        captionDiv.appendChild(p);
+                    };
+
+                    appendText('text-kr', scene.kr);
+                    appendText('text-ja', scene.ja);
+                    appendText('text-fr', scene.fr);
+                    appendText('text-en', scene.en);
+
+                    sceneBlock.appendChild(captionDiv);
+                }
+                
+                fragment.appendChild(sceneBlock);
+            });
+            
+            comicContent.appendChild(fragment);
+        };
+
+        renderWebtoon();
+
+    </script>
+    
+</body>
+</html>
