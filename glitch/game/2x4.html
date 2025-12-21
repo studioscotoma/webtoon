@@ -6,7 +6,7 @@
     <title>Glitch: Seoul Login - Beginner Mode</title>
     <style>
         :root {
-            --bg-color: #050505;
+            --bg-color: #000;
             --neon-cyan: #00FFFF;
             --neon-magenta: #FF00FF;
             --neon-green: #00FF00;
@@ -19,24 +19,36 @@
             background-color: var(--bg-color);
             color: var(--neon-cyan);
             font-family: var(--ui-font);
-            overflow: hidden;
-            touch-action: none;
+            overflow: hidden; /* スクロール禁止 */
+            touch-action: none; /* スマホでのブラウザ操作無効化 */
             user-select: none;
-        }
-
-        #game-container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
+            height: 100vh;
         }
 
+        /* =========================================
+           STAGE WRAPPER (The Container)
+           全ての要素をこの「箱」の中に閉じ込める
+           ========================================= */
+        #stage-wrapper {
+            position: relative;
+            background-color: #050505;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.15);
+            /* width/height は JSで動的に決定される */
+            margin: 0 auto;
+            overflow: hidden; /* はみ出し防止 */
+        }
+
+        /* =========================================
+           LAYERS (Canvas & UI)
+           箱のサイズ(100%)に合わせてピッタリ重なる
+           ========================================= */
         canvas {
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
-            border: 1px solid #333;
+            display: block;
+            width: 100%;
+            height: 100%;
             background-color: #000;
         }
 
@@ -49,7 +61,7 @@
             background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.2));
             background-size: 100% 4px;
             pointer-events: none;
-            z-index: 10;
+            z-index: 5;
             opacity: 0.3;
         }
 
@@ -59,31 +71,51 @@
             left: 0;
             width: 100%;
             height: 100%;
-            pointer-events: none;
+            pointer-events: none; /* UIはクリック透過 */
+            
+            /* Flexboxで上下配置 */
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 20px;
-            box-sizing: border-box;
+            
+            /* 内部の余白設定（重要） */
+            padding: 0;
+            box-sizing: border-box; 
+            z-index: 10;
         }
 
+        /* =========================================
+           UI COMPONENTS
+           ========================================= */
         .hud-top {
+            /* 高さを固定して確保する */
+            padding: 0px; /* 内側の余白 */
+            box-sizing: border-box;
+            width: 100%;
             display: flex;
             justify-content: space-between;
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
+            align-items: flex-start;
             text-shadow: 0 0 5px var(--neon-cyan);
             font-weight: bold;
-            font-size: 18px;
+            font-size: 14px; /* スマホ向けに少し調整 */
+        }
+
+        .status-block {
+            flex: 1;
+        }
+        
+        .status-center {
+            text-align: center;
+            width: 60px; /* 固定幅でズレ防止 */
         }
 
         .bar-container {
-            width: 120px;
-            height: 10px;
+            width: 100%;
+            height: 8px;
             background: #333;
-            margin-top: 5px;
+            margin-top: 4px;
             border: 1px solid #555;
+            position: relative;
         }
 
         .hp-bar {
@@ -96,32 +128,28 @@
 
         #log-console {
             width: 100%;
-            max-width: 600px;
             height: 80px;
-            margin: 0 auto;
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid #333;
+            background: rgba(0, 0, 0, 0.6);
+            border-top: 1px solid #333;
             color: var(--neon-green);
-            font-size: 12px;
-            padding: 10px;
-            overflow: hidden;
+            font-size: 11px;
+            padding: 5px;
+            box-sizing: border-box;
             display: flex;
-            flex-direction: column-reverse;
-            pointer-events: none;
+            flex-direction: column-reverse; /* 新しいログが下から */
+            overflow: hidden;
             text-shadow: 0 0 2px var(--neon-green);
+            pointer-events: none;
         }
         
         #tutorial-msg {
-            position: absolute;
-            bottom: 110px;
-            width: 100%;
             text-align: center;
-            font-size: 14px;
+            font-size: 12px;
             font-weight: bold;
             color: #FFF;
             text-shadow: 0 0 5px #FFF;
-            pointer-events: none;
             animation: pulse-text 2s infinite;
+            margin-bottom: 5px;
         }
 
         @keyframes pulse-text {
@@ -135,35 +163,36 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 20vw;
+            font-size: 80px;
             font-weight: 900;
             color: rgba(0, 255, 255, 0.2);
             text-shadow: 0 0 50px rgba(0, 255, 255, 0.5);
-            pointer-events: none;
             opacity: 0;
-            transition: opacity 0.2s, transform 0.1s, color 0.2s;
-            z-index: 5;
+            transition: opacity 0.2s, transform 0.1s;
+            z-index: 2;
             font-family: sans-serif;
         }
 
         #combo-display.high-combo {
             color: rgba(255, 0, 255, 0.3);
-            text-shadow: 0 0 50px rgba(255, 0, 255, 0.6);
         }
 
+        /* =========================================
+           GAME OVER OVERLAY
+           ========================================= */
         #game-over-screen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.85);
+            background: rgba(0, 0, 0, 0.9);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 100;
-            pointer-events: auto;
+            pointer-events: auto; /* ここだけクリック有効 */
             transition: opacity 0.3s;
         }
 
@@ -173,19 +202,20 @@
         }
 
         #game-result-title {
-            font-size: 40px;
-            margin-bottom: 30px;
+            font-size: 32px;
+            margin-bottom: 20px;
             text-shadow: 0 0 10px currentColor;
             text-align: center;
+            line-height: 1.2;
         }
 
         #reboot-btn {
             background: transparent;
             border: 2px solid var(--neon-cyan);
             color: var(--neon-cyan);
-            padding: 15px 40px;
+            padding: 12px 30px;
             font-family: var(--ui-font);
-            font-size: 24px;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
             box-shadow: 0 0 15px var(--neon-cyan);
@@ -201,60 +231,66 @@
 <body>
 
 <div id="game-container">
-    <canvas id="gameCanvas"></canvas>
-    <div class="scanline"></div>
-    
-    <div id="ui-layer">
-        <div class="hud-top">
+    <div id="stage-wrapper">
+        
+        <canvas id="gameCanvas"></canvas>
+        
+        <div class="scanline"></div>
+        
+        <div id="ui-layer">
+            <div class="hud-top">
+                <div class="status-block">
+                    PLAYER
+                    <div class="bar-container"><div id="p-bar" class="hp-bar p-hp" style="width: 100%"></div></div>
+                </div>
+                
+                <div class="status-center">
+                    CHN<br>
+                    <span id="chain-count" style="color: yellow; font-size: 18px;">0</span>
+                </div>
+                
+                <div class="status-block" style="text-align: right;">
+                    DAEMON
+                    <div class="bar-container"><div id="e-bar" class="hp-bar e-hp" style="width: 100%"></div></div>
+                </div>
+            </div>
+            
+            <div id="combo-display">0</div>
+            
             <div>
-                PLAYER <span id="p-hp-val">100</span>%
-                <div class="bar-container"><div id="p-bar" class="hp-bar p-hp" style="width: 100%"></div></div>
-            </div>
-            <div style="text-align: center;">
-                CHAIN: <span id="chain-count" style="color: yellow">0</span>
-            </div>
-            <div style="text-align: right;">
-                DAEMON <span id="e-hp-val">100</span>%
-                <div class="bar-container"><div id="e-bar" class="hp-bar e-hp" style="width: 100%"></div></div>
+                <div id="tutorial-msg">
+                    <span style="color:#00FFFF">DRAG</span> to Connect<br>
+                    <span style="color:#FF00FF">TAP SELF</span> to Reboot
+                </div>
+                <div id="log-console">
+                    <div>> System Initialized...</div>
+                    <div>> Waiting for Neural Link...</div>
+                </div>
             </div>
         </div>
-        
-        <div id="combo-display">0</div>
-        
-        <div id="tutorial-msg">
-            <span style="color:#00FFFF">DRAG</span> to Connect / <span style="color:#FF00FF">TAP SELF</span> to Reboot
+
+        <div id="game-over-screen" class="hidden">
+            <h1 id="game-result-title">SYSTEM HALTED</h1>
+            <button id="reboot-btn">REBOOT SYSTEM</button>
         </div>
-        
-        <div id="log-console">
-            <div>> System Initialized...</div>
-            <div>> Waiting for Neural Link...</div>
-        </div>
-    </div>
-    
-    <div id="game-over-screen" class="hidden">
-        <h1 id="game-result-title">SYSTEM HALTED</h1>
-        <button id="reboot-btn">REBOOT SYSTEM</button>
     </div>
 </div>
 
 <script>
 /**
- * GLITCH: SEOUL LOGIN - RECTANGLE GRID SUPPORT
- * Support for non-square grids (e.g., 2x4)
+ * GLITCH: SEOUL LOGIN - GAME ENGINE (Fixed Layout Ver.)
  */
 
 const CONFIG = {
-    // 【ここを変更しました】
-    GRID_W: 2, // 横の数 (Width)
-    GRID_H: 4, // 縦の数 (Height)
-    
+    GRID_W: 2, 
+    GRID_H: 4, 
     COLORS: ['#00FFFF', '#FF00FF', '#00FF00', '#FFFF00'], 
     TILE_TYPES: [0, 1, 2, 3],
     PLAYER_HP: 100,
-    ENEMY_HP: 10, // 初心者用なので敵HPも少し減らしました
+    ENEMY_HP: 10, 
     GLITCH_THRESHOLD: 0.7, 
     BASE_DMG: 10,
-    ENEMY_DMG: 10 // 敵の攻撃力も少し優しく
+    ENEMY_DMG: 10
 };
 
 const randomInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
@@ -316,30 +352,47 @@ class Renderer {
         this.ctx = canvas.getContext('2d');
         this.game = game;
         this.cellSize = 0;
-        this.padding = 10;
-        this.resize();
+        this.padding = 0; // ラッパー方式にしたのでCanvas内余白はゼロでOK（CSSでpadding管理）
         this.glitchIntensity = 0;
         this.shake = 0;
+        
+        this.resize();
     }
 
     resize() {
-        // 画面サイズに合わせて、縦横比を維持しつつ最大化する計算
-        const maxWidth = window.innerWidth * 0.9;
-        const maxHeight = window.innerHeight * 0.8; // UIスペース確保のため少し小さく
+        // ---------------------------------------------------------
+        // 【修正版リサイズロジック】
+        // 1. 画面サイズを取得し、少し余白(90%〜95%)を持たせる
+        // ---------------------------------------------------------
+        const maxWidth = window.innerWidth * 0.92;
+        const maxHeight = window.innerHeight * 0.92;
 
-        // 縦と横、どちらが制限になるか計算してセルサイズを決定
-        const cellW = (maxWidth - (this.padding * 2)) / CONFIG.GRID_W;
-        const cellH = (maxHeight - (this.padding * 2)) / CONFIG.GRID_H;
+        // 2. グリッド数からセルサイズを逆算
+        const cellW = maxWidth / CONFIG.GRID_W;
+        const cellH = maxHeight / CONFIG.GRID_H;
         this.cellSize = Math.min(cellW, cellH);
 
-        // 決定したセルサイズからCanvasサイズを確定
-        this.canvas.width = this.cellSize * CONFIG.GRID_W + (this.padding * 2);
-        this.canvas.height = this.cellSize * CONFIG.GRID_H + (this.padding * 2);
+        // 3. 確定した「箱」のサイズ
+        const finalWidth = this.cellSize * CONFIG.GRID_W;
+        const finalHeight = this.cellSize * CONFIG.GRID_H;
+
+        // 4. Stage Wrapperにサイズを適用
+        const stageWrapper = document.getElementById('stage-wrapper');
+        if (stageWrapper) {
+            stageWrapper.style.width = `${finalWidth}px`;
+            stageWrapper.style.height = `${finalHeight}px`;
+        }
+
+        // 5. Canvas解像度を箱に合わせる
+        this.canvas.width = finalWidth;
+        this.canvas.height = finalHeight;
+
+        // ※ UIパーツのサイズ調整は不要（CSSの width: 100% が効くため）
     }
 
     pixelToGrid(x, y) {
-        const gx = Math.floor((x - this.padding) / this.cellSize);
-        const gy = Math.floor((y - this.padding) / this.cellSize);
+        const gx = Math.floor(x / this.cellSize);
+        const gy = Math.floor(y / this.cellSize);
         if (gx >= 0 && gx < CONFIG.GRID_W && gy >= 0 && gy < CONFIG.GRID_H) {
             return { x: gx, y: gy };
         }
@@ -348,8 +401,8 @@ class Renderer {
 
     gridToPixel(gx, gy) {
         return {
-            x: this.padding + gx * this.cellSize + this.cellSize / 2,
-            y: this.padding + gy * this.cellSize + this.cellSize / 2
+            x: gx * this.cellSize + this.cellSize / 2,
+            y: gy * this.cellSize + this.cellSize / 2
         };
     }
 
@@ -385,7 +438,7 @@ class Renderer {
             for (let x = 0; x < CONFIG.GRID_W; x++) {
                 const tile = this.game.state.grid[y][x];
                 const pos = this.gridToPixel(x, y);
-                const size = this.cellSize * 0.85;
+                const size = this.cellSize * 0.9; // 少し隙間を空ける
 
                 this.ctx.fillStyle = CONFIG.COLORS[tile.type];
                 this.ctx.globalAlpha = 0.2;
@@ -416,9 +469,6 @@ class Renderer {
         const offset = Math.sin(Date.now() / 150) * 5;
 
         this.ctx.save();
-        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
-        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-        this.ctx.shadowColor = CONFIG.COLORS[headTile.type];
         this.ctx.shadowBlur = 10;
 
         directions.forEach(dir => {
@@ -432,7 +482,7 @@ class Renderer {
                 if (targetTile.type === headTile.type && !isVisited) {
                     const startPos = this.gridToPixel(currentHead.x, currentHead.y);
                     const angle = Math.atan2(dir.y, dir.x);
-                    const dist = this.cellSize * 0.35 + offset; 
+                    const dist = this.cellSize * 0.4 + offset; // ヒント位置調整
                     
                     const arrowX = startPos.x + Math.cos(angle) * dist;
                     const arrowY = startPos.y + Math.sin(angle) * dist;
@@ -440,6 +490,7 @@ class Renderer {
                     this.ctx.translate(arrowX, arrowY);
                     this.ctx.rotate(angle);
                     
+                    this.ctx.fillStyle = '#FFFFFF';
                     this.ctx.beginPath();
                     this.ctx.moveTo(0, 0);
                     this.ctx.lineTo(-6, -4);
@@ -485,21 +536,25 @@ class Renderer {
         this.ctx.fillStyle = '#FFFFFF';
         this.ctx.shadowBlur = 10;
         this.ctx.shadowColor = CONFIG.COLORS[0];
+        
+        // Player (Triangle)
         this.ctx.beginPath();
-        this.ctx.moveTo(pPos.x, pPos.y - 15);
-        this.ctx.lineTo(pPos.x + 12, pPos.y + 10);
-        this.ctx.lineTo(pPos.x - 12, pPos.y + 10);
+        this.ctx.moveTo(pPos.x, pPos.y - 12);
+        this.ctx.lineTo(pPos.x + 10, pPos.y + 8);
+        this.ctx.lineTo(pPos.x - 10, pPos.y + 8);
         this.ctx.fill();
 
         if (enemy.hp > 0) {
             const ePos = this.gridToPixel(enemy.x, enemy.y);
             this.ctx.fillStyle = '#FF0055';
             this.ctx.shadowColor = '#FF0055';
+            
+            // Enemy (Diamond)
             this.ctx.beginPath();
-            this.ctx.moveTo(ePos.x, ePos.y - 15);
-            this.ctx.lineTo(ePos.x + 15, ePos.y);
-            this.ctx.lineTo(ePos.x, ePos.y + 15);
-            this.ctx.lineTo(ePos.x - 15, ePos.y);
+            this.ctx.moveTo(ePos.x, ePos.y - 12);
+            this.ctx.lineTo(ePos.x + 12, ePos.y);
+            this.ctx.lineTo(ePos.x, ePos.y + 12);
+            this.ctx.lineTo(ePos.x - 12, ePos.y);
             this.ctx.fill();
         }
         this.ctx.shadowBlur = 0;
@@ -518,10 +573,6 @@ class Renderer {
                 );
             }
         }
-        this.ctx.globalCompositeOperation = 'lighter';
-        this.ctx.fillStyle = `rgba(255, 0, 0, ${0.2 * this.glitchIntensity})`;
-        this.ctx.fillRect(Math.random()*this.canvas.width, 0, 50, this.canvas.height);
-        this.ctx.globalCompositeOperation = 'source-over';
     }
 
     triggerGlitch(intensity) {
@@ -536,7 +587,6 @@ class Game {
         this.state = {
             grid: [],
             player: { x: 0, y: 0, hp: CONFIG.PLAYER_HP, maxHp: CONFIG.PLAYER_HP },
-            // 敵は右下に配置
             enemy: { x: CONFIG.GRID_W-1, y: CONFIG.GRID_H-1, hp: CONFIG.ENEMY_HP, maxHp: CONFIG.ENEMY_HP },
             currentPath: [],
             turn: 'player', 
@@ -546,9 +596,9 @@ class Game {
         this.renderer = new Renderer(this.canvas, this);
         this.input = new InputHandler(this.canvas, this);
         this.ui = {
-            pHp: document.getElementById('p-hp-val'),
+            //pHp: document.getElementById('p-hp-val'),
             pBar: document.getElementById('p-bar'),
-            eHp: document.getElementById('e-hp-val'),
+            //eHp: document.getElementById('e-hp-val'),
             eBar: document.getElementById('e-bar'),
             chain: document.getElementById('chain-count'),
             log: document.getElementById('log-console')
@@ -576,7 +626,6 @@ class Game {
             const row = [];
             for (let x = 0; x < CONFIG.GRID_W; x++) {
                 let type;
-                // Safe Zone at start (2x2)
                 if (x < 2 && y < 2) {
                     if (x === 0 && y === 0) {
                         type = CONFIG.TILE_TYPES[randomInt(0, CONFIG.TILE_TYPES.length - 1)];
@@ -627,15 +676,9 @@ class Game {
         const safeColor = CONFIG.TILE_TYPES[randomInt(0, CONFIG.TILE_TYPES.length - 1)];
         
         this.state.grid[py][px].type = safeColor;
-
+        // Ensure some safe moves
         if (px < CONFIG.GRID_W - 1) this.state.grid[py][px + 1].type = safeColor;
         if (py < CONFIG.GRID_H - 1) this.state.grid[py + 1][px].type = safeColor;
-        if (px < CONFIG.GRID_W - 1 && py < CONFIG.GRID_H - 1) {
-            this.state.grid[py + 1][px + 1].type = safeColor;
-        }
-
-        if (px > 0) this.state.grid[py][px - 1].type = safeColor;
-        if (py > 0) this.state.grid[py - 1][px].type = safeColor;
     }
 
     log(msg) {
@@ -649,10 +692,10 @@ class Game {
         const pPct = (this.state.player.hp / this.state.player.maxHp) * 100;
         const ePct = (this.state.enemy.hp / this.state.enemy.maxHp) * 100;
         
-        this.ui.pHp.textContent = Math.max(0, Math.ceil(this.state.player.hp));
+        //this.ui.pHp.textContent = Math.max(0, Math.ceil(this.state.player.hp));
         this.ui.pBar.style.width = `${Math.max(0, pPct)}%`;
         
-        this.ui.eHp.textContent = Math.max(0, this.state.enemy.hp);
+        //this.ui.eHp.textContent = Math.max(0, this.state.enemy.hp);
         this.ui.eBar.style.width = `${Math.max(0, ePct)}%`;
 
         const count = this.state.currentPath.length;
@@ -663,15 +706,11 @@ class Game {
         if (count > 1) {
             comboEl.textContent = count;
             comboEl.style.opacity = '1';
-            
             const scale = 1 + (count * 0.05); 
             comboEl.style.transform = `translate(-50%, -50%) scale(${scale})`;
-
-            if (count > 5) {
-                comboEl.classList.add('high-combo');
-            } else {
-                comboEl.classList.remove('high-combo');
-            }
+            
+            if (count > 5) comboEl.classList.add('high-combo');
+            else comboEl.classList.remove('high-combo');
         } else {
             comboEl.style.opacity = '0';
             comboEl.style.transform = `translate(-50%, -50%) scale(1)`;
@@ -735,7 +774,6 @@ class Game {
         this.state.player.y = endPos.y;
 
         let shakeIntensity = path.length * 0.05; 
-
         let damage = path.length * CONFIG.BASE_DMG;
         
         if (path.length > 5) {
@@ -744,7 +782,6 @@ class Game {
             shakeIntensity += 0.2; 
         }
 
-        // Glitch Break Threshold needs to adjust for smaller board
         const totalTiles = CONFIG.GRID_W * CONFIG.GRID_H;
         if (path.length >= totalTiles * CONFIG.GLITCH_THRESHOLD) {
             damage = path.length * CONFIG.BASE_DMG * 4.0;
@@ -777,7 +814,6 @@ class Game {
             const neighbors = [];
             const gx = p.x;
             const gy = p.y;
-
             if (gx > 0) neighbors.push(this.state.grid[gy][gx-1].type);
             if (gx < CONFIG.GRID_W-1) neighbors.push(this.state.grid[gy][gx+1].type);
             if (gy > 0) neighbors.push(this.state.grid[gy-1][gx].type);
@@ -837,13 +873,10 @@ class Game {
 
     endGame(result) {
         this.state.isGameOver = true;
-        
         setTimeout(() => {
             const screen = document.getElementById('game-over-screen');
             const title = document.getElementById('game-result-title');
-            
             screen.classList.remove('hidden');
-            
             if (result === 'win') {
                 title.textContent = "PROTOCOL BREACH SUCCESS";
                 title.style.color = "#00FFFF";
@@ -856,16 +889,13 @@ class Game {
 
     restart() {
         document.getElementById('game-over-screen').classList.add('hidden');
-        
         this.state.isGameOver = false;
         this.state.turn = 'player';
         this.state.player.hp = CONFIG.PLAYER_HP;
         this.state.enemy.hp = CONFIG.ENEMY_HP;
         this.state.currentPath = [];
-        
         this.ui.log.innerHTML = '';
         this.log("System Rebooted... Ready.");
-        
         this.initGrid();
         this.updateUI();
     }

@@ -99,10 +99,11 @@
         .game-wrapper {
             width: 100%;
             background-color: #000;
-            padding: 20px 0;
-            box-sizing: border-box;
-            border-top: 1px solid #333;
-            border-bottom: 1px solid #333;
+            
+            /* 線と余白を削除 */
+            padding: 0;
+            border: none; 
+            
             display: flex;
             justify-content: center;
         }
@@ -319,61 +320,11 @@
         // type: 'image' | 'game'
         const scenarioData = [
             // --- Intro: 覚醒直後の混乱 ---
-            {
-                type: 'image',
-                id: 1,
-                kr: "......시스템 동기화 완료.",
-                ja: "……システム同期、完了。",
-                fr: "......Synchronisation du système terminée.",
-                en: "......System synchronization complete."
-            },
-            {
-                type: 'image',
-                id: 2,
-                kr: "보인다... 모든 것이 데이터로 보여.",
-                ja: "見える……すべてがデータに見える。",
-                fr: "Je vois... tout sous forme de données.",
-                en: "I can see it... everything as data."
-            },
-            {
-                type: 'image',
-                id: 3,
-                kr: "저 녀석들은 평범한 회사원이 아니야. 'NPC'였어.",
-                ja: "あいつらはただの会社員じゃない。『NPC』だったんだ。",
-                fr: "Ce ne sont pas des employés ordinaires. C'étaient des 'PNJ'.",
-                en: "They aren't just office workers. They were 'NPCs'."
-            },
-            
-            // --- Encounter: 敵の出現 ---
-            {
-                type: 'image',
-                id: 4,
-                kr: "**[경고] 불법 접속자 감지.**",
-                ja: "**[警告] 不正アクセス者を検知。**",
-                fr: "**[ALERTE] Intrusion détectée.**",
-                en: "**[WARNING] Illegal connection detected.**"
-            },
-            {
-                type: 'image',
-                id: 5,
-                kr: "저건 뭐지? 방화벽(Firewall)... 아니, 괴물인가!?",
-                ja: "なんだあれは？ ファイアウォール……いや、怪物か！？",
-                fr: "Qu'est-ce que c'est ? Un pare-feu... non, un monstre !?",
-                en: "What is that? A Firewall... no, a monster!?"
-            },
-            {
-                type: 'image',
-                id: 6,
-                kr: "놈이 온다! 피할 수 없어!",
-                ja: "来るぞ！ 避けられない！",
-                fr: "Il arrive ! Impossible d'esquiver !",
-                en: "It's coming! Can't dodge!"
-            },
             
             // --- Battle Start: ゲーム挿入ポイント ---
             {
                 type: 'image',
-                id: 7,
+                id: 1,
                 kr: "[전투 프로토콜]을 개시합니다. 연결하시겠습니까?",
                 ja: "[戦闘プロトコル]を開始します。接続しますか？",
                 fr: "Lancement du [Protocole de Combat]. Connexion ?",
@@ -397,22 +348,6 @@
                 ja: "やったか……？",
                 fr: "Je l'ai eu... ?",
                 en: "Did I get it...?"
-            },
-            {
-                type: 'image',
-                id: 9,
-                kr: "**[시스템] 위협 제거 확인. 경험치를 획득했습니다.**",
-                ja: "**[システム] 脅威の排除を確認。経験値を獲得しました。**",
-                fr: "**[SYSTEM] Menace éliminée. Expérience acquise.**",
-                en: "**[SYSTEM] Threat eliminated. EXP acquired.**"
-            },
-            {
-                type: 'image',
-                id: 10,
-                kr: "이제 시작이야. 이 망할 게임을 뒤집어 엎어주겠어.",
-                ja: "これからだ。このクソゲーをひっくり返してやる。",
-                fr: "Ça ne fait que commencer. Je vais retourner ce jeu pourri.",
-                en: "This is just the start. I'm going to overturn this trash game."
             }
         ];
 
@@ -458,7 +393,7 @@
                     wrapper.style.display = 'flex';
                     wrapper.style.justifyContent = 'center';
                     wrapper.style.alignItems = 'center';
-                    wrapper.style.padding = '20px 0';      // 上下の余白
+                    wrapper.style.padding = '20px 0 80px';      // 上下の余白
                     wrapper.style.backgroundColor = '#000'; // 背景色
 
                     // コンテナ（iframe + overlay をまとめる箱）を作成
@@ -475,6 +410,7 @@
 
                     // 1. iframe本体
                     const iframe = document.createElement('iframe');
+                    iframe.style.border = 'none'; // または意図したデザインの線のみにする
                     iframe.src = scene.src;
                     iframe.className = 'game-frame';
                     
