@@ -449,27 +449,122 @@
                 const sceneBlock = document.createElement('div');
                 sceneBlock.className = 'scene-block';
 
-                // --- A. IFRAME (Game) ---
+                // --- A. IFRAME (Game) リサイズ版 ---
                 if (scene.type === 'game') {
                     const wrapper = document.createElement('div');
                     wrapper.className = 'game-wrapper';
                     
+                    // 【変更点1】wrapper自体を中央揃えのフレックスボックスにする
+                    wrapper.style.display = 'flex';
+                    wrapper.style.justifyContent = 'center';
+                    wrapper.style.alignItems = 'center';
+                    wrapper.style.padding = '20px 0';      // 上下の余白
+                    wrapper.style.backgroundColor = '#000'; // 背景色
+
+                    // コンテナ（iframe + overlay をまとめる箱）を作成
+                    const container = document.createElement('div');
+                    container.style.position = 'relative';
+                    
+                    // 【変更点2】サイズをここで制御（若干小さくする）
+                    container.style.width = '85%';        // 画面幅の85%
+                    container.style.maxWidth = '450px';   // ただし最大450pxまで
+                    container.style.height = '500px';     // 高さは500pxに固定
+                    
+                    // 影をつけて「浮いているウィンドウ」感を出す
+                    container.style.boxShadow = '0 0 20px rgba(0, 255, 255, 0.1)'; 
+
+                    // 1. iframe本体
                     const iframe = document.createElement('iframe');
                     iframe.src = scene.src;
                     iframe.className = 'game-frame';
-                    iframe.style.height = scene.height || '600px';
                     
-                    // 2025年基準のセキュリティ & パフォーマンス設定
+                    // iframeはコンテナいっぱいに広げる
+                    iframe.style.width = '100%';
+                    iframe.style.height = '100%';
+                    iframe.style.border = '2px solid #00FFFF';
+                    iframe.style.boxSizing = 'border-box'; // ボーダーをサイズに含める
+                    
                     iframe.loading = 'lazy';
-                    // allow-scripts: ゲーム実行に必須
-                    // allow-same-origin: ローカルデータの保存などに必要（不要なら外す）
-                    // allow-popups: 念のため許可
-                    iframe.sandbox = 'allow-scripts allow-same-origin allow-popups'; 
+                    iframe.sandbox = 'allow-scripts allow-same-origin allow-popups';
                     iframe.title = `Interactive Content: ${scene.id}`;
+                    iframe.style.pointerEvents = 'none'; // 初期ロック
+                    iframe.style.transition = 'opacity 0.3s';
+
+                    // 2. オーバーレイ（カバー）
+                    const overlay = document.createElement('div');
+                    // オーバーレイもコンテナいっぱいに
+                    Object.assign(overlay.style, {
+                        position: 'absolute',
+                        top: '0',
+                        left: '0',
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        zIndex: '10',
+                        backdropFilter: 'blur(3px)'
+                    });
+
+                    // スタイル定義（前回の点滅アニメーション）
+                    const blinkKeyframes = `
+                        @keyframes blink-text {
+                            0% { opacity: 1; text-shadow: 0 0 10px #FF0055; }
+                            50% { opacity: 0.6; text-shadow: 0 0 20px #FF0055; }
+                            100% { opacity: 1; text-shadow: 0 0 10px #FF0055; }
+                        }
+                        @keyframes pulse-border {
+                            0% { transform: scale(1); box-shadow: 0 0 0 rgba(255,0,85,0.4); }
+                            70% { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,0,85,0); }
+                            100% { transform: scale(1); box-shadow: 0 0 0 rgba(255,0,85,0); }
+                        }
+                    `;
+                    const styleSheet = document.createElement("style");
+                    styleSheet.innerText = blinkKeyframes;
+                    if (!document.getElementById('anim-style')) {
+                        styleSheet.id = 'anim-style';
+                        document.head.appendChild(styleSheet);
+                    }
+
+                    overlay.innerHTML = `
+                        <div style="
+                            text-align:center; 
+                            color: #FF0055; 
+                            font-family: 'Courier New', sans-serif; 
+                            width: 90%;
+                        ">
+                            <div style="font-size: 12px; margin-bottom: 5px; color: #fff;">WARNING: FIREWALL DETECTED</div>
+                            <div style="font-size: 24px; font-weight: 900; margin-bottom: 20px; animation: blink-text 1.5s infinite;">BATTLE START</div>
+                            <div style="
+                                display: inline-block;
+                                font-size: 14px; 
+                                font-weight: bold;
+                                color: #000;
+                                background-color: #FF0055;
+                                padding: 10px 20px;
+                                animation: pulse-border 2s infinite;
+                                clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+                            ">
+                                [ INITIATE BREACH ]
+                            </div>
+                        </div>
+                    `;
+
+                    overlay.addEventListener('click', function() {
+                        this.style.display = 'none';
+                        iframe.style.pointerEvents = 'auto';
+                        iframe.style.boxShadow = '0 0 30px rgba(0, 255, 255, 0.5)';
+                    });
+
+                    // 階層構造: Wrapper > Container > (Iframe + Overlay)
+                    container.appendChild(iframe);
+                    container.appendChild(overlay);
+                    wrapper.appendChild(container);
                     
-                    wrapper.appendChild(iframe);
                     sceneBlock.appendChild(wrapper);
-                } 
+                }
                 // --- B. IMAGE (Comic) ---
                 else {
                     // 画像
