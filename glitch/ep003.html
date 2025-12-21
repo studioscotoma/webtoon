@@ -385,50 +385,50 @@
                 sceneBlock.className = 'scene-block';
 
                 // --- A. IFRAME (Game) リサイズ版 ---
+                // ▼▼▼ このブロックを丸ごと上書きしてください ▼▼▼
                 if (scene.type === 'game') {
                     const wrapper = document.createElement('div');
                     wrapper.className = 'game-wrapper';
                     
-                    // 【変更点1】wrapper自体を中央揃えのフレックスボックスにする
+                    // レイアウト設定（中央揃え）
+                    wrapper.style.width = '100%';
                     wrapper.style.display = 'flex';
                     wrapper.style.justifyContent = 'center';
                     wrapper.style.alignItems = 'center';
-                    wrapper.style.padding = '20px 0 80px';      // 上下の余白
-                    wrapper.style.backgroundColor = '#000'; // 背景色
+                    
+                    // ★ 下の余白（ここで調整可能）
+                    wrapper.style.padding = '0 0 100px 0'; 
 
-                    // コンテナ（iframe + overlay をまとめる箱）を作成
+                    // コンテナ（iframe + overlay をまとめる箱）
                     const container = document.createElement('div');
                     container.style.position = 'relative';
-                    
-                    // 【変更点2】サイズをここで制御（若干小さくする）
-                    container.style.width = '85%';        // 画面幅の85%
-                    container.style.maxWidth = '450px';   // ただし最大450pxまで
-                    container.style.height = '500px';     // 高さは500pxに固定
-                    
-                    // 影をつけて「浮いているウィンドウ」感を出す
+                    container.style.width = '90%';        // 幅90%
+                    container.style.maxWidth = '450px';   // 最大450px
+                    container.style.height = '500px';     // 高さ500px
                     container.style.boxShadow = '0 0 20px rgba(0, 255, 255, 0.1)'; 
 
                     // 1. iframe本体
                     const iframe = document.createElement('iframe');
-                    iframe.style.border = 'none'; // または意図したデザインの線のみにする
                     iframe.src = scene.src;
-                    iframe.className = 'game-frame';
+                    iframe.className = 'game-frame'; // ★クラス名重要
                     
-                    // iframeはコンテナいっぱいに広げる
                     iframe.style.width = '100%';
                     iframe.style.height = '100%';
                     iframe.style.border = '2px solid #00FFFF';
-                    iframe.style.boxSizing = 'border-box'; // ボーダーをサイズに含める
+                    iframe.style.display = 'block'; // 隙間防止
+                    iframe.style.boxSizing = 'border-box';
                     
                     iframe.loading = 'lazy';
                     iframe.sandbox = 'allow-scripts allow-same-origin allow-popups';
                     iframe.title = `Interactive Content: ${scene.id}`;
                     iframe.style.pointerEvents = 'none'; // 初期ロック
-                    iframe.style.transition = 'opacity 0.3s';
+                    iframe.style.transition = 'all 0.3s';
 
                     // 2. オーバーレイ（カバー）
                     const overlay = document.createElement('div');
-                    // オーバーレイもコンテナいっぱいに
+                    overlay.className = 'game-overlay'; // ★★★ 修正箇所：この行が抜けていました ★★★
+                    
+                    // オーバーレイのスタイル
                     Object.assign(overlay.style, {
                         position: 'absolute',
                         top: '0',
@@ -444,7 +444,7 @@
                         backdropFilter: 'blur(3px)'
                     });
 
-                    // スタイル定義（前回の点滅アニメーション）
+                    // 点滅アニメーション定義（初回のみ追加）
                     const blinkKeyframes = `
                         @keyframes blink-text {
                             0% { opacity: 1; text-shadow: 0 0 10px #FF0055; }
@@ -464,6 +464,7 @@
                         document.head.appendChild(styleSheet);
                     }
 
+                    // オーバーレイの中身（初期状態）
                     overlay.innerHTML = `
                         <div style="
                             text-align:center; 
@@ -488,13 +489,13 @@
                         </div>
                     `;
 
+                    // クリック時の挙動
                     overlay.addEventListener('click', function() {
                         this.style.display = 'none';
                         iframe.style.pointerEvents = 'auto';
                         iframe.style.boxShadow = '0 0 30px rgba(0, 255, 255, 0.5)';
                     });
 
-                    // 階層構造: Wrapper > Container > (Iframe + Overlay)
                     container.appendChild(iframe);
                     container.appendChild(overlay);
                     wrapper.appendChild(container);
@@ -549,6 +550,77 @@
         };
 
         renderWebtoon();
+    
+        // ゲームからのメッセージを監視
+        // Webtoonビューワー側の <script> 末尾
+        window.addEventListener('message', function(event) {
+            // デバッグ用ログ：メッセージが来ているか確認
+            console.log("📨 Message received:", event.data);
+
+            if (event.data === 'GAME_CLEAR') {
+                console.log("✅ Game Clear signal detected!");
+
+                // クラス名で取得（念のため document全体から探す）
+                const overlay = document.querySelector('.game-overlay');
+                const iframe = document.querySelector('iframe.game-frame'); // タグ名も指定して精度を上げる
+                
+                if (!overlay) {
+                    console.error("❌ Overlay element NOT found!");
+                    return;
+                }
+                if (!iframe) {
+                    console.error("❌ Iframe element NOT found!");
+                    return;
+                }
+
+                console.log("🔄 Restoring overlay...");
+
+                // テキスト変更（エラーが出ても止まらないようにtry-catchで囲むか、存在確認する）
+                try {
+                    // Pattern B構造の場合のセレクタ
+                    // もし構造を変えていたらここが原因かもしれないので、
+                    // 単純に innerHTML を丸ごと書き換える方式の方が確実です。
+                    
+                    overlay.innerHTML = `
+                        <div style="
+                            text-align:center; 
+                            color: #00FFFF; 
+                            font-family: 'Courier New', sans-serif; 
+                            width: 90%;
+                            background: rgba(0, 0, 0, 0.9);
+                            padding: 30px;
+                            border: 1px solid #00FFFF;
+                            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+                        ">
+                            <div style="font-size: 14px; margin-bottom: 5px; color: #fff;">SYSTEM HACKED</div>
+                            <div style="font-size: 28px; font-weight: 900; margin-bottom: 25px; text-shadow: 0 0 20px #00FFFF;">COMPLETE</div>
+                            <div style="
+                                display: inline-block;
+                                font-size: 16px; 
+                                font-weight: bold;
+                                color: #000;
+                                background-color: #00FFFF;
+                                padding: 12px 30px;
+                                box-shadow: 0 0 20px rgba(0,255,255,0.5);
+                            ">
+                                [ ACCESS GRANTED ]
+                            </div>
+                        </div>
+                    `;
+                } catch (e) {
+                    console.error("⚠️ Text update failed:", e);
+                }
+                
+                // オーバーレイを表示（flexで強制上書き）
+                overlay.style.display = 'flex';
+                
+                // iframeの操作ロック
+                iframe.style.pointerEvents = 'none';
+                iframe.style.borderColor = "#00FFFF";
+                iframe.style.boxShadow = "0 0 20px rgba(0, 255, 255, 0.4)";
+            }
+        });
+
 
     </script>
     

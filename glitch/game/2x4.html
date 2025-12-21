@@ -871,15 +871,27 @@ class Game {
         this.state.turn = 'player';
     }
 
+    // Gameクラス内
     endGame(result) {
         this.state.isGameOver = true;
+        
         setTimeout(() => {
             const screen = document.getElementById('game-over-screen');
             const title = document.getElementById('game-result-title');
+            
             screen.classList.remove('hidden');
+            
             if (result === 'win') {
                 title.textContent = "PROTOCOL BREACH SUCCESS";
                 title.style.color = "#00FFFF";
+                
+                // ▼▼▼ 追加: 親ページにクリア信号を送る ▼▼▼
+                // 0.5秒待ってからカバーを戻す（余韻を残すため）
+                setTimeout(() => {
+                    window.parent.postMessage('GAME_CLEAR', '*');
+                }, 500); 
+                // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+                
             } else {
                 title.textContent = "CONNECTION TERMINATED";
                 title.style.color = "#FF0055";
