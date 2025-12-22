@@ -6,24 +6,37 @@
     <title>Glitch: Seoul Login 002</title>
     <style>
         /* =========================================
-           1. Base Layout & Reset
+           1. BASE LAYOUT & RESET (Unified with EP.003)
            ========================================= */
+        :root {
+            --color-bg: #000;
+            --color-text: #fff;
+            
+            /* ▼ テーマカラー設定 ▼ */
+            /* EP.001はCyan(#00FFFF)をメインにしています。 */
+            /* EP.003と同じ色にしたい場合はここを #FF0055 に変更してください */
+            --color-theme: #00FFFF; 
+            
+            --color-sub: #333;
+            --font-ui: 'Courier New', sans-serif;
+        }
+
         body {
             margin: 0;
             padding: 0;
-            background-color: #000;
-            color: #fff;
+            background-color: var(--color-bg);
+            color: var(--color-text);
             font-family: sans-serif;
             display: flex;
             justify-content: center;
         }
 
-        /* ビューワー本体（中央カラム） */
+        /* ビューワー本体 */
         #viewer-container {
             width: 100%;
             max-width: 690px;
-            background-color: #000;
-            display: none; /* 表紙表示中は非表示 */
+            background-color: var(--color-bg);
+            display: none;
         }
         
         #viewer-container.active {
@@ -34,6 +47,7 @@
             display: flex;
             flex-direction: column;
             margin: 0;
+            position: relative; /* EP.003に合わせる */
         }
 
         .comic-image {
@@ -41,234 +55,114 @@
             width: 100%;
             height: auto;
             border: none;
-            background-color: #111; /* 画像ロード前のプレースホルダー色 */
+            background-color: #111;
+            transition: opacity 0.5s; /* EP.003のフェード処理に合わせる */
         }
         
-        /* 字幕エリア全体 */
+        /* 字幕エリア */
         .caption-area {
             padding: 24px 16px 40px;
-            background-color: #000;
+            background-color: var(--color-bg);
             text-align: center;
         }
 
         /* =========================================
            2. Webtoon Multilingual Text Styles
            ========================================= */
-        
-        /* 韓国語 (Main) */
-        .text-kr {
-            font-size: 18px;
-            font-weight: 700;
-            line-height: 1.5;
-            color: #ffffff;
-            margin: 0 0 8px 0;
-            letter-spacing: 0.02em;
-        }
-
-        /* 日本語 (Sub) */
-        .text-ja {
-            font-size: 14px;
-            font-weight: 400;
-            line-height: 1.5;
-            color: #d0d0d0;
-            margin: 0 0 4px 0;
-        }
-
-        /* 中国語・繁体字 (Reserved) */
-        /* .text-zh { font-size: 14px; color: #b0b0b0; ... } */
-
-        /* フランス語 (Atmosphere) */
-        .text-fr {
-            font-size: 12px;
-            color: #777777;
-            font-style: italic;
-            font-family: 'Georgia', serif;
-            line-height: 1.4;
-            margin: 0 0 2px 0;
-            opacity: 0.9;
-        }
-
-        /* 英語 (Bridge/Atmosphere) */
-        .text-en {
-            font-size: 11px;
-            color: #666666;
-            font-style: italic;
-            font-family: 'Georgia', serif;
-            line-height: 1.4;
-            opacity: 0.8;
-            margin: 0;
-        }
+        .text-kr { font-size: 18px; font-weight: 700; line-height: 1.5; color: #fff; margin-bottom: 8px; letter-spacing: 0.02em; }
+        .text-ja { font-size: 14px; font-weight: 400; line-height: 1.5; color: #d0d0d0; margin-bottom: 4px; }
+        .text-fr { font-size: 12px; color: #777; font-style: italic; font-family: 'Georgia', serif; margin-bottom: 2px; opacity: 0.9; }
+        .text-en { font-size: 11px; color: #666; font-style: italic; font-family: 'Georgia', serif; opacity: 0.8; margin: 0; }
 
         /* =========================================
            3. UI Components: Cover Screen
            ========================================= */
         #cover-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh; /* 全画面 */
-            z-index: 9999;
-            background-color: #000;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px; 
-            box-sizing: border-box;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            z-index: 9999; background-color: #000;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            padding: 20px; box-sizing: border-box;
             transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
-            opacity: 1;
-            visibility: visible;
-            overflow-y: auto; 
         }
 
-        #cover-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
+        #cover-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
         #cover-image {
             width: 100%;
             max-width: 690px;
-            height: auto;
-            max-height: 70vh;
-            object-fit: contain;
+            
+            /* ▼ 修正: 高さを固定せず、余白に応じて縮むようにする ▼ */
+            height: auto;           /* 高さは自動 */
+            max-height: 60vh;       /* 最大でも画面の6割 */
+            flex-shrink: 1;         /* 画面が狭いときは縮むことを許可 */
+            min-height: 0;          /* Flexアイテムが潰れるのを許可（Firefox対策） */
+            object-fit: contain;    /* アスペクト比を維持 */
+            
             margin-bottom: 40px;
             box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
         }
 
         #start-button {
-            padding: 16px 48px;
-            font-size: 18px;
-            font-weight: bold;
-            letter-spacing: 0.1em;
-            color: #0ff;
-            background-color: transparent;
-            border: 2px solid #0ff;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-transform: uppercase;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            padding: 16px 48px; font-size: 18px; font-weight: bold; letter-spacing: 0.1em;
+            color: var(--color-theme); 
+            background: transparent; 
+            border: 2px solid var(--color-theme);
+            cursor: pointer; text-transform: uppercase;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5); /* 初期影 */
             text-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
-            margin-bottom: 20px;
+            transition: all 0.3s ease;
         }
 
         #start-button:hover {
             background-color: rgba(0, 255, 255, 0.1);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
-        }
-        
-        #start-button:active {
-            transform: scale(0.98);
+            box-shadow: 0 0 20px var(--color-theme); /* 変数を利用して発光 */
         }
 
         /* =========================================
            4. UI Components: Navigation Footer
            ========================================= */
+        .next-episode-area { padding: 60px 10px 40px; text-align: center; background-color: #000; }
         
-        /* Next Episode Button Area */
-        .next-episode-area {
-            padding: 60px 10px 40px;
-            text-align: center;
-            background-color: #000;
-        }
-
         .next-button {
-            display: inline-flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 90%;
-            max-width: 300px;
-            padding: 20px;
-            border: 1px solid #333;
-            background-color: #050505;
-            color: #fff;
-            text-decoration: none;
+            display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 90%; max-width: 300px; padding: 20px;
+            border: 1px solid #333; background-color: #050505; 
+            color: #fff; text-decoration: none;
             transition: all 0.3s ease;
         }
-
-        .next-button.disabled {
-            border-color: #222;
-            opacity: 0.6;
-            cursor: default;
-            pointer-events: none;
+        
+        /* ホバー時の発光演出をEP.003と統一 */
+        .next-button:hover { 
+            border-color: var(--color-theme); 
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3); /* テーマカラーに合わせるならrgba調整が必要ですが、一旦Cyan系で統一 */
         }
+        
+        .next-label { font-size: 10px; color: #666; letter-spacing: 0.2em; margin-bottom: 5px; }
+        .next-title { font-size: 20px; font-weight: bold; font-family: var(--font-ui); color: #ddd; }
 
-        .next-label {
-            font-size: 10px;
-            color: #666;
-            letter-spacing: 0.2em;
-            margin-bottom: 5px;
-        }
-
-        .next-title {
-            font-size: 20px;
-            font-weight: bold;
-            letter-spacing: 0.1em;
-            font-family: 'Courier New', sans-serif;
-            color: #888;
-        }
-
-        /* Footer Nav (Prev / Select / Studio) */
         .nav-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            background-color: #0a0a0a;
-            border-top: 1px solid #222;
-            margin-top: 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px; background-color: #0a0a0a; border-top: 1px solid #222; margin-top: 20px;
         }
-
-        .nav-link {
-            font-size: 12px;
-            color: #888;
-            text-decoration: none;
-            font-weight: bold;
-            letter-spacing: 0.1em;
-            padding: 10px;
-            transition: color 0.3s;
+        
+        .nav-link { 
+            font-size: 12px; color: #888; text-decoration: none; font-weight: bold; 
+            padding: 10px; transition: color 0.3s; 
         }
+        .nav-link:hover { color: var(--color-theme); }
+        .nav-link.disabled { color: #333; pointer-events: none; cursor: default; }
 
-        .nav-link:hover {
-            color: #0ff;
-        }
-
-        .nav-link.disabled {
-            color: #333;       /* 背景に溶け込む暗い色 */
-            pointer-events: none; /* クリック無効 */
-            cursor: default;   /* マウスカーソルを指にしない */
-        }
-
-        .ep-select-wrapper {
-            position: relative;
-        }
-
+        /* Select Box */
+        .ep-select-wrapper { position: relative; }
         .ep-select-wrapper select {
-            appearance: none;
-            background-color: #000;
-            color: #0ff;
-            border: 1px solid #333;
-            padding: 5px 30px 5px 15px;
-            font-size: 14px;
-            font-family: 'Courier New', monospace;
-            cursor: pointer;
-            border-radius: 4px;
+            appearance: none; background-color: #000; color: var(--color-theme);
+            border: 1px solid #333; padding: 5px 30px 5px 15px;
+            font-size: 14px; font-family: var(--font-ui); border-radius: 4px; cursor: pointer;
         }
-
         .ep-select-wrapper::after {
-            content: '▼';
-            font-size: 8px;
-            color: #0ff;
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            pointer-events: none;
+            content: '▼'; font-size: 8px; color: var(--color-theme);
+            position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none;
         }
-
     </style>
 </head>
 <body>

@@ -136,8 +136,8 @@
 
         /* 状態B: HACKED (クリア後) */
         .game-overlay.hacked {
-            background-color: rgba(0, 0, 0, 0.85);
-            pointer-events: auto !important; /* オーバーレイを表示状態に固定 */
+            background-color: rgba(0, 0, 0, 0.6); /* 裏のゲーム画面がうっすら見える */
+            backdrop-filter: blur(2px); /* 少しぼかしを入れる */
         }
         .game-overlay.hacked .status-msg { color: var(--color-cyan); }
         .game-overlay.hacked .main-title {
