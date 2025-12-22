@@ -113,6 +113,28 @@ body {
     transition: all 0.3s ease;
 }
 .next-button:hover { border-color: var(--color-theme); box-shadow: 0 0 15px var(--color-theme); }
+
+.next-button.disabled {
+    pointer-events: none;
+    opacity: 0.5;
+    
+    /* ロックされた雰囲気 */
+    color: #333;
+    border: 1px dashed #333; /* 実線ではなく破線に */
+    
+    /* 斜線の背景（立ち入り禁止テープ風） */
+    background: repeating-linear-gradient(
+        45deg,
+        #000,
+        #000 10px,
+        #111 10px,
+        #111 20px
+    );
+    
+    text-shadow: none;
+    box-shadow: none;
+}
+
 .next-label { font-size: 10px; color: #666; letter-spacing: 0.2em; margin-bottom: 5px; }
 .next-title { font-size: 20px; font-weight: bold; font-family: var(--font-ui); color: #ddd; }
 
