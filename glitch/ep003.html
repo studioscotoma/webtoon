@@ -177,9 +177,18 @@
         #cover-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
         
         #cover-image {
-            width: 100%; max-width: 690px; height: auto; max-height: 60vh;
-            object-fit: contain; margin-bottom: 40px;
-            box-shadow: 0 0 30px rgba(255, 0, 255, 0.2);
+            width: 100%;
+            max-width: 690px;
+            
+            /* ▼ 修正: 高さを固定せず、余白に応じて縮むようにする ▼ */
+            height: auto;           /* 高さは自動 */
+            max-height: 60vh;       /* 最大でも画面の6割 */
+            flex-shrink: 1;         /* 画面が狭いときは縮むことを許可 */
+            min-height: 0;          /* Flexアイテムが潰れるのを許可（Firefox対策） */
+            object-fit: contain;    /* アスペクト比を維持 */
+            
+            margin-bottom: 40px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
         }
 
         #start-button {
