@@ -4,166 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Glitch: Seoul Login 002</title>
-    <style>
-        /* =========================================
-           1. BASE LAYOUT & RESET (Unified with EP.003)
-           ========================================= */
-        :root {
-            --color-bg: #000;
-            --color-text: #fff;
-            
-            /* ▼ テーマカラー設定 ▼ */
-            /* EP.001はCyan(#00FFFF)をメインにしています。 */
-            /* EP.003と同じ色にしたい場合はここを #FF0055 に変更してください */
-            --color-theme: #00FFFF; 
-            
-            --color-sub: #333;
-            --font-ui: 'Courier New', sans-serif;
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            background-color: var(--color-bg);
-            color: var(--color-text);
-            font-family: sans-serif;
-            display: flex;
-            justify-content: center;
-        }
-
-        /* ビューワー本体 */
-        #viewer-container {
-            width: 100%;
-            max-width: 690px;
-            background-color: var(--color-bg);
-            display: none;
-        }
-        
-        #viewer-container.active {
-            display: block;
-        }
-
-        .scene-block {
-            display: flex;
-            flex-direction: column;
-            margin: 0;
-            position: relative; /* EP.003に合わせる */
-        }
-
-        .comic-image {
-            display: block;
-            width: 100%;
-            height: auto;
-            border: none;
-            background-color: #111;
-            transition: opacity 0.5s; /* EP.003のフェード処理に合わせる */
-        }
-        
-        /* 字幕エリア */
-        .caption-area {
-            padding: 24px 16px 40px;
-            background-color: var(--color-bg);
-            text-align: center;
-        }
-
-        /* =========================================
-           2. Webtoon Multilingual Text Styles
-           ========================================= */
-        .text-kr { font-size: 18px; font-weight: 700; line-height: 1.5; color: #fff; margin-bottom: 8px; letter-spacing: 0.02em; }
-        .text-ja { font-size: 14px; font-weight: 400; line-height: 1.5; color: #d0d0d0; margin-bottom: 4px; }
-        .text-fr { font-size: 12px; color: #777; font-style: italic; font-family: 'Georgia', serif; margin-bottom: 2px; opacity: 0.9; }
-        .text-en { font-size: 11px; color: #666; font-style: italic; font-family: 'Georgia', serif; opacity: 0.8; margin: 0; }
-
-        /* =========================================
-           3. UI Components: Cover Screen
-           ========================================= */
-        #cover-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
-            z-index: 9999; background-color: #000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            padding: 20px; box-sizing: border-box;
-            transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
-        }
-
-        #cover-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-
-        #cover-image {
-            width: 100%;
-            max-width: 690px;
-            
-            /* ▼ 修正: 高さを固定せず、余白に応じて縮むようにする ▼ */
-            height: auto;           /* 高さは自動 */
-            max-height: 60vh;       /* 最大でも画面の6割 */
-            flex-shrink: 1;         /* 画面が狭いときは縮むことを許可 */
-            min-height: 0;          /* Flexアイテムが潰れるのを許可（Firefox対策） */
-            object-fit: contain;    /* アスペクト比を維持 */
-            
-            margin-bottom: 40px;
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
-        }
-
-        #start-button {
-            padding: 16px 48px; font-size: 18px; font-weight: bold; letter-spacing: 0.1em;
-            color: var(--color-theme); 
-            background: transparent; 
-            border: 2px solid var(--color-theme);
-            cursor: pointer; text-transform: uppercase;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.5); /* 初期影 */
-            text-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
-            transition: all 0.3s ease;
-        }
-
-        #start-button:hover {
-            background-color: rgba(0, 255, 255, 0.1);
-            box-shadow: 0 0 20px var(--color-theme); /* 変数を利用して発光 */
-        }
-
-        /* =========================================
-           4. UI Components: Navigation Footer
-           ========================================= */
-        .next-episode-area { padding: 60px 10px 40px; text-align: center; background-color: #000; }
-        
-        .next-button {
-            display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
-            width: 90%; max-width: 300px; padding: 20px;
-            border: 1px solid #333; background-color: #050505; 
-            color: #fff; text-decoration: none;
-            transition: all 0.3s ease;
-        }
-        
-        /* ホバー時の発光演出をEP.003と統一 */
-        .next-button:hover { 
-            border-color: var(--color-theme); 
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3); /* テーマカラーに合わせるならrgba調整が必要ですが、一旦Cyan系で統一 */
-        }
-        
-        .next-label { font-size: 10px; color: #666; letter-spacing: 0.2em; margin-bottom: 5px; }
-        .next-title { font-size: 20px; font-weight: bold; font-family: var(--font-ui); color: #ddd; }
-
-        .nav-footer {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 20px; background-color: #0a0a0a; border-top: 1px solid #222; margin-top: 20px;
-        }
-        
-        .nav-link { 
-            font-size: 12px; color: #888; text-decoration: none; font-weight: bold; 
-            padding: 10px; transition: color 0.3s; 
-        }
-        .nav-link:hover { color: var(--color-theme); }
-        .nav-link.disabled { color: #333; pointer-events: none; cursor: default; }
-
-        /* Select Box */
-        .ep-select-wrapper { position: relative; }
-        .ep-select-wrapper select {
-            appearance: none; background-color: #000; color: var(--color-theme);
-            border: 1px solid #333; padding: 5px 30px 5px 15px;
-            font-size: 14px; font-family: var(--font-ui); border-radius: 4px; cursor: pointer;
-        }
-        .ep-select-wrapper::after {
-            content: '▼'; font-size: 8px; color: var(--color-theme);
-            position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none;
-        }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
@@ -197,20 +38,9 @@
         </div>
     </div>
     
-    <script>
-        // ==========================================
-        // 1. CONFIG & DATA
-        // ==========================================
-        
-        // true にすると表紙をスキップ（開発用）
-        const DEBUG_MODE = false;
-        
-        const CONFIG = {
-            totalImages: 32,
-            filePrefix: 'ep002/scene',
-            fileExtension: '.webp'
-        };
+    <script src="js/viewer.js"></script>
 
+    <script>
         const scenarioData = [
             {
                 id: 1,
@@ -438,81 +268,13 @@
             }
         ];
 
-        // ==========================================
-        // 2. MAIN LOGIC
-        // ==========================================
-        
-        const coverScreen = document.getElementById('cover-screen');
-        const startButton = document.getElementById('start-button');
-        const viewerContainer = document.getElementById('viewer-container');
-        const comicContent = document.getElementById('comic-content'); // 画像挿入用のコンテナ
+        // ビューワー起動
+        const viewer = new GlitchViewer({
+            filePrefix: 'ep002/scene',  // 画像パスのプレフィックス
+            debugMode: false
+        });
 
-        // スタート処理
-        const startWebtoon = () => {
-            coverScreen.classList.add('hidden');
-            viewerContainer.classList.add('active');
-            window.scrollTo(0, 0);
-        };
-
-        // 初期化：デバッグモード判定
-        if (DEBUG_MODE) {
-            console.log("🔧 Debug Mode: Cover skipped.");
-            startWebtoon();
-        } else {
-            startButton.addEventListener('click', startWebtoon);
-        }
-
-        // 本編画像の生成＆DOMへの追加
-        const renderWebtoon = () => {
-            const fragment = document.createDocumentFragment();
-
-            for (let i = 1; i <= CONFIG.totalImages; i++) {
-                const sceneBlock = document.createElement('div');
-                sceneBlock.className = 'scene-block';
-
-                // 画像
-                const fileNumber = i.toString().padStart(2, '0');
-                const img = document.createElement('img');
-                img.src = `${CONFIG.filePrefix}${fileNumber}${CONFIG.fileExtension}`;
-                img.className = 'comic-image';
-                img.loading = 'lazy';
-                img.alt = `Scene ${i}`;
-                
-                sceneBlock.appendChild(img);
-                
-                // 字幕
-                const sceneText = scenarioData.find(data => data.id === i);
-                if (sceneText) {
-                    const captionDiv = document.createElement('div');
-                    captionDiv.className = 'caption-area';
-                    
-                    // 多言語レンダリング関数
-                    const appendText = (cls, text) => {
-                        if (!text) return;
-                        const p = document.createElement('p');
-                        p.className = cls;
-                        p.innerHTML = text; // マークアップ許可
-                        captionDiv.appendChild(p);
-                    };
-
-                    appendText('text-kr', sceneText.kr);
-                    appendText('text-ja', sceneText.ja);
-                    // appendText('text-zh', sceneText.zh); // 必要ならコメント解除
-                    appendText('text-fr', sceneText.fr);
-                    appendText('text-en', sceneText.en);
-
-                    sceneBlock.appendChild(captionDiv);
-                }
-                
-                fragment.appendChild(sceneBlock);
-            }
-            
-            // 一括追加（パフォーマンス向上）
-            comicContent.appendChild(fragment);
-        };
-
-        // レンダリング実行
-        renderWebtoon();
+        viewer.init(scenarioData);
 
     </script>
     

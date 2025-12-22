@@ -1,0 +1,136 @@
+
+@charset "UTF-8";
+
+/* =========================================
+   1. BASE VARIABLES & RESET
+   ========================================= */
+:root {
+    --color-bg: #000;
+    --color-text: #fff;
+    --color-sub: #333;
+    --font-ui: 'Courier New', sans-serif;
+    
+    /* デフォルト値（万が一設定忘れがあった場合の色） */
+    --color-theme: #00FFFF; 
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: sans-serif;
+    display: flex;
+    justify-content: center;
+}
+
+/* =========================================
+   2. VIEWER CONTAINER
+   ========================================= */
+#viewer-container {
+    width: 100%;
+    max-width: 690px;
+    background-color: var(--color-bg);
+    display: none;
+}
+#viewer-container.active { display: block; }
+
+.scene-block {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    margin: 0;
+}
+
+.comic-image {
+    display: block;
+    width: 100%;
+    height: auto;
+    background-color: #111;
+    transition: opacity 0.5s;
+}
+
+/* =========================================
+   3. TEXT STYLES (Multilingual)
+   ========================================= */
+.caption-area {
+    padding: 24px 16px 40px;
+    background-color: var(--color-bg);
+    text-align: center;
+}
+.text-kr { font-size: 18px; font-weight: 700; line-height: 1.5; color: #fff; margin-bottom: 8px; letter-spacing: 0.02em; }
+.text-ja { font-size: 14px; font-weight: 400; line-height: 1.5; color: #d0d0d0; margin-bottom: 4px; }
+.text-fr { font-size: 12px; color: #777; font-style: italic; font-family: 'Georgia', serif; margin-bottom: 2px; opacity: 0.9; }
+.text-en { font-size: 11px; color: #666; font-style: italic; font-family: 'Georgia', serif; opacity: 0.8; margin: 0; }
+
+/* =========================================
+   4. COVER SCREEN (Responsive Fix)
+   ========================================= */
+#cover-screen {
+    position: fixed; top: 0; left: 0; width: 100%;
+    height: 100dvh; /* スマホのアドレスバー対策 */
+    z-index: 9999; background-color: #000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 20px; box-sizing: border-box;
+    transition: opacity 0.8s, visibility 0.8s;
+    overflow-y: auto; /* 小さい画面ではスクロール許可 */
+}
+#cover-screen.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+
+#cover-image {
+    width: 100%; max-width: 690px;
+    height: auto; max-height: 60vh;
+    object-fit: contain; margin-bottom: 40px;
+    flex-shrink: 1; /* 画面が狭いときに縮む */
+    min-height: 0;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.2); /* ※ここの影色も変数化しても良い */
+}
+
+#start-button {
+    padding: 16px 48px; font-size: 18px; font-weight: bold; letter-spacing: 0.1em;
+    color: var(--color-theme);
+    background: transparent;
+    border: 2px solid var(--color-theme);
+    cursor: pointer; text-transform: uppercase;
+    box-shadow: 0 0 10px var(--color-theme); /* 変数化 */
+    text-shadow: 0 0 5px var(--color-theme); /* 変数化 */
+    transition: all 0.3s ease;
+    flex-shrink: 0; /* ボタンは縮ませない */
+}
+#start-button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 0 20px var(--color-theme);
+}
+
+/* =========================================
+   5. NAVIGATION FOOTER
+   ========================================= */
+.next-episode-area { padding: 60px 10px 40px; text-align: center; background-color: #000; }
+.next-button {
+    display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+    width: 90%; max-width: 300px; padding: 20px;
+    border: 1px solid #333; background-color: #050505; color: #fff; text-decoration: none;
+    transition: all 0.3s ease;
+}
+.next-button:hover { border-color: var(--color-theme); box-shadow: 0 0 15px var(--color-theme); }
+.next-label { font-size: 10px; color: #666; letter-spacing: 0.2em; margin-bottom: 5px; }
+.next-title { font-size: 20px; font-weight: bold; font-family: var(--font-ui); color: #ddd; }
+
+.nav-footer {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px; background-color: #0a0a0a; border-top: 1px solid #222; margin-top: 20px;
+}
+.nav-link { font-size: 12px; color: #888; text-decoration: none; font-weight: bold; padding: 10px; transition: color 0.3s; }
+.nav-link:hover { color: var(--color-theme); }
+.nav-link.disabled { color: #333; pointer-events: none; cursor: default; }
+
+.ep-select-wrapper { position: relative; }
+.ep-select-wrapper select {
+    appearance: none; background-color: #000; color: var(--color-theme);
+    border: 1px solid #333; padding: 5px 30px 5px 15px;
+    font-size: 14px; font-family: var(--font-ui); border-radius: 4px; cursor: pointer;
+}
+.ep-select-wrapper::after {
+    content: '▼'; font-size: 8px; color: var(--color-theme);
+    position: absolute; right: 10px; top: 50%; transform: translateY(-50%); pointer-events: none;
+}
