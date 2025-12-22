@@ -145,69 +145,16 @@
 
     <script>
         const scenarioData = [
-            { 
-                type: 'image', id: 1, 
-                kr: "강원특별자치도 강원랜드", 
-                ja: "江原特別自治道 カンウォンランド", 
-                fr: "Province de Gangwon, Gangwon Land", 
-                en: "Gangwon State, Gangwon Land"
-            },
-            { 
-                type: 'image', id: 2, 
-                kr: "강원 복합 리조트(IR) 카지노", 
-                ja: "カンウォン統合リゾート(IR) カジノ", 
-                fr: "Casino du complexe intégré (IR) de Gangwon", 
-                en: "Gangwon Integrated Resort (IR) Casino"
-            },
-            { 
-                type: 'image', id: 3, 
-                kr: "카지노 플로어의 슬롯머신들", 
-                ja: "カジノフロアのスロット", 
-                fr: "Machines à sous de l'étage du casino", 
-                en: "Slot machines on the casino floor"
-            },
-            { 
-                type: 'image', id: 4, 
-                kr: "돈을 빌려주는 사채업자들", 
-                ja: "貸付を行う個人債業者", 
-                fr: "Prêteurs sur gages offrant des crédits", 
-                en: "Private moneylenders offering loans"
-            },
-            { 
-                type: 'image', id: 5, 
-                kr: "영어로는 론 샤크(Loan Shark). 어둠의 웅덩이(Dark Pool)에서 헤엄치길 즐기지.", 
-                ja: "英語ではLoan Shark、ダークプールで泳ぐのを好む", 
-                fr: "Loan Sharks, en anglais. Ils préfèrent nager dans les « dark pools ».", 
-                en: "Loan Sharks, in English. Preferring to swim in dark pools."
-            },
-            { 
-                type: 'image', id: 6, 
-                kr: "금연 구역에서 전자담배를 피우는 론 샤크", 
-                ja: "禁煙フロアで電子タバコを吸うLoan Shark", 
-                fr: "Un Loan Shark vapotant dans la zone non-fumeur", 
-                en: "A Loan Shark vaping in the non-smoking section"
-            },
-            { 
-                type: 'image', id: 7, 
-                kr: "슬롯머신 자리에 앉는다", 
-                ja: "スロット席に座る", 
-                fr: "S'asseoir à une machine à sous", 
-                en: "Sitting at a slot machine"
-            },
-            { 
-                type: 'image', id: 8, 
-                kr: "<i><code>『(AI 음성) 동기화 진행 중. RNG 주기 125ms. 타겟 난수까지 앞으로 3사이클.』</code></i>", 
-                ja: "<i><code>『(AI音声)同期進行中。RNG周期、125ミリ秒。ターゲット乱数まで、あと3サイクル』</code></i>", 
-                fr: "<i><code>« (Voix IA) Synchronisation en cours. Cycle RNG, 125 ms. 3 cycles avant la graine cible. »</code></i>", 
-                en: "<i><code>『(AI Voice) Synchronization in progress. RNG cycle, 125ms. 3 cycles to target seed.』</code></i>"
-            },
-            { 
-                type: 'image', id: 9, 
-                kr: "<i><code>『(AI 음성) 3... 2... 1...』</code></i>", 
-                ja: "<i><code>『(AI音声)3...2...1...』</code></i>", 
-                fr: "<i><code>« (Voix IA) 3... 2... 1... »</code></i>", 
-                en: "<i><code>『(AI Voice) 3... 2... 1...』</code></i>"
-            },
+            { type:'image', id: 1, kr: "강원특별자치도 강원랜드", ja: "江原特別自治道 カンウォンランド", fr: "Province autonome spéciale de Gangwon, Kangwon Land", en: "Gangwon Special Self-Governing Province, Kangwon Land"},
+            { type:'image', id: 2, kr: "강원 통합 리조트(IR) 카지노", ja: "カンウォン統合リゾート(IR) カジノ", fr: "Casino Kangwon Integrated Resort (IR)", en: "Kangwon Integrated Resort (IR) Casino"},
+            { type:'image', id: 3, kr: "카지노 플로어 슬롯머신", ja: "カジノフロアのスロット", fr: "Machines à sous, étage du casino", en: "Casino Floor Slots"},
+            { type:'image', id: 4, kr: "사채업자", ja: "貸付を行う個人債業者", fr: "Prêteur sur gages particulier", en: "Private Moneylender"},
+            { type:'image', id: 5, kr: "영어로는 론 샤크(Loan Shark), 다크 풀에서 헤엄치길 즐기지.", ja: "英語ではLoan Shark、ダークプールで泳ぐのを好む", fr: "En anglais, on dit « Loan Shark ». Il aime nager dans les dark pools.", en: "Called 'Loan Shark' in English. Prefers swimming in dark pools."},
+            { type:'image', id: 6, kr: "금연 구역에서 전자담배를 피우는 론 샤크", ja: "禁煙フロアで電子タバコを吸うLoan Shark", fr: "Loan Shark vapotant dans la zone non-fumeur", en: "Loan Shark vaping in the non-smoking section"},
+            { type:'image', id: 7, kr: "(털석)", ja: "スロット席に座る", fr: "(S'assoit)", en: "(Sits down)"},
+            { type:'image', id: 8, kr: "<i><code>『(AI 음성) 동기화 진행 중. RNG 주기, 125밀리초. 타깃 난수까지, 앞으로 3사이클.』</code></i>", ja: "<i><code>『(AI音声)同期進行中。RNG周期、125ミリ秒。ターゲット乱数まで、あと3サイクル』</code></i>", fr: "<i><code>« (Voix IA) Synchronisation en cours. Cycle RNG, 125ms. 3 cycles avant le nombre aléatoire cible. »</code></i>", en: "<i><code>\"(AI Voice) Sync in progress. RNG cycle, 125ms. 3 cycles to target random number.\"</code></i>"},
+            { type:'image', id: 9, kr: "<i><code>『(AI 음성) 3... 2... 1...』</code></i>", ja: "<i><code>『(AI音声)3...2...1...』</code></i>", fr: "<i><code>« (Voix IA) 3... 2... 1... »</code></i>", en: "<i><code>\"(AI Voice) 3... 2... 1...\"</code></i>"},
+            
             // ▼▼▼ GAME INSERTION ▼▼▼
             {
                 type: 'game',
@@ -215,167 +162,30 @@
                 src: 'game/2x4.html'
             },
             // ▲▲▲ GAME END ▲▲▲
-            { 
-                type: 'image', id: 10, 
-                kr: "**JACKPOT!**", 
-                ja: "**JACKPOT!**", 
-                fr: "**JACKPOT !**", 
-                en: "**JACKPOT!**"
-            },
-            { 
-                type: 'image', id: 11, 
-                kr: "자리에서 일어난다", 
-                ja: "席を立つ", 
-                fr: "Se lever", 
-                en: "Standing up"
-            },
-            { 
-                type: 'image', id: 12, 
-                kr: "어이, 여기 자리 났어!", 
-                ja: "おい、この席空いてるぞ。", 
-                fr: "« Hé, cette place est libre ! »", 
-                en: "“Hey, this seat's open!”"
-            },
-            { 
-                type: 'image', id: 13, 
-                kr: "엥?", 
-                ja: "えぇ？", 
-                fr: "« Hein ? »", 
-                en: "“Huh?”"
-            },
-            { 
-                type: 'image', id: 14, 
-                kr: "이동한다", 
-                ja: "移動する", 
-                fr: "Déplacement", 
-                en: "Moving"
-            },
-            { 
-                type: 'image', id: 15, 
-                kr: "다른 자리에 앉는다", 
-                ja: "別の席に座る", 
-                fr: "S'asseoir à une autre place", 
-                en: "Sitting at another seat"
-            },
-            { 
-                type: 'image', id: 16, 
-                kr: "당첨", 
-                ja: "当てる", 
-                fr: "Gagné", 
-                en: "Hit"
-            },
-            { 
-                type: 'image', id: 17, 
-                kr: "야.", 
-                ja: "おい。", 
-                fr: "« Hé. »", 
-                en: "“Hey.”"
-            },
-            { 
-                type: 'image', id: 18, 
-                kr: "으아아악!", 
-                ja: "うわああ！", 
-                fr: "« Waaah ! »", 
-                en: "“Whoaaaa!”"
-            },
-            { 
-                type: 'image', id: 19, 
-                kr: "반복", 
-                ja: "繰り返す", 
-                fr: "Répéter", 
-                en: "Repeat"
-            },
-            { 
-                type: 'image', id: 20, 
-                kr: "대박 자리를 찾아 폭동을 일으키는 손님들", 
-                ja: "当たり席を求めて暴動と化す客", 
-                fr: "Les clients se transforment en émeutiers à la recherche des sièges gagnants", 
-                en: "Customers turning into a riot mob, seeking the winning seats"
-            },
-            { 
-                type: 'image', id: 21, 
-                kr: "쉴 새 없이 자리를 바꾸는 통에 카메라 추적 로직이 붕괴한다", 
-                ja: "次々と席を替わるため、カメラの追跡ロジックが崩壊する", 
-                fr: "Les changements de siège constants font s'effondrer la logique de suivi des caméras", 
-                en: "Constant seat-swapping causes the camera tracking logic to collapse"
-            },
-            { 
-                type: 'image', id: 22, 
-                kr: "AI가 객장 내 전원을 출입 금지로 판정, 상어 머리들과 전투 개시", 
-                ja: "AIが客全員を出禁と判定し戦闘になるサメ頭たち", 
-                fr: "L'IA bannit tous les clients ; les têtes de requin engagent le combat", 
-                en: "AI flags all patrons for ban; Shark-heads engage in combat"
-            },
-            { 
-                type: 'image', id: 23, 
-                kr: "피트 보스 스탠드", 
-                ja: "ピットボススタンド", 
-                fr: "Pit boss stand", 
-                en: "Pit boss stand"
-            },
-            { 
-                type: 'image', id: 24, 
-                kr: "**딸깍**", 
-                ja: "**カチッ**", 
-                fr: "**Clic**", 
-                en: "**Click**"
-            },
-            { 
-                type: 'image', id: 25, 
-                kr: "특권 접근 권한(Privileged Access) 생성", 
-                ja: "特権アクセス権（Privileged Access）を作成", 
-                fr: "Création d'un accès privilégié (Privileged Access)", 
-                en: "Creating Privileged Access"
-            },
-            { 
-                type: 'image', id: 26, 
-                kr: "자금 세탁 기록 다운로드 중", 
-                ja: "マネーロンダリングの記録をダウンロード", 
-                fr: "Téléchargement des registres de blanchiment d'argent", 
-                en: "Downloading money laundering records"
-            },
-            { 
-                type: 'image', id: 27, 
-                kr: "계속해. 푼돈이나 줍자고 온 거 아니니까.", 
-                ja: "続行だ。ケチなコイン拾う気無し。", 
-                fr: "« Continue. Je ne suis pas là pour ramasser des centimes. »", 
-                en: "“Keep going. I didn't come here to pick up pennies.”"
-            },
-            { 
-                type: 'image', id: 28, 
-                kr: "**철컥**", 
-                ja: "**ガチャ**", 
-                fr: "**Clac**", 
-                en: "**Clack**"
-            },
-            { 
-                type: 'image', id: 29, 
-                kr: "Marginalized", 
-                ja: "Marginalized", 
-                fr: "Marginalized", 
-                en: "Marginalized"
-            },
-            { 
-                type: 'image', id: 30, 
-                kr: "**삐삐삐삐삐삐**", 
-                ja: "**ピッピッピッピッピッピッ**", 
-                fr: "**Bip bip bip bip bip**", 
-                en: "**Beep-beep-beep-beep**"
-            },
-            { 
-                type: 'image', id: 31, 
-                kr: "코인이 멈추지 않는 슬롯머신", 
-                ja: "コインが止まらないスロットマシン", 
-                fr: "Une machine à sous qui ne cesse de cracher des pièces", 
-                en: "A slot machine spitting out endless coins"
-            },
-            { 
-                type: 'image', id: 32, 
-                kr: "GLITCH: SEOUL LOGIN", 
-                ja: "GLITCH: SEOUL LOGIN", 
-                fr: "GLITCH: SEOUL LOGIN", 
-                en: "GLITCH: SEOUL LOGIN"
-            }
+            
+            { type:'image', id: 10, kr: "**JACKPOT!**", ja: "**JACKPOT!**", fr: "**JACKPOT !**", en: "**JACKPOT!**"},
+            { type:'image', id: 11, kr: "(자리를 뜬다)", ja: "席を立つ", fr: "(Se lève)", en: "(Stands up)"},
+            { type:'image', id: 12, kr: "어이, 여기 자리 비었어.", ja: "おい、この席空いてるぞ。", fr: "Hé, cette place est libre.", en: "Hey, this seat's open."},
+            { type:'image', id: 13, kr: "엥?", ja: "えぇ？", fr: "Hein ?", en: "Huh?"},
+            { type:'image', id: 14, kr: "(이동)", ja: "移動する", fr: "(Change de place)", en: "(Moves)"},
+            { type:'image', id: 15, kr: "(다른 자리에 앉는다)", ja: "別の席に座る", fr: "(S'assoit ailleurs)", en: "(Sits at another seat)"},
+            { type:'image', id: 16, kr: "**쾅!** (당첨)", ja: "当てる", fr: "**Bam !** (Gagne)", en: "**Bam!** (Wins)"},
+            { type:'image', id: 17, kr: "야.", ja: "おい。", fr: "Hé.", en: "Hey."},
+            { type:'image', id: 18, kr: "우와아악!", ja: "うわああ！", fr: "Waaaaah !", en: "Whoaaaa!"},
+            { type:'image', id: 19, kr: "(반복)", ja: "繰り返す", fr: "(Répète)", en: "(Repeats)"},
+            { type:'image', id: 20, kr: "대박 자리를 찾아 폭동을 일으키는 손님들", ja: "当たり席を求めて暴動と化す客", fr: "Les clients se révoltent pour les sièges gagnants", en: "Customers riot seeking winning seats"},
+            { type:'image', id: 21, kr: "줄줄이 자리를 바꾸는 통에 카메라 추적 로직이 붕괴된다.", ja: "次々と席を替わるため、カメラの追跡ロジックが崩壊する", fr: "La logique de suivi des caméras s'effondre à cause des changements de sièges constants.", en: "Camera tracking logic collapses due to rapid seat swapping."},
+            { type:'image', id: 22, kr: "AI가 객장 전원을 '출입 금지' 판정, 전투 태세에 돌입하는 상어 머리들", ja: "AIが客全員を出禁と判定し戦闘になるサメ頭たち", fr: "L'IA bannit tous les clients, les têtes de requin entrent en combat", en: "AI bans all guests; Shark-heads engage in combat"},
+            { type:'image', id: 23, kr: "핏 보스 스탠드 (Pit Boss Stand)", ja: "ピットボススタンド", fr: "Stand du Pit Boss", en: "Pit Boss Stand"},
+            { type:'image', id: 24, kr: "**딸깍**", ja: "**カチッ**", fr: "**Clic**", en: "**Click**"},
+            { type:'image', id: 25, kr: "특권 액세스 권한(Privileged Access) 생성", ja: "特権アクセス権（Privileged Access）を作成", fr: "Création de l'accès privilégié (Privileged Access)", en: "Creating Privileged Access"},
+            { type:'image', id: 26, kr: "자금 세탁 기록 다운로드", ja: "マネーロンダリングの記録をダウンロード", fr: "Téléchargement des registres de blanchiment d'argent", en: "Downloading money laundering records"},
+            { type:'image', id: 27, kr: "계속해. 푼돈이나 주울 생각 없으니까.", ja: "続行だ。ケチなコイン拾う気無し。", fr: "On continue. Pas là pour ramasser des miettes.", en: "Proceed. Not here to pick up pennies."},
+            { type:'image', id: 28, kr: "**철컥**", ja: "**ガチャ**", fr: "**Clack**", en: "**Clack**"},
+            { type:'image', id: 29, kr: "Integrated Out", ja: "Integrated Out", fr: "Integrated Out", en: "Integrated Out"},
+            { type:'image', id: 30, kr: "**삐삐삐삐삐삐**", ja: "**ピッピッピッピッピッピッ**", fr: "**Bip bip bip bip bip bip**", en: "**Beep beep beep beep beep beep**"},
+            { type:'image', id: 31, kr: "코인이 멈추지 않는 슬롯머신", ja: "コインが止まらないスロットマシン", fr: "Machine à sous déversant des pièces sans fin", en: "Slot machine spitting coins endlessly"},
+            { type:'image', id: 32, kr: "GLITCH: SEOUL LOGIN", ja: "GLITCH: SEOUL LOGIN", fr: "GLITCH: SEOUL LOGIN", en: "GLITCH: SEOUL LOGIN"}
         ];
 
         // 1. インスタンス生成
