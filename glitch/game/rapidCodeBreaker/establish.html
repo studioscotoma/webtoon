@@ -448,6 +448,24 @@
     });
 
     // 3. スマホ用イベント (隠しフォーム入力)
+    // virtualInput.addEventListener('input', (e) => {
+    //     if (!isPlaying) {
+    //         virtualInput.value = '';
+    //         return;
+    //     }
+
+    //     const val = virtualInput.value;
+    //     if (val.length > 0) {
+    //         // 最後に入力された文字を取得して大文字で処理
+    //         const lastChar = val.slice(-1).toUpperCase();
+    //         handleInput(lastChar);
+    //     }
+        
+    //     // 次の入力のためにクリア
+    //     virtualInput.value = '';
+    // });
+
+    // 3. スマホ用イベント (隠しフォーム入力)
     virtualInput.addEventListener('input', (e) => {
         if (!isPlaying) {
             virtualInput.value = '';
@@ -455,13 +473,18 @@
         }
 
         const val = virtualInput.value;
+        // 入力があった場合
         if (val.length > 0) {
-            // 最後に入力された文字を取得して大文字で処理
-            const lastChar = val.slice(-1).toUpperCase();
-            handleInput(lastChar);
+            const inputChar = val.slice(-1).toUpperCase();
+            const targetChar = currentWord[currentIndex]; // 現在狙うべき正解の文字
+
+            // ▼▼▼ 修正: スマホ入力は「正解の時だけ」反応させる（誤入力は無視） ▼▼▼
+            if (inputChar === targetChar) {
+                handleInput(inputChar);
+            }
+            // 不正解の場合は何もしない（handleInputを呼ばないのでペナルティも発生しない）
         }
         
-        // 次の入力のためにクリア
         virtualInput.value = '';
     });
 
