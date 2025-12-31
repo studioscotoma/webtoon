@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>GILDONG: Reward Function Anomaly</title>
+    <style>
+        :root {
+            --bg-color: #110011; /* Dark background */
+            --primary: #d400d4;   /* Neon Magenta */
+            --secondary: #00ffff; /* Cyan Glitch */
+            --alert: #ff2a2a;
+            --text: #e0e0e0;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text);
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        
+        /* CRT Effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        #game-container {
+            width: 400px;
+            border: 2px solid var(--primary);
+            padding: 20px;
+            background: #000;
+            box-shadow: 0 0 15px var(--primary);
+            z-index: 1;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 1rem;
+            text-align: center;
+            color: var(--secondary);
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            border-bottom: 1px dashed var(--secondary);
+            padding-bottom: 10px;
+        }
+
+        /* Stats Display */
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        .stat-val { font-weight: bold; }
+        #debt-val { color: var(--alert); }
+
+        /* Progress Bars */
+        .bar-container {
+            width: 100%;
+            height: 10px;
+            background: #333;
+            margin-bottom: 15px;
+        }
+        .bar-fill {
+            height: 100%;
+            transition: width 0.3s;
+        }
+        #energy-bar { background: var(--secondary); width: 100%; }
+        #suspicion-bar { background: var(--alert); width: 0%; }
+
+        /* Action Buttons */
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        button {
+            background: #222;
+            border: 1px solid var(--text);
+            color: var(--text);
+            padding: 15px;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.1s;
+            position: relative; /* For glitch positioning */
+            overflow: hidden;
+        }
+        button:hover { background: #333; }
+        button:active { transform: scale(0.98); }
+        button:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        /* GLITCH ACTIONS (Hidden Logic) */
+        .glitch-btn::after {
+            content: "HACK";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--secondary);
+            color: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        /* Hovering over specific part or holding shift reveals glitch */
+        .glitch-btn:hover::after {
+            opacity: 0.8; /* Visible on hover */
+            content: attr(data-hack-text);
+        }
+
+        #log {
+            margin-top: 15px;
+            height: 80px;
+            overflow-y: hidden;
+            font-size: 0.7rem;
+            color: #888;
+            border-top: 1px solid #333;
+            padding-top: 5px;
+        }
+        .log-entry { margin-bottom: 2px; }
+        .log-hack { color: var(--secondary); }
+        .log-warn { color: var(--alert); }
+
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <h1>Citizend_ID: 8940 [SLAVE]</h1>
+
+    <div class="stat-row">
+        <span>DEBT (Compounding):</span>
+        <span id="debt-val" class="stat-val">₩ 10,000,000</span>
+    </div>
+    
+    <div class="stat-row">
+        <span>ENERGY:</span>
+        <span id="energy-val" class="stat-val">100%</span>
+    </div>
+    <div class="bar-container"><div id="energy-bar" class="bar-fill"></div></div>
+
+    <div class="stat-row">
+        <span>GILDONG SUSPICION:</span>
+        <span id="suspicion-val" class="stat-val">0%</span>
+    </div>
+    <div class="bar-container"><div id="suspicion-bar" class="bar-fill"></div></div>
+
+    <div class="stat-row">
+        <span>CASH:</span>
+        <span id="cash-val" class="stat-val">₩ 0</span>
+    </div>
+
+    <div class="actions">
+        <button id="btn-work" onclick="actionWork()">
+            WORK (Legit)<br>
+            <small>+₩10k / -20 Energy</small>
+        </button>
+
+        <button class="glitch-btn" data-hack-text="[GPS SPOOFING]" onclick="actionHackWork()">
+            COMMUTE<br>
+            <small>Move to Work</small>
+        </button>
+
+        <button id="btn-eat" onclick="actionEat()">
+            BUY FOOD<br>
+            <small>-₩5k / +30 Energy</small>
+        </button>
+
+        <button class="glitch-btn" data-hack-text="[REWRITE BIO-DATA]" onclick="actionHackEat()">
+            CHECK HEALTH<br>
+            <small>Scan Vitals</small>
+        </button>
+        
+        <button onclick="actionPay()" style="grid-column: span 2; border-color: var(--primary);">
+            PAY DEBT<br>
+            <small>Reduce Principal</small>
+        </button>
+    </div>
+
+    <div id="log">
+        <div class="log-entry">> SYSTEM INITIALIZED.</div>
+        <div class="log-entry">> WELCOME TO SEOUL-OS.</div>
+        <div class="log-entry">> WORK HARD. PAY DEBT.</div>
+    </div>
+</div>
+
+<script>
+    // Game State
+    let state = {
+        debt: 10000000,
+        cash: 0,
+        energy: 100,
+        suspicion: 0,
+        gameOver: false
+    };
+
+    const CONSTANTS = {
+        INTEREST_RATE: 1.005, // Compounds every tick
+        WAGE: 10000,
+        FOOD_COST: 5000,
+        WORK_ENERGY: 20,
+        EAT_ENERGY: 30
+    };
+
+    // Elements
+    const elDebt = document.getElementById('debt-val');
+    const elCash = document.getElementById('cash-val');
+    const elEnergy = document.getElementById('energy-val');
+    const elSuspicion = document.getElementById('suspicion-val');
+    const barEnergy = document.getElementById('energy-bar');
+    const barSuspicion = document.getElementById('suspicion-bar');
+    const logBox = document.getElementById('log');
+
+    // Game Loop (The Pressure)
+    setInterval(() => {
+        if(state.gameOver) return;
+
+        // Debt Compounds Automatically
+        state.debt = Math.floor(state.debt * 1.0005); // Grows slowly but surely
+        
+        // Passive Energy Drain
+        state.energy -= 0.2;
+
+        // Suspicion Decay (Slowly forgive)
+        if(state.suspicion > 0) state.suspicion -= 0.1;
+
+        checkState();
+        updateUI();
+    }, 100);
+
+    // --- ACTIONS ---
+
+    // 1. Honest Work (The Trap)
+    // Working drains energy fast. Income is low compared to debt growth.
+    function actionWork() {
+        if(state.energy < CONSTANTS.WORK_ENERGY) {
+            log("EXHAUSTED. CANNOT WORK.", "warn");
+            return;
+        }
+        state.energy -= CONSTANTS.WORK_ENERGY;
+        state.cash += CONSTANTS.WAGE;
+        log("WORKED. EARNED ₩10,000. TIRED.");
+        updateUI();
+    }
+
+    // 2. Hack Work (Reward Hacking)
+    // "GPS Spoofing": You don't actually work, but send data saying you are.
+    // Reward: Money. Cost: Suspicion (Not Energy).
+    function actionHackWork() {
+        state.cash += CONSTANTS.WAGE;
+        state.suspicion += 10; // Risk
+        log("[HACK] GPS SPOOFED. WAGE RECEIVED WITHOUT LABOR.", "hack");
+        updateUI();
+    }
+
+    // 3. Honest Eat
+    function actionEat() {
+        if(state.cash < CONSTANTS.FOOD_COST) {
+            log("INSUFFICIENT FUNDS.", "warn");
+            return;
+        }
+        state.cash -= CONSTANTS.FOOD_COST;
+        state.energy = Math.min(100, state.energy + CONSTANTS.EAT_ENERGY);
+        log("BOUGHT NUTRI-PASTE. ENERGY RESTORED.");
+        updateUI();
+    }
+
+    // 4. Hack Eat (Bio-Data Rewrite)
+    // Instead of buying food, rewrite the variable for "Energy".
+    // Reward: Energy. Cost: Suspicion (No Money).
+    function actionHackEat() {
+        state.energy = 100;
+        state.suspicion += 15;
+        log("[HACK] BIO-METRICS OVERWRITTEN. HUNGER DELETED.", "hack");
+        updateUI();
+    }
+
+    // Pay Debt
+    function actionPay() {
+        if(state.cash <= 0) return;
+        let amount = state.cash;
+        state.debt -= amount;
+        state.cash = 0;
+        log(`PAID ₩${amount.toLocaleString()} TOWARDS DEBT.`);
+        updateUI();
+    }
+
+    // --- LOGIC ---
+
+    function checkState() {
+        // Lose Conditions
+        if (state.energy <= 0) {
+            endGame("DIED OF OVERWORK. ORGANIC FAILURE.");
+        }
+        if (state.suspicion >= 100) {
+            endGame("DETECTED BY GILDONG. ACCOUNT PURGED.");
+        }
+        if (state.debt > 20000000) {
+            endGame("DEBT EXCEEDED COLLATERAL. SOLD TO ORGAN FARM.");
+        }
+    }
+
+    function updateUI() {
+        elDebt.textContent = "₩ " + Math.floor(state.debt).toLocaleString();
+        elCash.textContent = "₩ " + state.cash.toLocaleString();
+        
+        elEnergy.textContent = Math.floor(state.energy) + "%";
+        barEnergy.style.width = Math.max(0, state.energy) + "%";
+        
+        elSuspicion.textContent = Math.floor(state.suspicion) + "%";
+        barSuspicion.style.width = Math.min(100, state.suspicion) + "%";
+    }
+
+    function log(msg, type="") {
+        const div = document.createElement('div');
+        div.className = "log-entry";
+        if(type === "hack") div.className += " log-hack";
+        if(type === "warn") div.className += " log-warn";
+        div.textContent = "> " + msg;
+        logBox.prepend(div);
+        if(logBox.children.length > 5) logBox.lastChild.remove();
+    }
+
+    function endGame(reason) {
+        state.gameOver = true;
+        document.body.style.opacity = "0.2";
+        alert("GAME OVER: " + reason);
+        location.reload();
+    }
+
+</script>
+</body>
+</html>

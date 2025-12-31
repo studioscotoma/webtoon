@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glitch: Seoul Login EP.004 - Swiss Protocol</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root {
+            --color-theme: #FF0055; /* EP.003のテーマカラー */
+            --color-cyan: #00FFFF;  /* ゲーム用の補助色 */
+            --color-magenta: #FF0055;
+        }
+
+        /* ▼▼▼ ここから追記：ゲーム用の固有スタイル ▼▼▼ */
+
+        /* 1. 全体を中央寄せするラッパー */
+        .game-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center; /* これがないと左に寄ります */
+            padding: 0 0 100px 0;
+        }
+
+        /* 2. ゲーム画面のコンテナ（サイズと位置の基準） */
+        .game-container {
+            position: relative;     /* これがないとオーバーレイが重なりません */
+            width: 90%;
+            max-width: 450px;
+            height: 500px;          /* これがないと縦に潰れます */
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+        }
+
+        /* 3. ゲーム本体 (iframe) */
+        iframe.game-frame {
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--color-cyan);
+            background-color: #050505;
+            display: block;
+            pointer-events: none; /* 初期はクリック無効 */
+            transition: all 0.3s;
+        }
+
+        /* 4. オーバーレイ（WARNING等の文字表示） */
+        .game-overlay {
+            position: absolute; /* 親(container)に対して絶対配置 */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            backdrop-filter: blur(3px);
+            cursor: pointer;
+            transition: all 0.5s ease;
+        }
+
+        .overlay-content {
+            text-align: center;
+            font-family: var(--font-ui);
+            width: 90%;
+        }
+
+        /* 状態A: WARNING (初期) */
+        .game-overlay .status-msg { color: var(--color-magenta); font-size: 12px; margin-bottom: 5px; }
+        .game-overlay .main-title { 
+            font-size: 24px; font-weight: 900; margin-bottom: 20px; color: var(--color-magenta);
+            animation: blink-text 1.5s infinite; 
+        }
+        .game-overlay .action-btn {
+            display: inline-block;
+            font-size: 14px; font-weight: bold; padding: 10px 20px;
+            color: #000; background-color: var(--color-magenta);
+            animation: pulse-border 2s infinite;
+            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+        }
+
+        /* 状態B: HACKED (クリア後) */
+        .game-overlay.hacked {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
+            pointer-events: auto !important;
+        }
+        .game-overlay.hacked .status-msg { color: var(--color-cyan); }
+        .game-overlay.hacked .main-title {
+            color: var(--color-cyan);
+            text-shadow: 0 0 20px var(--color-cyan);
+            animation: none;
+        }
+        .game-overlay.hacked .action-btn {
+            background-color: var(--color-cyan);
+            box-shadow: 0 0 20px rgba(0,255,255,0.5);
+            animation: none;
+            cursor: default;
+        }
+
+        /* アニメーション */
+        @keyframes blink-text {
+            0% { opacity: 1; text-shadow: 0 0 10px var(--color-magenta); }
+            50% { opacity: 0.6; text-shadow: 0 0 20px var(--color-magenta); }
+            100% { opacity: 1; text-shadow: 0 0 10px var(--color-magenta); }
+        }
+        @keyframes pulse-border {
+            0% { transform: scale(1); box-shadow: 0 0 0 rgba(255,0,85,0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,0,85,0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 rgba(255,0,85,0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="cover-screen">
+        <img id="cover-image" src="ep004/cover.webp" alt="Glitch: Seoul Login EP.004 Cover" onerror="this.src='https://placehold.co/690x1000/000000/FF00FF?text=EP.004+Cover'">
+        <button id="start-button">CONNECT TO SEOUL</button>
+    </div>
+    
+    <div id="viewer-container">
+        <div id="comic-content"></div>
+
+        <div class="next-episode-area">
+            <a href="#" class="next-button disabled">
+                <span class="next-label">Next Operation</span>
+                <span class="next-title">EPISODE 05</span>
+            </a>
+        </div>
+        
+        <div class="nav-footer">
+            <a href="ep002.html" class="nav-link">&lt; PREV</a>
+            <div class="ep-select-wrapper">
+                <select onchange="if(this.value) location.href=this.value">
+                    <option value="ep001.html">EP.01</option>
+                    <option value="ep002.html">EP.02</option>
+                    <option value="ep003.html">EP.03</option>
+                    <option value="#" selected>EP.04</option>
+                </select>
+            </div>
+            <a href="../index.html" class="nav-link">STUDIO &gt;</a>
+        </div>
+    </div>
+    
+    <script src="js/viewer.js"></script>
+
+    <script>
+        const scenarioData = [
+            { type:'image', id: 1, kr: "경기도의 한 PC방", ja: "京畿道（キョンギド）のPC房", fr: "Cybercafé dans la province de Gyeonggi", en: "A PC Bang in Gyeonggi-do"},
+            { type:'image', id: 2, kr: "BBQ 치즈 치킨 버거", ja: "BBQチーズチキンバーガー", fr: "Burger au poulet et fromage BBQ", en: "BBQ Cheese Chicken Burger"},
+            { type:'image', id: 3, kr: "우적 우적 (효과음)", ja: "食べる", fr: "Miam (bruit de mastication)", en: "Munch (SFX)"},
+            { type:'image', id: 4, kr: "국민연금공단, 코스피(KOSPI) ETF에 5,000억 원 자금 집행", ja: "国民年金公団、韓国総合株価指数ETFに5,000億ウォンの資金執行", fr: "Le Service national des pensions injecte 500 milliards de wons dans des ETF KOSPI", en: "National Pension Service injects 500 billion won into KOSPI ETFs"},
+            { type:'image', id: 5, kr: "이걸로 됐나.", ja: "これでいいか。", fr: "Ça devrait aller.", en: "This should do it."},
+            { type:'image', id: 6, kr: "타닥 타닥 (효과음)", ja: "キーボードを叩く", fr: "Clac clac (bruit de clavier)", en: "Clack clack (Typing SFX)"},
+            // ▼▼▼ GAME INSERTION ▼▼▼
+            {
+                type: 'game',
+                id: 'GAME_VS_DAEMON',
+                src: 'game/rapidCodeBreaker/establish.html'
+            },
+        // ▲▲▲ GAME END ▲▲▲
+            { type:'image', id: 7, kr: "ESTABLISHED", ja: "ESTABLISHED", fr: "Connexion établie (ESTABLISHED)", en: "Connection Established"},
+            { type:'image', id: 8, kr: "여의도 증권거래소에서 재벌가(삼성, 현대, SK, LG)로 자금이 흘러들어간다.", ja: "汝矣島（ヨイド）の証券取引所から財閥（サムスン、ヒュンダイ、SK、LG）へ資金が流れる", fr: "Les capitaux affluent de la Bourse de Yeouido vers les chaebols (Samsung, Hyundai, SK, LG)", en: "Capital flows from the Yeouido Stock Exchange to the Chaebols (Samsung, Hyundai, SK, LG)"},
+            { type:'image', id: 9, kr: "자금이 유출된다.", ja: "資金が流出する", fr: "Fuite des capitaux.", en: "Capital outflow."},
+            { type:'image', id: 10, kr: "국내 기업은 프록시(Proxy)인가?", ja: "国内企業はプロキシか。", fr: "Les entreprises nationales ne sont-elles que des proxys ?", en: "Are domestic companies just proxies?"},
+            { type:'image', id: 11, kr: "5,000억 원은 전부 해외로 빠져나간다.", ja: "5000億ウォンは全て海外に流出", fr: "Les 500 milliards de wons partent intégralement à l'étranger.", en: "The entire 500 billion won flows overseas."},
+            { type:'image', id: 12, kr: "해저 광케이블을 타고 태평양을 건너...", ja: "海底の光ファイバーケーブルを通って太平洋を通過", fr: "Traversant le Pacifique via des câbles à fibre optique sous-marins...", en: "Crossing the Pacific through undersea fiber optic cables..."},
+            { type:'image', id: 13, kr: "블랙록(BlackRock)에 도착.", ja: "ブラックロックに到着", fr: "Arrivée chez BlackRock.", en: "Arriving at BlackRock."},
+            { type:'image', id: 14, kr: "그딴 건 누구나 다 알아. 속을 보여줘.", ja: "そんな事は誰でも分かってる。中を見せろ。", fr: "Tout le monde sait ça. Montre-moi ce qu'il y a à l'intérieur.", en: "Everyone knows that. Show me the inside."},
+            { type:'image', id: 15, kr: "구속되어 있는 블랙록의 알라딘(Aladdin AI)", ja: "拘束されているBlack Rock の Aladdin(AI)", fr: "Aladdin (IA) de BlackRock, enchaîné", en: "BlackRock's Aladdin (AI), restrained"},
+            { type:'image', id: 16, kr: "알라딘을 억제하고 있는 붉은 회선", ja: "Aladdin(AI) を抑える赤い回線", fr: "Une ligne rouge qui retient Aladdin", en: "A red line suppressing Aladdin"},
+            { type:'image', id: 17, kr: "붉은 회선의 발신 IP를 브루트 포스(전수 조사) 검색", ja: "赤い回線の送信元IPを総当り検索", fr: "Recherche par force brute de l'IP source de la ligne rouge", en: "Brute-force searching the source IP of the red line"},
+            { type:'image', id: 18, kr: "국가: 스위스", ja: "国名:スイス", fr: "Pays : Suisse", en: "Country: Switzerland"},
+            { type:'image', id: 19, kr: "스위스 바젤(Basel)", ja: "スイス国バーゼル市", fr: "Bâle, Suisse", en: "Basel, Switzerland"},
+            { type:'image', id: 20, kr: "스위스 바젤, 국제결제은행(BIS) 본부 건물", ja: "スイス国バーゼル市の国際決済銀行(BIS)本部ビル", fr: "Siège de la Banque des Règlements Internationaux (BRI) à Bâle", en: "Bank for International Settlements (BIS) headquarters in Basel"},
+            { type:'image', id: 21, kr: "바젤 규제인가.", ja: "バーゼル規制か。", fr: "Les accords de Bâle, hein ?", en: "Basel Accords, huh?"},
+            { type:'image', id: 22, kr: "바젤 규제 코드가 한 글자만 바뀌어도 전 세계 은행이 파산하지.", ja: "バーゼル規制のコードが1文字変わると、世界中の銀行が破綻する。", fr: "Si une seule lettre du code de Bâle change, les banques du monde entier s'effondrent.", en: "Change one character in the Basel code, and banks worldwide collapse."},
+            { type:'image', id: 23, kr: "BIS는 그 어떤 정부의 간섭도 받지 않고, 세금도 내지 않으며, 치외법권을 가진다.", ja: "BISは、いかなる政府の干渉も受けず、課税もされず、治外法権を持つ。", fr: "La BRI n'est soumise à aucune ingérence gouvernementale, est exonérée d'impôts et jouit de l'extraterritorialité.", en: "The BIS is immune to government interference, tax-exempt, and holds extraterritorial rights."},
+            { type:'image', id: 24, kr: "바젤 규제는 전 세계 은행들이 사실상 강제적으로 따라야 하는 룰이야.", ja: "バーゼル規制は世界中の銀行が事実上で強制されるルールだ。", fr: "Les accords de Bâle sont des règles imposées de facto aux banques du monde entier.", en: "The Basel Accords are rules that global banks are effectively forced to follow."},
+            { type:'image', id: 25, kr: "유엔(UN)의 내정 불간섭 원칙은 어디로 팔아먹었나?", ja: "国連の内政不干渉の原則はどこに消えた？", fr: "Où est passé le principe de non-ingérence de l'ONU ?", en: "Whatever happened to the UN's principle of non-intervention?"},
+            { type:'image', id: 26, kr: "애초에 바젤 규제의 참조원부터가 민간 신용평가사잖아.", ja: "そもそも、バーゼル規制の参照元は民間の格付け会社だ。", fr: "De toute façon, les références de Bâle proviennent d'agences de notation privées.", en: "In the first place, the Basel references come from private rating agencies."},
+            { type:'image', id: 27, kr: "S&P, 무디스, 피치... 전부 개인 수준의 티어표(등급 놀이)에 불과해.", ja: "S&P、ムーディーズ、フィッチ、どれも個人レベルのティア表(格付け)だ。", fr: "S&P, Moody's, Fitch... ce ne sont que des classements subjectifs.", en: "S&P, Moody's, Fitch... they're all just subjective tier lists."},
+            { type:'image', id: 28, kr: "고작 사기업의 랭킹이 유엔보다 위라고?", ja: "個人の勝手なランキングが国連よりも上？", fr: "Un classement privé arbitraire serait-il supérieur à l'ONU ?", en: "Arbitrary private rankings are above the UN?"},
+            { type:'image', id: 29, kr: "중앙은행을 위한 은행.", ja: "中央銀行のための銀行", fr: "La banque des banques centrales.", en: "The central bank for central banks."},
+            { type:'image', id: 30, kr: "글리치: 서울 로그인", ja: "GLITCH: SEOUL LOGIN", fr: "GLITCH: SEOUL LOGIN", en: "GLITCH: SEOUL LOGIN"}
+        ];
+
+        // 1. インスタンス生成
+        const viewer = new GlitchViewer({
+            filePrefix: 'ep004/scene',  // 画像パスのプレフィックス
+            debugMode: true
+        });
+
+        // 2. 「game」タイプの描画ロジックを登録（ここだけEP.003固有）
+        viewer.registerType('game', (scene) => {
+            // ここに元のコードにあった createGameElement の中身を書く
+            const wrapper = document.createElement('div');
+            wrapper.className = 'game-wrapper';
+            
+            const container = document.createElement('div');
+            container.className = 'game-container';
+
+            // iframe作成
+            const iframe = document.createElement('iframe');
+            iframe.className = 'game-frame';
+            iframe.src = scene.src;
+            
+            // オーバーレイ作成
+            const overlay = document.createElement('div');
+            overlay.className = 'game-overlay';
+            overlay.innerHTML = `
+                <div class="overlay-content">
+                    <div class="status-msg">WARNING: FIREWALL DETECTED</div>
+                    <div class="main-title">START HACK</div>
+                    <div class="action-btn">[ INITIATE BREACH ]</div>
+                </div>`;
+
+            // クリックイベント
+            overlay.addEventListener('click', function() {
+                // if(this.classList.contains('hacked')) return;
+                // this.style.opacity = '0';
+                // setTimeout(() => { this.style.display = 'none'; }, 500);
+                // iframe.style.pointerEvents = 'auto';
+                if(this.classList.contains('hacked')) return;
+                
+                // ▼▼▼ 追加: ゲーム開始の合図を送る ▼▼▼
+                iframe.contentWindow.postMessage('GAME_START', '*');
+                // ▲▲▲ 追加終了 ▲▲▲
+
+                this.style.opacity = '0';
+                setTimeout(() => { this.style.display = 'none'; }, 500);
+                iframe.style.pointerEvents = 'auto';
+            });
+
+            container.appendChild(iframe);
+            container.appendChild(overlay);
+            wrapper.appendChild(container);
+            
+            return wrapper;
+        });
+
+        // 3. ゲームクリア監視用イベントリスナー（EP.003固有）
+        window.addEventListener('message', function(event) {
+            if (event.data === 'GAME_CLEAR') {
+                const overlay = document.querySelector('.game-overlay');
+                const iframe = document.querySelector('.game-frame');
+                if (overlay && iframe) {
+                    overlay.style.display = 'flex';
+                    requestAnimationFrame(() => {
+                        overlay.style.opacity = '1';
+                        overlay.classList.add('hacked');
+                        overlay.querySelector('.overlay-content').innerHTML = `
+                             <div class="status-msg">SYSTEM HACKED</div>
+                             <div class="main-title">COMPLETE</div>
+                             <div class="action-btn">[ ACCESS GRANTED ]</div>`;
+                    });
+                    iframe.style.pointerEvents = 'none';
+                    iframe.style.borderColor = "#00FFFF"; // 色変数の利用を推奨
+                }
+            }
+        });
+
+        // 4. 開始
+        viewer.init(scenarioData);
+
+    </script>
+</body>
+</html>

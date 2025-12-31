@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>GLITCH: PROTOCOL SHEPHERD</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        body {
+            background-color: #0d0d10;
+            color: #00ffea;
+            font-family: 'Share Tech Mono', monospace;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        /* Scanline Effect */
+        body::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 10;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        #game-wrapper {
+            position: relative;
+            box-shadow: 0 0 30px rgba(0, 255, 234, 0.1);
+            border: 1px solid #333;
+        }
+
+        canvas {
+            background-color: #000;
+            display: block;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .hud-top {
+            display: flex;
+            justify-content: space-between;
+            font-size: 20px;
+            text-shadow: 0 0 5px #00ffea;
+        }
+
+        .hud-bottom {
+            text-align: center;
+            font-size: 16px;
+            color: #888;
+        }
+
+        .btn {
+            pointer-events: auto;
+            background: #000;
+            border: 1px solid #ff00ff;
+            color: #ff00ff;
+            padding: 10px 20px;
+            font-family: inherit;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #ff00ff;
+            color: #000;
+        }
+
+        #message-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(0,0,0,0.9);
+            padding: 40px;
+            border: 2px solid #ff0055;
+            display: none;
+            z-index: 20;
+        }
+
+        h1 { margin: 0 0 20px 0; color: #fff; }
+        .status-ok { color: #00ffea; }
+        .status-warn { color: #ff0055; }
+
+    </style>
+</head>
+<body>
+
+<div id="game-wrapper">
+    <canvas id="gameCanvas" width="800" height="500"></canvas>
+    <div id="ui-layer">
+        <div class="hud-top">
+            <div>PACKETS: <span id="alive-count">0</span> / <span id="total-count">20</span></div>
+            <div>SAVED: <span id="saved-count">0</span></div>
+            <div>STATUS: <span id="status-text" class="status-ok">INFILTRATING</span></div>
+        </div>
+        <div class="hud-bottom">
+            [MOUSE] CLICK OBJECTS TO HACK // [R] RESET
+        </div>
+    </div>
+    
+    <div id="message-overlay">
+        <h1 id="msg-title">SYSTEM HACKED</h1>
+        <p id="msg-desc">Access Granted.</p>
+        <button class="btn" onclick="resetGame()">REBOOT SYSTEM</button>
+    </div>
+</div>
+
+<script>
+    /**
+     * GLITCH: SEOUL LOGIN - PROTOCOL SHEPHERD (MVP)
+     * Masahiro Sakurai Persona Implementation
+     */
+
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Game Constants
+    const GRAVITY = 0.5;
+    const SPAWN_RATE = 60; // Frames between spawns
+    const TOTAL_PACKETS = 20;
+    
+    // Colors
+    const C_BG = '#050505';
+    const C_PACKET = '#00ffea';
+    const C_WALL_ACTIVE = '#ff0055'; // Firewall (Kill)
+    const C_WALL_INACTIVE = '#333333'; // Disabled Firewall (Pass)
+    const C_FLOOR_ACTIVE = '#00ffea'; // Solid Floor
+    const C_FLOOR_INACTIVE = '#1a1a1a'; // Ghost Floor (Fall through)
+    const C_GOAL = '#ffff00';
+
+    // State
+    let packets = [];
+    let walls = [];
+    let floors = [];
+    let particles = [];
+    let frameCount = 0;
+    let spawnedCount = 0;
+    let savedCount = 0;
+    let deadCount = 0;
+    let gameState = 'PLAY'; // PLAY, WIN, LOSE
+
+    // --- Classes ---
+
+    class Packet {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.w = 10;
+            this.h = 10;
+            this.vx = 2; // Constant forward speed
+            this.vy = 0;
+            this.alive = true;
+            this.saved = false;
+        }
+
+        update() {
+            if (!this.alive || this.saved) return;
+
+            // Apply Physics
+            this.vy += GRAVITY;
+            this.x += this.vx;
+            this.y += this.vy;
+
+            // Collision Detection (Floors)
+            let onGround = false;
+            for (let f of floors) {
+                if (f.active && 
+                    this.x + this.w > f.x && this.x < f.x + f.w &&
+                    this.y + this.h >= f.y && this.y + this.h <= f.y + f.h + 10 &&
+                    this.vy >= 0) {
+                    
+                    this.y = f.y - this.h;
+                    this.vy = 0;
+                    onGround = true;
+                }
+            }
+
+            // Collision Detection (Walls/Firewalls)
+            for (let w of walls) {
+                if (w.active &&
+                    this.x + this.w > w.x && this.x < w.x + w.w &&
+                    this.y + this.h > w.y && this.y < w.y + w.h) {
+                    
+                    this.kill();
+                }
+            }
+
+            // Goal Detection
+            if (this.x > canvas.width - 50) {
+                this.save();
+            }
+
+            // Out of bounds (Fall)
+            if (this.y > canvas.height) {
+                this.kill();
+            }
+        }
+
+        draw() {
+            if (!this.alive || this.saved) return;
+            ctx.fillStyle = C_PACKET;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = C_PACKET;
+            ctx.fillRect(this.x, this.y, this.w, this.h);
+            ctx.shadowBlur = 0;
+
+            // Simple glitch trail
+            if (Math.random() > 0.8) {
+                ctx.fillStyle = 'rgba(0, 255, 234, 0.3)';
+                ctx.fillRect(this.x - 5, this.y, 5, this.h);
+            }
+        }
+
+        kill() {
+            this.alive = false;
+            deadCount++;
+            spawnExplosion(this.x, this.y, C_WALL_ACTIVE);
+            checkGameOver();
+        }
+
+        save() {
+            this.saved = true;
+            savedCount++;
+            spawnExplosion(this.x, this.y, C_GOAL);
+            checkGameOver();
+        }
+    }
+
+    class InteractiveObject {
+        constructor(x, y, w, h, type) {
+            this.x = x;
+            this.y = y;
+            this.w = w;
+            this.h = h;
+            this.type = type; // 'WALL' or 'FLOOR'
+            this.active = true; // Default state
+            this.hover = false;
+        }
+
+        toggle() {
+            this.active = !this.active;
+            spawnExplosion(this.x + this.w/2, this.y + this.h/2, '#ffffff');
+        }
+
+        draw() {
+            if (this.type === 'WALL') {
+                // Firewall: Active = Red (Kill), Inactive = Dark (Pass)
+                ctx.fillStyle = this.active ? C_WALL_ACTIVE : C_WALL_INACTIVE;
+                ctx.strokeStyle = this.active ? '#ff0055' : '#555';
+            } else {
+                // Bridge: Active = Cyan (Walk), Inactive = Ghost (Fall)
+                ctx.fillStyle = this.active ? C_FLOOR_ACTIVE : C_FLOOR_INACTIVE;
+                ctx.strokeStyle = this.active ? '#00ffea' : '#555';
+            }
+
+            // Glitch effect on hover
+            if (this.hover) {
+                ctx.lineWidth = 3;
+                ctx.strokeRect(this.x - 2, this.y - 2, this.w + 4, this.h + 4);
+            } else {
+                ctx.lineWidth = 1;
+            }
+
+            ctx.fillRect(this.x, this.y, this.w, this.h);
+            ctx.strokeRect(this.x, this.y, this.w, this.h);
+
+            // Label
+            ctx.fillStyle = '#fff';
+            ctx.font = '10px sans-serif';
+            ctx.fillText(this.active ? (this.type === 'WALL' ? 'FIREWALL' : 'LINK') : 'OFFLINE', this.x + 5, this.y + 15);
+        }
+    }
+
+    // Particles for feedback
+    class Particle {
+        constructor(x, y, color) {
+            this.x = x;
+            this.y = y;
+            this.vx = (Math.random() - 0.5) * 5;
+            this.vy = (Math.random() - 0.5) * 5;
+            this.life = 1.0;
+            this.color = color;
+        }
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.life -= 0.05;
+        }
+        draw() {
+            ctx.globalAlpha = this.life;
+            ctx.fillStyle = this.color;
+            ctx.fillRect(this.x, this.y, 3, 3);
+            ctx.globalAlpha = 1.0;
+        }
+    }
+
+    function spawnExplosion(x, y, color) {
+        for(let i=0; i<10; i++) {
+            particles.push(new Particle(x, y, color));
+        }
+    }
+
+    // --- Level Setup ---
+    function initLevel() {
+        walls = [];
+        floors = [];
+        
+        // 1. Starting Platform
+        floors.push(new InteractiveObject(0, 200, 200, 20, 'FLOOR')); 
+        
+        // 2. The Gap (Bridge needed) - Starts INACTIVE
+        let bridge = new InteractiveObject(200, 200, 150, 20, 'FLOOR');
+        bridge.active = false; 
+        floors.push(bridge);
+
+        // 3. Middle Platform
+        floors.push(new InteractiveObject(350, 200, 150, 20, 'FLOOR'));
+
+        // 4. The Firewall (Blocker) - Starts ACTIVE
+        let firewall = new InteractiveObject(450, 100, 20, 100, 'WALL');
+        walls.push(firewall);
+
+        // 5. Lower Route (Alternative?)
+        floors.push(new InteractiveObject(350, 400, 450, 20, 'FLOOR'));
+        
+        // 6. Final Platform
+        floors.push(new InteractiveObject(600, 200, 200, 20, 'FLOOR'));
+    }
+
+    function resetGame() {
+        packets = [];
+        particles = [];
+        spawnedCount = 0;
+        savedCount = 0;
+        deadCount = 0;
+        frameCount = 0;
+        gameState = 'PLAY';
+        initLevel();
+        document.getElementById('message-overlay').style.display = 'none';
+        updateHUD();
+    }
+
+    function checkGameOver() {
+        const finished = savedCount + deadCount;
+        if (finished >= TOTAL_PACKETS && gameState === 'PLAY') {
+            const el = document.getElementById('message-overlay');
+            const title = document.getElementById('msg-title');
+            const desc = document.getElementById('msg-desc');
+            
+            el.style.display = 'block';
+            if (savedCount >= 10) {
+                title.innerText = "HACK SUCCESSFUL";
+                title.style.color = C_PACKET;
+                desc.innerText = `UPLOADED: ${savedCount} / ${TOTAL_PACKETS}`;
+            } else {
+                title.innerText = "CONNECTION FAILED";
+                title.style.color = C_WALL_ACTIVE;
+                desc.innerText = "INSUFFICIENT DATA TRANSFER";
+            }
+            gameState = 'END';
+        }
+        updateHUD();
+    }
+
+    function updateHUD() {
+        document.getElementById('alive-count').innerText = spawnedCount - (savedCount + deadCount); // Currently on screen
+        document.getElementById('total-count').innerText = TOTAL_PACKETS - spawnedCount; // Remaining to spawn
+        document.getElementById('saved-count').innerText = savedCount;
+    }
+
+    // --- Main Loop ---
+
+    function loop() {
+        // Clear
+        ctx.fillStyle = C_BG;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Spawning
+        if (gameState === 'PLAY' && spawnedCount < TOTAL_PACKETS) {
+            frameCount++;
+            if (frameCount % SPAWN_RATE === 0) {
+                packets.push(new Packet(50, 150));
+                spawnedCount++;
+                updateHUD();
+            }
+        }
+
+        // Draw/Update Floors & Walls
+        [...floors, ...walls].forEach(obj => obj.draw());
+
+        // Update Packets
+        packets.forEach(p => {
+            p.update();
+            p.draw();
+        });
+
+        // Update Particles
+        particles.forEach((p, i) => {
+            p.update();
+            p.draw();
+            if (p.life <= 0) particles.splice(i, 1);
+        });
+
+        // Draw Goal Area
+        ctx.fillStyle = 'rgba(255, 255, 0, 0.2)';
+        ctx.fillRect(canvas.width - 50, 0, 50, canvas.height);
+        ctx.fillStyle = '#fff';
+        ctx.fillText("SERVER", canvas.width - 45, 50);
+
+        requestAnimationFrame(loop);
+    }
+
+    // --- Input Handling ---
+
+    canvas.addEventListener('mousemove', (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+
+        [...floors, ...walls].forEach(obj => {
+            obj.hover = (mx > obj.x && mx < obj.x + obj.w && my > obj.y && my < obj.y + obj.h);
+        });
+    });
+
+    canvas.addEventListener('mousedown', (e) => {
+        if (gameState !== 'PLAY') return;
+        const rect = canvas.getBoundingClientRect();
+        const mx = e.clientX - rect.left;
+        const my = e.clientY - rect.top;
+
+        [...floors, ...walls].forEach(obj => {
+            if (mx > obj.x && mx < obj.x + obj.w && my > obj.y && my < obj.y + obj.h) {
+                obj.toggle();
+            }
+        });
+    });
+    
+    document.addEventListener('keydown', (e) => {
+        if(e.key === 'r' || e.key === 'R') resetGame();
+    });
+
+    // Start
+    initLevel();
+    loop();
+
+</script>
+</body>
+</html>

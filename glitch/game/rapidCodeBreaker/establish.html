@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLITCH: SEOUL LOGIN - Rapid Breaker Proto</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        body {
+            background-color: #050505;
+            color: #00ffea;
+            font-family: 'Share Tech Mono', monospace;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-transform: uppercase;
+        }
+
+        /* CRT Scanline Effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            /* iframeの枠と馴染むように内側の発光のみ残す */
+            box-shadow: inset 0 0 20px rgba(0, 255, 234, 0.1); 
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 10px;
+            width: 90%;
+            display: flex;
+            justify-content: space-between;
+            font-size: clamp(16px, 5vw, 24px); /* レスポンシブフォント */
+            color: #ff00ff;
+            text-shadow: 0 0 5px #ff00ff;
+            z-index: 5;
+        }
+
+        #target-word {
+            font-size: clamp(40px, 15vw, 80px); /* レスポンシブフォント */
+            letter-spacing: 5px;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            width: 100%;
+            word-break: break-all;
+            min-height: 1.2em; /* 文字がない時も高さを確保 */
+        }
+
+        .matched { color: #555; }
+        
+        .active {
+            color: #00ffea;
+            text-shadow: 0 0 15px #00ffea, 0 0 30px #00ffea;
+        }
+
+        .remaining { color: #00ffea; opacity: 0.5; }
+
+        #timer-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 10px;
+            background-color: #ff0055;
+            width: 100%;
+            transition: width 0.1s linear;
+        }
+
+        .shake {
+            animation: shake 0.3s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        #game-over-screen, #game-clear-screen {
+            position: absolute;
+            background: rgba(0,0,0,0.95);
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 { 
+            margin: 0; 
+            font-size: clamp(32px, 10vw, 60px); 
+            color: #fff; 
+            text-shadow: 2px 2px #ff0055; 
+            line-height: 1.2;
+        }
+        p { 
+            font-size: clamp(14px, 4vw, 20px); 
+            color: #ccc; 
+            margin: 10px 0;
+        }
+        
+        .hidden { display: none !important; }
+        
+        #game-clear-screen h1 {
+            color: #00ffea;
+            text-shadow: 0 0 20px #00ffea;
+        }
+
+        /* 待機中のカーソル点滅用 */
+        .blinking-cursor::after {
+            content: '_';
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0% { opacity: 1; }
+            50% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="ui-layer">
+        <div id="score">SCORE: 0</div>
+        <div id="level">PROGRESS: 0/3</div>
+    </div>
+
+    <div id="target-word" class="blinking-cursor">READY</div>
+    <div id="timer-bar" style="width: 100%;"></div>
+
+    <div id="game-over-screen" class="hidden">
+        <h1 style="color:#ff0055">SYSTEM LOCKED</h1>
+        <p>CONNECTION TERMINATED</p>
+        <p id="final-score">SCORE: 0</p>
+        <br>
+        <p>PRESS [SPACE] TO RETRY</p>
+    </div>
+
+    <div id="game-clear-screen" class="hidden">
+        <h1>ACCESS GRANTED</h1>
+        <p>SYSTEM HACK SUCCESSFUL</p>
+        <p id="clear-score">SCORE: 0</p>
+        <br>
+        <p style="color:#00ffea; animation: blink 1s infinite;">COMPLETE</p>
+    </div>
+</div>
+
+<script>
+    // Game Configuration
+    const WORDS = [
+        "LAN", "WAN", "VPN", "NET", "WEB", "HUB", "MAC",
+        "TCP", "UDP", "IPX", "SSH", "SSL", "TLS", "FTP", "DNS", "ARP", "NAT",
+        "SYN", "ACK", "FIN", "RST", "REQ", "RES", "ERR",
+        "API", "URL", "URI", "KEY", "LOG", "TAG", "UID", "PID",
+        "BIT", "HEX", "BIN", "RAM", "CPU", "BUS", "PWR", "GND"
+    ];
+
+    const GAME_DURATION_BASE = 6000;
+    const TARGET_WORDS_COUNT = 3; 
+    
+    // State
+    let isPlaying = false;
+    let score = 0;
+    let wordsCompleted = 0;
+    let currentWord = "";
+    let currentIndex = 0;
+    let timer = null;
+    let timeLeft = 0;
+    let maxTime = 0;
+
+    // DOM Elements
+    const targetDiv = document.getElementById('target-word');
+    const timerBar = document.getElementById('timer-bar');
+    const scoreDiv = document.getElementById('score');
+    const levelDiv = document.getElementById('level');
+    const gameOverScreen = document.getElementById('game-over-screen');
+    const gameClearScreen = document.getElementById('game-clear-screen');
+    const finalScoreDiv = document.getElementById('final-score');
+    const clearScoreDiv = document.getElementById('clear-score');
+    const container = document.getElementById('game-container');
+
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = new AudioContext();
+
+    function playSound(type) {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+        
+        if (type === 'type') {
+            osc.type = 'square';
+            osc.frequency.setValueAtTime(800, now);
+            osc.frequency.exponentialRampToValueAtTime(100, now + 0.05);
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+            osc.start(now);
+            osc.stop(now + 0.05);
+        } else if (type === 'success') {
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(1200, now);
+            osc.frequency.exponentialRampToValueAtTime(2000, now + 0.2);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+            osc.start(now);
+            osc.stop(now + 0.2);
+        } else if (type === 'error') {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(100, now);
+            osc.frequency.linearRampToValueAtTime(50, now + 0.2);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+            osc.start(now);
+            osc.stop(now + 0.2);
+        } else if (type === 'clear') {
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.setValueAtTime(880, now + 0.1);
+            osc.frequency.setValueAtTime(1760, now + 0.2);
+            gain.gain.setValueAtTime(0.3, now);
+            gain.gain.linearRampToValueAtTime(0, now + 0.6);
+            osc.start(now);
+            osc.stop(now + 0.6);
+        }
+    }
+
+    // ゲーム初期化（外部メッセージ、またはリトライから呼ばれる）
+    function initGame() {
+        score = 0;
+        wordsCompleted = 0;
+        
+        updateUI();
+        
+        targetDiv.classList.remove('blinking-cursor');
+        gameOverScreen.classList.add('hidden');
+        gameClearScreen.classList.add('hidden');
+        
+        isPlaying = true;
+        nextWord();
+        gameLoop();
+    }
+
+    function nextWord() {
+        currentWord = WORDS[Math.floor(Math.random() * WORDS.length)];
+        currentIndex = 0;
+        maxTime = GAME_DURATION_BASE;
+        timeLeft = maxTime;
+        renderWord();
+    }
+
+    function renderWord() {
+        let html = '';
+        for (let i = 0; i < currentWord.length; i++) {
+            if (i < currentIndex) {
+                html += `<span class="matched">${currentWord[i]}</span>`;
+            } else if (i === currentIndex) {
+                html += `<span class="active">${currentWord[i]}</span>`;
+            } else {
+                html += `<span class="remaining">${currentWord[i]}</span>`;
+            }
+        }
+        targetDiv.innerHTML = html;
+    }
+
+    function updateUI() {
+        scoreDiv.innerText = `SCORE: ${score}`;
+        levelDiv.innerText = `PROGRESS: ${wordsCompleted}/${TARGET_WORDS_COUNT}`;
+    }
+
+    function gameOver() {
+        isPlaying = false;
+        playSound('error');
+        finalScoreDiv.innerText = `SCORE: ${score}`;
+        gameOverScreen.classList.remove('hidden');
+        cancelAnimationFrame(timer);
+    }
+
+    function gameClear() {
+        isPlaying = false;
+        playSound('clear');
+        clearScoreDiv.innerText = `SCORE: ${score}`;
+        gameClearScreen.classList.remove('hidden');
+        cancelAnimationFrame(timer);
+        container.style.boxShadow = "inset 0 0 50px #00ffea";
+        
+        // 親ウィンドウへクリア通知
+        window.parent.postMessage('GAME_CLEAR', '*');
+    }
+
+    function gameLoop() {
+        if (!isPlaying) return;
+
+        timeLeft -= 16.6; 
+        let pct = (timeLeft / maxTime) * 100;
+        timerBar.style.width = `${pct}%`;
+
+        if (timeLeft <= 0) {
+            gameOver();
+        } else {
+            timer = requestAnimationFrame(gameLoop);
+        }
+    }
+
+    // キーボード入力
+    document.addEventListener('keydown', (e) => {
+        // ゲームオーバー時のリトライ用
+        if (!isPlaying) {
+            // ゲームオーバー画面が表示されている時のみスペースでリトライ
+            if (!gameOverScreen.classList.contains('hidden') && e.code === 'Space') {
+                container.style.boxShadow = "inset 0 0 20px rgba(0, 255, 234, 0.1)";
+                initGame();
+            }
+            return;
+        }
+
+        const key = e.key.toUpperCase();
+        const targetChar = currentWord[currentIndex];
+
+        if (key === targetChar) {
+            currentIndex++;
+            score++;
+            playSound('type');
+            renderWord();
+
+            if (currentIndex >= currentWord.length) {
+                playSound('success');
+                score += 10;
+                wordsCompleted++; 
+                updateUI(); 
+
+                if (wordsCompleted >= TARGET_WORDS_COUNT) {
+                    gameClear();
+                    return;
+                }
+
+                container.style.backgroundColor = '#111';
+                setTimeout(() => container.style.backgroundColor = '#000', 50);
+                nextWord();
+            }
+        } else {
+            if (key.length === 1 && key.match(/[A-Z]/)) { 
+                playSound('error');
+                container.classList.add('shake');
+                timeLeft -= 500; 
+                setTimeout(() => container.classList.remove('shake'), 300);
+            }
+        }
+    });
+
+    // モバイル用（タップでAudioContext有効化）
+    document.addEventListener('click', () => {
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+    });
+
+    // 親ウィンドウからのメッセージ受信 (ep004.html のオーバーレイクリックで送信される)
+    window.addEventListener('message', function(event) {
+        // メッセージが 'GAME_START' で、かつゲームが始まっていない場合のみ開始
+        if (event.data === 'GAME_START' && !isPlaying) {
+            initGame();
+        }
+    });
+
+</script>
+</body>
+</html>

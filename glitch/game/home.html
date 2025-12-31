@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>G-OS v0.9 // GLITCH: SEOUL LOGIN</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+        :root {
+            --bg-color: #050505;
+            --main-cyan: #00ffea;
+            --alert-magenta: #ff0055;
+            --dim-gray: #333;
+            --term-green: #0f0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--main-cyan);
+            font-family: 'Share Tech Mono', monospace;
+            margin: 0;
+            overflow: hidden;
+            height: 100vh;
+            user-select: none;
+            cursor: crosshair;
+        }
+
+        /* --- CRT & Glitch Effects --- */
+        #crt-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* --- Boot Sequence --- */
+        #boot-screen {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding: 40px;
+            box-sizing: border-box;
+            font-size: 18px;
+            color: var(--term-green);
+        }
+
+        /* --- Desktop Layout --- */
+        #desktop {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 50% 50%, #111 0%, #000 100%);
+            display: none; /* Hidden until boot finishes */
+        }
+
+        /* Background Logo/Deco */
+        #bg-deco {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 200px;
+            color: rgba(0, 255, 234, 0.03);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* --- Icons --- */
+        .icon-grid {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            z-index: 10;
+        }
+
+        .icon {
+            width: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            opacity: 0.8;
+        }
+
+        .icon:hover {
+            transform: scale(1.1);
+            opacity: 1;
+            text-shadow: 0 0 8px var(--main-cyan);
+        }
+
+        .icon-img {
+            width: 64px;
+            height: 64px;
+            border: 2px solid var(--main-cyan);
+            background: rgba(0, 255, 234, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 8px;
+            box-shadow: 0 0 10px rgba(0, 255, 234, 0.2);
+        }
+
+        .icon-label {
+            font-size: 14px;
+            color: #fff;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 5px;
+        }
+
+        /* Color variations for specific icons */
+        .icon[data-type="battle"] .icon-img {
+            border-color: var(--alert-magenta);
+            color: var(--alert-magenta);
+            background: rgba(255, 0, 85, 0.1);
+            box-shadow: 0 0 10px rgba(255, 0, 85, 0.2);
+        }
+
+        /* --- Window System --- */
+        .window {
+            position: absolute;
+            top: 15%;
+            left: 25%;
+            width: 600px;
+            height: 400px;
+            background: rgba(10, 10, 12, 0.95);
+            border: 1px solid var(--dim-gray);
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            z-index: 100;
+            overflow: hidden;
+            animation: openWindow 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        @keyframes openWindow {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .window-header {
+            background: var(--dim-gray);
+            color: #fff;
+            padding: 5px 10px;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #444;
+        }
+
+        .window-content {
+            flex-grow: 1;
+            padding: 20px;
+            color: #ccc;
+            font-size: 16px;
+            position: relative;
+        }
+
+        .close-btn {
+            cursor: pointer;
+            color: var(--alert-magenta);
+            font-weight: bold;
+        }
+        .close-btn:hover { color: #fff; }
+
+        /* Window Specific Colors */
+        .window[data-type="battle"] { border-color: var(--alert-magenta); }
+        .window[data-type="battle"] .window-header { background: #500; }
+
+        /* --- Status Bar (Taskbar) --- */
+        #status-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 30px;
+            background: rgba(10, 10, 10, 0.9);
+            border-top: 1px solid var(--dim-gray);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-sizing: border-box;
+            justify-content: space-between;
+            font-size: 14px;
+            z-index: 50;
+        }
+
+        .status-item {
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .blink { animation: blinking 1s infinite; }
+        @keyframes blinking { 0%{opacity:1;} 50%{opacity:0.3;} 100%{opacity:1;} }
+
+        /* --- Simulator Content (Fake Game) --- */
+        .sim-loading-bar {
+            width: 100%; height: 20px; background: #222; margin-top: 20px;
+            position: relative;
+        }
+        .sim-progress {
+            height: 100%; background: var(--main-cyan); width: 0%;
+            transition: width 0.5s;
+        }
+        .launch-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid var(--main-cyan);
+            color: var(--main-cyan);
+            font-family: inherit;
+            font-size: 18px;
+            cursor: pointer;
+            display: none;
+        }
+        .launch-btn:hover { background: var(--main-cyan); color: #000; }
+
+    </style>
+</head>
+<body>
+
+<div id="crt-overlay"></div>
+
+<div id="boot-screen">
+    <div id="boot-text"></div>
+</div>
+
+<div id="desktop">
+    <div id="bg-deco">G-OS</div>
+
+    <div class="icon-grid">
+        <div class="icon" onclick="openWindow('win-typing')">
+            <div class="icon-img">>_</div>
+            <div class="icon-label">BRUTE_FORCE.exe</div>
+        </div>
+
+        <div class="icon" onclick="openWindow('win-worm')">
+            <div class="icon-img">☍</div>
+            <div class="icon-label">WORM_INJECT.exe</div>
+        </div>
+
+        <div class="icon" data-type="battle" onclick="openWindow('win-battle')">
+            <div class="icon-img">☠</div>
+            <div class="icon-label">DAEMON_KILL.exe</div>
+        </div>
+
+        <div class="icon" onclick="openWindow('win-mail')">
+            <div class="icon-img">✉</div>
+            <div class="icon-label">INBOX (99+)</div>
+        </div>
+    </div>
+
+    <div id="win-typing" class="window">
+        <div class="window-header">
+            <span>PROTOCOL: RAPID BREAKER (Phase 1)</span>
+            <span class="close-btn" onclick="closeWindow('win-typing')">[X]</span>
+        </div>
+        <div class="window-content">
+            <p>> TARGET: YEOUIDO_BANK_NODE_04</p>
+            <p>> ENCRYPTION: 256bit ROTATING</p>
+            <p>> STATUS: LOCKED</p>
+            <div class="sim-loading-bar"><div class="sim-progress" id="prog-typing"></div></div>
+            <p id="txt-typing" style="margin-top:10px; color:#888;">Initializing...</p>
+            <button class="launch-btn" id="btn-typing">EXECUTE ATTACK</button>
+        </div>
+    </div>
+
+    <div id="win-worm" class="window">
+        <div class="window-header">
+            <span>PROTOCOL: SHEPHERD (Phase 2)</span>
+            <span class="close-btn" onclick="closeWindow('win-worm')">[X]</span>
+        </div>
+        <div class="window-content">
+            <p>> TARGET: INTERNAL_LOGIC_GATE</p>
+            <p>> PAYLOAD: DAO_MOB_v2.0</p>
+            <div class="sim-loading-bar"><div class="sim-progress" id="prog-worm"></div></div>
+            <p id="txt-worm" style="margin-top:10px; color:#888;">Loading Map Data...</p>
+            <button class="launch-btn" id="btn-worm">DEPLOY WORM</button>
+        </div>
+    </div>
+
+    <div id="win-battle" class="window" data-type="battle">
+        <div class="window-header">
+            <span>PROTOCOL: DECAPITATION (Phase 3)</span>
+            <span class="close-btn" onclick="closeWindow('win-battle')">[X]</span>
+        </div>
+        <div class="window-content">
+            <h2 style="color:var(--alert-magenta); margin-top:0;">WARNING: CLASS-A DAEMON</h2>
+            <p>> TARGET: EXECUTIVE_MANAGER_AI</p>
+            <p>> RISK: LETHAL (DEBT PENALTY x10)</p>
+            <div class="sim-loading-bar"><div class="sim-progress" id="prog-battle" style="background:var(--alert-magenta)"></div></div>
+            <button class="launch-btn" id="btn-battle" style="border-color:var(--alert-magenta); color:var(--alert-magenta)">ENGAGE BOSS</button>
+        </div>
+    </div>
+
+    <div id="status-bar">
+        <div class="status-item">USER: KANG_JI-HOON [ADMIN]</div>
+        <div class="status-item" style="color:var(--alert-magenta)">
+            DEBT: ₩ 452,000,000 <span class="blink">▲</span>
+        </div>
+        <div class="status-item">
+            NET: <span id="net-stat">CONNECTED</span>
+        </div>
+        <div class="status-item" id="clock">00:00:00</div>
+    </div>
+</div>
+
+<script>
+    /* --- BOOT SEQUENCE --- */
+    const bootText = [
+        "G-OS (c) 2024-2026 Studio SCOTOMA",
+        "Initializing Kernel...",
+        "Loading Drivers: [Display] [Network] [Neural_Link]",
+        "Bypassing GILDONG National Firewall... SUCCESS",
+        "Mounting File System... OK",
+        "Welcome Back, Master."
+    ];
+    
+    const bootScreen = document.getElementById('boot-screen');
+    const bootContainer = document.getElementById('boot-text');
+    const desktop = document.getElementById('desktop');
+    let lineIndex = 0;
+
+    function typeLine() {
+        if (lineIndex < bootText.length) {
+            const p = document.createElement('div');
+            p.innerText = "> " + bootText[lineIndex];
+            bootContainer.appendChild(p);
+            lineIndex++;
+            setTimeout(typeLine, 300 + Math.random() * 500);
+        } else {
+            setTimeout(() => {
+                bootScreen.style.display = 'none';
+                desktop.style.display = 'block';
+                startClock();
+            }, 800);
+        }
+    }
+
+    // Start Boot on Load
+    window.onload = typeLine;
+
+
+    /* --- WINDOW MANAGER --- */
+    let zIndexCounter = 100;
+
+    function openWindow(id) {
+        // Bring to front
+        zIndexCounter++;
+        const win = document.getElementById(id);
+        win.style.display = 'flex';
+        win.style.zIndex = zIndexCounter;
+        
+        // Randomize position slightly for "organic" feel
+        const rTop = 10 + Math.random() * 10;
+        const rLeft = 20 + Math.random() * 10;
+        win.style.top = rTop + "%";
+        win.style.left = rLeft + "%";
+
+        // Simulate Loading Logic
+        simulateLoad(id);
+    }
+
+    function closeWindow(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+
+    /* --- SIMULATED LOADING LOGIC --- */
+    function simulateLoad(winId) {
+        // Find elements inside this window
+        let suffix = winId.replace('win-', ''); // typing, worm, battle
+        let bar = document.getElementById('prog-' + suffix);
+        let btn = document.getElementById('btn-' + suffix);
+        let txt = document.getElementById('txt-' + suffix);
+
+        // Reset
+        bar.style.width = '0%';
+        btn.style.display = 'none';
+        if(txt) txt.innerText = "Connecting...";
+
+        // Animate
+        let width = 0;
+        let interval = setInterval(() => {
+            if (width >= 100) {
+                clearInterval(interval);
+                btn.style.display = 'block';
+                if(txt) txt.innerText = "READY TO EXECUTE.";
+            } else {
+                width += Math.random() * 10; // Random speed
+                bar.style.width = Math.min(width, 100) + '%';
+            }
+        }, 100);
+    }
+
+    /* --- UTILS --- */
+    function startClock() {
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString();
+            
+            // Random Net Fluctuation
+            const ping = Math.floor(Math.random() * 50) + 10;
+            document.getElementById('net-stat').innerText = `SECURE (${ping}ms)`;
+        }, 1000);
+    }
+
+</script>
+</body>
+</html>

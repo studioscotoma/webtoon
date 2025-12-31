@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>GLITCH: SEOUL LOGIN - PROTO_v0.1</title>
+<style>
+    /* --- KOJIMA PRODUCTION STYLE CSS --- */
+    body {
+        background-color: #050505;
+        color: #e0e0e0;
+        font-family: 'Courier New', Courier, monospace;
+        margin: 0;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    
+    #game-container {
+        position: relative;
+        width: 600px;
+        height: 400px;
+        border: 2px solid #333;
+        background: radial-gradient(circle, #111 0%, #000 100%);
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+    }
+
+    /* SCANLINE EFFECT */
+    #game-container::after {
+        content: " ";
+        display: block;
+        position: absolute;
+        top: 0; left: 0; bottom: 0; right: 0;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+        z-index: 2;
+        background-size: 100% 2px, 3px 100%;
+        pointer-events: none;
+    }
+
+    /* CHARACTERS */
+    .entity {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        font-weight: bold;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 24px;
+        transition: all 0.1s linear;
+    }
+    #player {
+        color: #0ff; /* CYAN */
+        text-shadow: 0 0 5px #0ff;
+        border: 1px solid #0ff;
+    }
+    #enemy {
+        color: #f0f; /* MAGENTA */
+        text-shadow: 0 0 5px #f0f;
+        border: 1px solid #f0f;
+    }
+
+    /* UI ELEMENTS */
+    #timeline-bar {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 300px;
+        height: 10px;
+        background: #333;
+        border: 1px solid #555;
+    }
+    #timeline-progress {
+        width: 0%;
+        height: 100%;
+        background-color: #f0f; /* Enemy Intent Color */
+        transition: width 0.1s linear;
+    }
+    
+    #status-text {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        font-size: 12px;
+        color: #888;
+    }
+
+    /* GLITCH MODE (PAUSE MENU) */
+    #glitch-overlay {
+        display: none;
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 20, 40, 0.85);
+        z-index: 10;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        backdrop-filter: blur(4px);
+    }
+    
+    .code-block {
+        background: #000;
+        border: 1px solid #0ff;
+        padding: 20px;
+        color: #0f0;
+        font-size: 14px;
+        margin-bottom: 20px;
+        box-shadow: 5px 5px 0px #0ff;
+    }
+
+    .hack-btn {
+        background: transparent;
+        border: 1px solid #fff;
+        color: #fff;
+        padding: 10px 20px;
+        margin: 5px;
+        cursor: pointer;
+        font-family: inherit;
+        transition: 0.2s;
+    }
+    .hack-btn:hover {
+        background: #0ff;
+        color: #000;
+    }
+
+    /* ANIMATIONS */
+    @keyframes shake {
+        0% { transform: translate(1px, 1px) rotate(0deg); }
+        10px { transform: translate(-1px, -2px) rotate(-1deg); }
+        20% { transform: translate(-3px, 0px) rotate(1deg); }
+        30% { transform: translate(3px, 2px) rotate(0deg); }
+        40% { transform: translate(1px, -1px) rotate(1deg); }
+        50% { transform: translate(-1px, 2px) rotate(-1deg); }
+        60% { transform: translate(-3px, 1px) rotate(0deg); }
+        70% { transform: translate(3px, 1px) rotate(-1deg); }
+        80% { transform: translate(-1px, -1px) rotate(1deg); }
+        90% { transform: translate(1px, 2px) rotate(0deg); }
+        100% { transform: translate(1px, -2px) rotate(-1deg); }
+    }
+    .shake { animation: shake 0.5s; }
+
+</style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="timeline-bar"><div id="timeline-progress"></div></div>
+    <div id="enemy" class="entity" style="top: 100px; left: 400px;">E</div>
+    <div id="player" class="entity" style="top: 200px; left: 100px;">P</div>
+    
+    <div id="status-text">
+        [WASD] MOVE | [SPACE] GLITCH (HACK) <br>
+        STATUS: REALITY MODE
+    </div>
+
+    <div id="glitch-overlay">
+        <h2 style="color:#0ff; text-shadow:2px 2px #f0f;">>> SYSTEM BREACH <<</h2>
+        <div class="code-block">
+            <span style="color:#888;">// ENEMY INTENT DETECTED</span><br>
+            function executeAttack() {<br>
+            &nbsp;&nbsp;target: <span id="code-target" style="color:#f0f;">PLAYER</span>;<br>
+            &nbsp;&nbsp;damage: <span id="code-damage" style="color:#f0f;">10000</span>;<br>
+            }
+        </div>
+        <div id="hack-options">
+            </div>
+    </div>
+</div>
+
+<script>
+    // --- GAME ENGINE ---
+    const player = { x: 100, y: 200, el: document.getElementById('player') };
+    const enemy = { x: 400, y: 100, el: document.getElementById('enemy'), charge: 0 };
+    const container = document.getElementById('game-container');
+    const timeline = document.getElementById('timeline-progress');
+    const overlay = document.getElementById('glitch-overlay');
+    const statusText = document.getElementById('status-text');
+    
+    let isPaused = false;
+    let gameLoop;
+    let attackSpeed = 0.5; // % per frame
+
+    // --- CONTROLS ---
+    document.addEventListener('keydown', (e) => {
+        if (isPaused) return;
+        
+        const step = 20;
+        if (e.key === 'w' || e.key === 'ArrowUp') player.y -= step;
+        if (e.key === 's' || e.key === 'ArrowDown') player.y += step;
+        if (e.key === 'a' || e.key === 'ArrowLeft') player.x -= step;
+        if (e.key === 'd' || e.key === 'ArrowRight') player.x += step;
+        
+        // Simple Boundary
+        player.x = Math.max(0, Math.min(560, player.x));
+        player.y = Math.max(0, Math.min(360, player.y));
+        updatePos();
+
+        // GLITCH TRIGGER
+        if (e.code === 'Space') {
+            triggerGlitch();
+        }
+    });
+
+    function updatePos() {
+        player.el.style.left = player.x + 'px';
+        player.el.style.top = player.y + 'px';
+    }
+
+    // --- CORE LOOP ---
+    function update() {
+        if (isPaused) return;
+
+        // Enemy Charging Logic
+        enemy.charge += attackSpeed;
+        timeline.style.width = enemy.charge + '%';
+
+        // Attack Execution
+        if (enemy.charge >= 100) {
+            enemy.charge = 0;
+            takeDamage();
+        }
+
+        // Enemy Move (Simple AI)
+        if (Math.random() < 0.05) {
+            enemy.el.style.top = (Math.random() * 300) + 'px';
+        }
+
+        requestAnimationFrame(update);
+    }
+
+    function takeDamage() {
+        container.classList.add('shake');
+        statusText.innerHTML = "<span style='color:red'>WARNING: DEBT INCREASED! (-100,000 KRW)</span>";
+        setTimeout(() => container.classList.remove('shake'), 500);
+    }
+
+    // --- GLITCH MECHANIC (THE CORE FUN) ---
+    function triggerGlitch() {
+        isPaused = true;
+        overlay.style.display = 'flex';
+        statusText.innerHTML = "STATUS: <span style='color:#0ff'>GLITCH MODE ACTIVE</span>";
+        
+        // Generate Hack Options
+        const opts = document.getElementById('hack-options');
+        opts.innerHTML = '';
+
+        // Option 1: REDIRECT (Classic Hacker Move)
+        const btn1 = document.createElement('button');
+        btn1.className = 'hack-btn';
+        btn1.innerText = '> REWRITE: target = ENEMY';
+        btn1.onclick = () => resolveHack('redirect');
+        
+        // Option 2: INVERT (Debt to Asset)
+        const btn2 = document.createElement('button');
+        btn2.className = 'hack-btn';
+        btn2.innerText = '> REWRITE: damage = -100 (HEAL)';
+        btn2.onclick = () => resolveHack('invert');
+
+        opts.appendChild(btn1);
+        opts.appendChild(btn2);
+    }
+
+    function resolveHack(type) {
+        // Close Menu
+        overlay.style.display = 'none';
+        isPaused = false;
+        
+        // Apply Hack Effect
+        if (type === 'redirect') {
+            statusText.innerHTML = "<span style='color:#0ff'>SUCCESS: ENEMY HIT SELF!</span>";
+            enemy.charge = 0; // Reset charge
+            // Visual feedback on enemy
+            enemy.el.style.backgroundColor = '#f0f';
+            setTimeout(() => enemy.el.style.backgroundColor = 'transparent', 200);
+        } else if (type === 'invert') {
+            statusText.innerHTML = "<span style='color:#0ff'>SUCCESS: ASSET ACQUIRED!</span>";
+            enemy.charge = 0;
+        }
+
+        // Resume Loop
+        requestAnimationFrame(update);
+    }
+
+    // Start
+    update();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glitch: Seoul Login - Tactical Protocol</title>
+    <style>
+        /* --- Glitch Mode Visual Style --- */
+        :root {
+            --bg-color: #050505;
+            --primary: #00f3ff; /* Cyan */
+            --secondary: #ff00ff; /* Magenta */
+            --text-color: #e0e0e0;
+            --panel-bg: rgba(20, 20, 30, 0.9);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        h1 {
+            color: var(--primary);
+            text-shadow: 2px 2px var(--secondary);
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: glitch 2s infinite;
+        }
+
+        /* --- Game Container --- */
+        #game-interface {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            gap: 15px;
+        }
+
+        /* --- Enemy Sector (Top) --- */
+        #target-display {
+            border: 1px solid var(--secondary);
+            padding: 15px;
+            background: rgba(50, 0, 50, 0.2);
+            position: relative;
+        }
+
+        .target-name { font-weight: bold; color: var(--secondary); }
+        .status-bar { height: 10px; background: #333; margin-top: 5px; width: 100%; }
+        .hp-fill { height: 100%; background: var(--secondary); width: 100%; transition: width 0.3s; }
+        .security-layer { margin-top: 5px; font-size: 0.8rem; color: #aaa; }
+
+        /* --- Player Status (Middle) --- */
+        #player-hud {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--primary);
+            padding-bottom: 5px;
+        }
+        .ram-counter { color: var(--primary); font-weight: bold; }
+
+        /* --- Card Deck (Bottom) --- */
+        #deck-area {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px 0;
+            height: 160px;
+            align-items: center;
+        }
+
+        .card {
+            width: 100px;
+            height: 140px;
+            background: var(--panel-bg);
+            border: 1px solid var(--primary);
+            border-radius: 5px;
+            padding: 10px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            user-select: none;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 0 15px var(--primary);
+        }
+
+        .card-cost {
+            background: var(--primary);
+            color: #000;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+            font-weight: bold;
+        }
+
+        .card-title { font-size: 0.8rem; font-weight: bold; color: var(--primary); margin-top: 5px;}
+        .card-desc { font-size: 0.7rem; color: #ccc; }
+
+        /* --- Log --- */
+        #console-log {
+            height: 100px;
+            border: 1px dashed #444;
+            background: #000;
+            overflow-y: scroll;
+            font-size: 0.7rem;
+            padding: 5px;
+            color: #0f0;
+        }
+
+        /* --- Animations --- */
+        @keyframes glitch {
+            0% { text-shadow: 2px 2px var(--secondary); }
+            20% { text-shadow: -2px -2px var(--primary); }
+            40% { text-shadow: 2px -2px var(--secondary); }
+            100% { text-shadow: 2px 2px var(--secondary); }
+        }
+
+        .shake { animation: shake 0.5s; }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -1px) rotate(0deg); }
+        }
+
+        button#end-turn {
+            background: var(--text-color);
+            color: #000;
+            border: none;
+            padding: 10px;
+            font-family: inherit;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Glitch: Seoul Login <span style="font-size:0.5em;">// v0.1</span></h1>
+
+    <div id="game-interface">
+        <div id="target-display">
+            <div style="display:flex; justify-content:space-between;">
+                <span class="target-name">TARGET: GILDONG_NODE_77</span>
+                <span id="enemy-intent">⚠️ CHARGING FIREWALL</span>
+            </div>
+            <div class="status-bar"><div id="enemy-hp-bar" class="hp-fill"></div></div>
+            <div class="security-layer">INTEGRITY: <span id="enemy-hp">100</span> / 100</div>
+        </div>
+
+        <div id="console-log">
+            > SYSTEM INITIALIZED...<br>
+            > GLITCH MODE: ACTIVE<br>
+            > TARGET DETECTED.
+        </div>
+
+        <div>
+            <div id="player-hud">
+                <span>USER: KANG_JIHUN</span>
+                <span class="ram-counter">RAM: <span id="player-ram">3</span> / 3</span>
+            </div>
+            <div class="status-bar" style="background:#111;"><div id="player-hp-bar" class="hp-fill" style="background:var(--primary); width:100%;"></div></div>
+            <div style="font-size:0.7rem; text-align:right;">MENTAL STABILITY: <span id="player-hp">50</span></div>
+        </div>
+
+        <div id="deck-area">
+            </div>
+
+        <button id="end-turn" onclick="endTurn()">END CYCLE (Compiling...)</button>
+    </div>
+
+    <script>
+        // --- Game State (The Model) ---
+        const state = {
+            player: { hp: 50, maxHp: 50, ram: 3, maxRam: 3, deck: [] },
+            enemy: { hp: 100, maxHp: 100, damage: 8, nextAction: 'attack' },
+            turn: 1
+        };
+
+        // --- Card Database (The Assets) ---
+        const cardLibrary = [
+            { id: 'atk1', name: 'DDoS Ping', cost: 1, type: 'attack', val: 6, desc: 'Deal 6 Damage to Integrity.' },
+            { id: 'atk2', name: 'SQL Injection', cost: 2, type: 'attack', val: 14, desc: 'Deal 14 Damage. High Load.' },
+            { id: 'def1', name: 'VPN Tunnel', cost: 1, type: 'defend', val: 5, desc: 'Restore 5 Mental Stability.' },
+            { id: 'spl1', name: 'Ram Optimizer', cost: 0, type: 'utility', val: 1, desc: 'Gain 1 RAM this turn.' },
+            { id: 'ult1', name: 'GLITCH STRIKE', cost: 3, type: 'attack', val: 25, desc: 'Massive Damage. Requires full RAM.' }
+        ];
+
+        // --- Game Logic (The Engine) ---
+        
+        function initGame() {
+            log("> CONNECTING TO GILDONG SERVER...");
+            drawHand();
+            updateDisplay();
+        }
+
+        function drawHand() {
+            const deckArea = document.getElementById('deck-area');
+            deckArea.innerHTML = '';
+            // Simulate drawing 4 random cards
+            for(let i=0; i<4; i++) {
+                const randomCard = cardLibrary[Math.floor(Math.random() * cardLibrary.length)];
+                createCardElement(randomCard);
+            }
+        }
+
+        function createCardElement(cardData) {
+            const el = document.createElement('div');
+            el.className = 'card';
+            el.innerHTML = `
+                <div class="card-cost">${cardData.cost}</div>
+                <div class="card-title">${cardData.name}</div>
+                <div class="card-desc">${cardData.desc}</div>
+            `;
+            el.onclick = () => playCard(cardData, el);
+            document.getElementById('deck-area').appendChild(el);
+        }
+
+        function playCard(card, element) {
+            if (state.player.ram < card.cost) {
+                log("!! ERROR: INSUFFICIENT RAM !!");
+                element.classList.add('shake');
+                setTimeout(()=>element.classList.remove('shake'), 500);
+                return;
+            }
+
+            // Pay Cost
+            state.player.ram -= card.cost;
+            element.remove(); // Remove from hand
+
+            // Execute Effect
+            if (card.type === 'attack') {
+                state.enemy.hp -= card.val;
+                log(`> EXECUTING ${card.name}: TARGET DAMAGE -${card.val}`);
+                document.getElementById('target-display').classList.add('shake');
+                setTimeout(()=>document.getElementById('target-display').classList.remove('shake'), 500);
+            } else if (card.type === 'defend') {
+                state.player.hp = Math.min(state.player.hp + card.val, state.player.maxHp);
+                log(`> EXECUTING ${card.name}: MENTAL RECOVERY +${card.val}`);
+            } else if (card.type === 'utility') {
+                state.player.ram += card.val;
+                log(`> EXECUTING ${card.name}: RAM EXPANDED`);
+            }
+
+            checkWinCondition();
+            updateDisplay();
+        }
+
+        function endTurn() {
+            log("> CYCLE ENDED. ENEMY RESPONSE INCOMING...");
+            
+            // Enemy Action
+            setTimeout(() => {
+                if(state.enemy.hp > 0) {
+                    state.player.hp -= state.enemy.damage;
+                    log(`!! WARNING !! FIREWALL COUNTER-ATTACK: -${state.enemy.damage} MENTAL DAMAGE`);
+                    document.getElementById('game-interface').classList.add('shake');
+                    setTimeout(()=>document.getElementById('game-interface').classList.remove('shake'), 500);
+                }
+                
+                // Reset Player
+                state.player.ram = state.player.maxRam;
+                state.turn++;
+                checkWinCondition();
+                
+                if(state.player.hp > 0 && state.enemy.hp > 0) {
+                    drawHand();
+                    updateDisplay();
+                    log(`> CYCLE ${state.turn} STARTED. WAITING FOR INPUT...`);
+                }
+            }, 800);
+        }
+
+        function checkWinCondition() {
+            if (state.enemy.hp <= 0) {
+                state.enemy.hp = 0;
+                log("*** HACKING SUCCESSFUL. ROOT ACCESS GRANTED. ***");
+                document.querySelector('.target-name').innerText = "STATUS: PWNED";
+                document.querySelector('.target-name').style.color = "#0f0";
+                document.getElementById('deck-area').innerHTML = "<h2 style='color:#0f0; margin:auto;'>SYSTEM OVERRIDE COMPLETE</h2>";
+                document.getElementById('end-turn').disabled = true;
+            } else if (state.player.hp <= 0) {
+                state.player.hp = 0;
+                log("!!! CRITICAL FAILURE. DISCONNECTED. !!!");
+                document.getElementById('deck-area').innerHTML = "<h2 style='color:#f00; margin:auto;'>CONNECTION LOST</h2>";
+                document.getElementById('end-turn').disabled = true;
+            }
+        }
+
+        function updateDisplay() {
+            // Enemy HP
+            const enemyPercent = (state.enemy.hp / state.enemy.maxHp) * 100;
+            document.getElementById('enemy-hp-bar').style.width = enemyPercent + '%';
+            document.getElementById('enemy-hp').innerText = state.enemy.hp;
+
+            // Player Stats
+            document.getElementById('player-ram').innerText = state.player.ram;
+            document.getElementById('player-hp').innerText = state.player.hp;
+            const playerPercent = (state.player.hp / state.player.maxHp) * 100;
+            document.getElementById('player-hp-bar').style.width = playerPercent + '%';
+        }
+
+        function log(msg) {
+            const consoleEl = document.getElementById('console-log');
+            consoleEl.innerHTML += `<div>${msg}</div>`;
+            consoleEl.scrollTop = consoleEl.scrollHeight;
+        }
+
+        // Start
+        initGame();
+
+    </script>
+</body>
+</html>
