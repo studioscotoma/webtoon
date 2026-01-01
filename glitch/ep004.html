@@ -146,12 +146,12 @@
 
     <script>
         const scenarioData = [
-            { type:'image', id: 1, kr: "경기도의 한 PC방", ja: "京畿道（キョンギド）のPC房", fr: "Un cybercafé dans le Gyeonggi-do", en: "A PC Bang in Gyeonggi-do" },
-            { type:'image', id: 2, kr: "BBQ 치즈 치킨 버거", ja: "BBQチーズチキンバーガー", fr: "Burger au poulet et fromage BBQ", en: "BBQ Cheese Chicken Burger" },
-            { type:'image', id: 3, kr: "우적 (먹는 소리)", ja: "食べる", fr: "Miam (bruit de mastication)", en: "Munch (eating sfx)" },
-            { type:'image', id: 4, kr: "[속보] 국민연금공단, 코스피 ETF에 5,000억 원 자금 집행", ja: "国民年金公団、韓国総合株価指数ETFに5,000億ウォンの資金執行", fr: "Le Service national des pensions injecte 500 milliards de wons dans des ETF KOSPI", en: "National Pension Service injects 500 billion won into KOSPI ETFs" },
-            { type:'image', id: 5, kr: "이 정도면 됐나.", ja: "これでいいか。", fr: "Ça devrait aller.", en: "This should do it." },
-            { type:'image', id: 6, kr: "타닥 타닥 (키보드 소리)", ja: "キーボードを叩く", fr: "Clac clac (bruit de clavier)", en: "Clack clack (typing sfx)" },
+            { type:'image', id: 1, kr: "경기도의 어느 PC방", ja: "京畿道（キョンギド）のPC房", fr: "Cybercafé dans la province de Gyeonggi", en: "PC Bang in Gyeonggi Province"},
+            { type:'image', id: 2, kr: "BBQ 치즈 치킨 버거", ja: "BBQチーズチキンバーガー", fr: "Burger au poulet et fromage BBQ", en: "BBQ Cheese Chicken Burger"},
+            { type:'image', id: 3, kr: "우물우물", ja: "食べる", fr: "*Miam*", en: "*Munch*"},
+            { type:'image', id: 4, kr: "국민연금공단, 코스피(KOSPI) ETF에 5,000억 원 자금 집행", ja: "国民年金公団、韓国総合株価指数ETFに5,000億ウォンの資金執行", fr: "Le Service national des pensions investit 500 milliards de wons dans des ETF KOSPI", en: "National Pension Service injects 500 billion won into KOSPI ETFs"},
+            { type:'image', id: 5, kr: "이걸로 됐나.", ja: "これでいいか。", fr: "Ça devrait aller.", en: "That should do it."},
+            { type:'image', id: 6, kr: "타다닥", ja: "キーボードを叩く", fr: "*Tac tac tac*", en: "*Clack clack clack*"},
             // ▼▼▼ GAME INSERTION ▼▼▼
             {
                 type: 'game',
@@ -159,37 +159,36 @@
                 src: 'game/rapidCodeBreaker/establish.html'
             },
             // ▲▲▲ GAME END ▲▲▲
-            { type:'image', id: 7, kr: "ESTABLISHED (접속 완료)", ja: "ESTABLISHED", fr: "CONNEXION ÉTABLIE", en: "ESTABLISHED" },
-            { type:'image', id: 8, kr: "여의도 증권거래소에서 재벌가로 흘러가는 자금...", ja: "汝矣島（ヨイド）証券取引所から財閥へ資金が流れる", fr: "Des fonds s'écoulent de la Bourse de Yeouido vers les Chaebols...", en: "Funds flowing from the Yeouido Stock Exchange to the Chaebols..." },
-            { type:'image', id: 9, kr: "자금이 유출된다.", ja: "資金が流出する", fr: "Fuite de capitaux.", en: "Capital outflow." },
-            { type:'image', id: 10, kr: "국내 기업은 프록시인가?", ja: "国内企業はプロキシか。", fr: "Les entreprises nationales ne sont-elles que des mandataires ?", en: "Are domestic companies just proxies?" },
-            { type:'image', id: 11, kr: "5천억 원, 전부 해외로 유출.", ja: "5000億ウォンは全て海外に流出", fr: "Les 500 milliards de wons partent tous à l'étranger.", en: "The entire 500 billion won leaks overseas." },
-            { type:'image', id: 12, kr: "해저 광케이블을 타고 태평양을 건너...", ja: "海底の光ファイバーケーブルを通って太平洋を通過", fr: "Via les câbles à fibre optique sous-marins, traversant le Pacifique...", en: "Through undersea fiber optic cables, crossing the Pacific..." },
-            { type:'image', id: 13, kr: "블랙록(BlackRock)에 도착.", ja: "ブラックロックに到着", fr: "Arrivée chez BlackRock.", en: "Arriving at BlackRock." },
-            { type:'image', id: 14, kr: "그런 건 누구나 다 알아. 안을 보여줘.", ja: "そんな事は誰でも分かってる。中を見せろ。", fr: "Tout le monde sait ça. Montre-moi l'intérieur.", en: "Everyone knows that. Show me the inside." },
-            { type:'image', id: 15, kr: "구속된 블랙록의 알라딘(Aladdin)", ja: "拘束されているBlack Rock の Aladdin(AI)", fr: "Aladdin (IA) de BlackRock, entravé", en: "BlackRock's Aladdin (AI), restrained" },
-            { type:'image', id: 16, kr: "알라딘을 억제하는 붉은 회선", ja: "Aladdin(AI) を抑える赤い回線", fr: "Une ligne rouge contenant Aladdin", en: "A red line suppressing Aladdin" },
-            { type:'image', id: 17, kr: "붉은 회선의 발신 IP, 브루트 포스(Brute force) 검색.", ja: "赤い回線の送信元IPを総当り検索", fr: "Recherche par force brute de l'IP source de la ligne rouge.", en: "Brute-forcing the source IP of the red line." },
-            { type:'image', id: 18, kr: "국가: 스위스", ja: "国名:スイス", fr: "Pays : Suisse", en: "Country: Switzerland" },
-            { type:'image', id: 19, kr: "스위스 바젤(Basel)시", ja: "スイス国バーゼル市", fr: "Ville de Bâle, Suisse", en: "City of Basel, Switzerland" },
-            { type:'image', id: 20, kr: "스위스 바젤, 국제결제은행(BIS) 본부", ja: "スイス国バーゼル市の国際決済銀行(BIS)本部ビル", fr: "Siège de la Banque des règlements internationaux (BRI) à Bâle", en: "Bank for International Settlements (BIS) Headquarters, Basel" },
-            { type:'image', id: 21, kr: "바젤 규제인가.", ja: "バーゼル規制か。", fr: "Les accords de Bâle ?", en: "The Basel Accords?" },
-            { type:'image', id: 22, kr: "바젤 규제 코드가 단 한 글자만 바뀌어도, 전 세계 은행이 파산하지.", ja: "バーゼル規制のコードが1文字変わると、世界中の銀行が破綻する。", fr: "Changez un caractère du code de Bâle, et les banques du monde entier s'effondrent.", en: "Change one character in the Basel code, and banks worldwide collapse." },
-            { type:'image', id: 23, kr: "BIS는 그 어떤 정부의 간섭도, 과세도 받지 않으며 치외법권을 가진다.", ja: "BISは、いかなる政府の干渉も受けず、課税もされず、治外法権を持つ。", fr: "La BRI ne subit aucune ingérence gouvernementale, est exonérée d'impôts et jouit de l'extraterritorialité.", en: "The BIS is immune to government interference, tax-exempt, and holds extraterritoriality." },
-            { type:'image', id: 24, kr: "바젤 규제는 전 세계 은행들이 사실상 강제로 따라야 하는 룰이야.", ja: "バーゼル規制は世界中の銀行が事実上で強制されるルールだ。", fr: "Les accords de Bâle sont des règles que les banques du monde entier sont forcées de suivre.", en: "The Basel Accords are rules that banks worldwide are practically forced to obey." },
-            { type:'image', id: 25, kr: "유엔의 내정불간섭 원칙은 어디로 사라졌나?", ja: "国連の内政不干渉の原則(政策を強制されない国家の主権)はどこに消えた？", fr: "Où est passé le principe de non-ingérence de l'ONU ?", en: "Where did the UN's principle of non-intervention go?" },
-            { type:'image', id: 26, kr: "애초에 바젤 규제의 참조원은 민간 신용평가사들이지.", ja: "そもそも、バーゼル規制の参照元は民間の格付け会社だ。", fr: "À la base, les accords de Bâle se réfèrent à des agences de notation privées.", en: "In the first place, the Basel Accords reference private credit rating agencies." },
-            { type:'image', id: 27, kr: "S&P, 무디스, 피치... 전부 개인 수준의 티어표(Tier list)일 뿐이야.", ja: "S&P、ムーディーズ、フィッチ、どれも個人レベルのティア表(格付け)だ。", fr: "S&P, Moody's, Fitch... ce ne sont que des classements subjectifs.", en: "S&P, Moody's, Fitch... they're just personal tier lists." },
-            { type:'image', id: 28, kr: "머리 좀 식히자. 즉...", ja: "頭を整理しろ。つまり、", fr: "Clarifions les choses. En d'autres termes...", en: "Get a grip. In other words..." },
-            { type:'image', id: 29, kr: "시장 독재", ja: "市場独裁", fr: "Dictature du marché", en: "Market Dictatorship" },
-            { type:'image', id: 30, kr: "중앙은행을 위한 중앙은행", ja: "中央銀行のための銀行", fr: "La banque des banques centrales", en: "The Central Bank for Central Banks" },
-            { type:'image', id: 31, kr: "글리치: 서울 로그인", ja: "GLITCH: SEOUL LOGIN", fr: "GLITCH: SEOUL LOGIN", en: "GLITCH: SEOUL LOGIN" }
+            { type:'image', id: 7, kr: "ESTABLISHED", ja: "ESTABLISHED", fr: "ESTABLISHED (connexion établie)", en: "ESTABLISHED"},
+            { type:'image', id: 8, kr: "여의도 증권거래소에서 재벌가로 흘러가는 자금", ja: "汝矣島（ヨイド）証券取引所から財閥へ資金が流れる", fr: "Des fonds circulent de la Bourse de Yeouido vers les chaebols", en: "Capital flowing from the Yeouido Stock Exchange to the chaebols"},
+            { type:'image', id: 9, kr: "자금이 빠져나간다.", ja: "資金が流出する", fr: "Les capitaux s'enfuient.", en: "Funds are leaking out."},
+            { type:'image', id: 10, kr: "국내 기업은 그저 프록시(대리인)인가?", ja: "国内企業はプロキシか。", fr: "Les entreprises nationales ne sont-elles que des proxys ?", en: "Are domestic companies just proxies?"},
+            { type:'image', id: 11, kr: "5,000억 원 전액, 해외로 유출", ja: "5000億ウォンは全て海外に流出", fr: "Les 500 milliards de wons partent tous à l'étranger", en: "The entire 500 billion won flows overseas"},
+            { type:'image', id: 12, kr: "해저 광케이블을 타고 태평양을 건너...", ja: "海底の光ファイバーケーブルを通って太平洋を通過", fr: "Traversant le Pacifique via des câbles à fibre optique sous-marins...", en: "Crossing the Pacific through undersea fiber optic cables..."},
+            { type:'image', id: 13, kr: "블랙록(BlackRock)에 도달", ja: "ブラックロックに到着", fr: "Arrivée chez BlackRock", en: "Arriving at BlackRock"},
+            { type:'image', id: 14, kr: "그딴 건 누구나 다 알아. 안을 보여줘.", ja: "そんな事は誰でも分かってる。中を見せろ。", fr: "Tout le monde sait ça. Montre-moi l'intérieur.", en: "Everyone knows that. Show me the inside."},
+            { type:'image', id: 15, kr: "구속된 블랙록의 알라딘(Aladdin)", ja: "拘束されているBlack Rock の Aladdin(AI)", fr: "Aladdin (IA) de BlackRock, enchaînée", en: "BlackRock's Aladdin (AI), restrained"},
+            { type:'image', id: 16, kr: "알라딘을 억제하는 붉은 회선", ja: "Aladdin(AI) を抑える赤い回線", fr: "La ligne rouge qui contient Aladdin", en: "The red line suppressing Aladdin"},
+            { type:'image', id: 17, kr: "붉은 회선의 발신 IP, 브루트 포스(Brute Force) 검색 개시", ja: "赤い回線の送信元IPを総当り検索", fr: "Recherche par force brute de l'IP source de la ligne rouge", en: "Brute-forcing the source IP of the red line"},
+            { type:'image', id: 18, kr: "국가명: 스위스", ja: "国名:スイス", fr: "Pays : Suisse", en: "Country: Switzerland"},
+            { type:'image', id: 19, kr: "스위스 바젤(Basel)시", ja: "スイス国バーゼル市", fr: "Ville de Bâle, Suisse", en: "Basel, Switzerland"},
+            { type:'image', id: 20, kr: "스위스 바젤, 국제결제은행(BIS) 본부", ja: "スイス国バーゼル市の国際決済銀行(BIS)本部ビル", fr: "Siège de la Banque des règlements internationaux (BRI) à Bâle", en: "Bank for International Settlements (BIS) Headquarters in Basel"},
+            { type:'image', id: 21, kr: "바젤 규제인가.", ja: "バーゼル規制か。", fr: "Les accords de Bâle ?", en: "The Basel Accords?"},
+            { type:'image', id: 22, kr: "바젤 규제 코드가 단 한 글자만 바뀌어도, 전 세계 은행이 파산하지.", ja: "バーゼル規制のコードが1文字変わると、世界中の銀行が破綻する。", fr: "Si une seule lettre du code des accords de Bâle change, les banques du monde entier s'effondrent.", en: "Change one character of the Basel Accords' code, and banks worldwide collapse."},
+            { type:'image', id: 23, kr: "BIS는 어떤 정부의 간섭도 받지 않고, 세금도 내지 않으며, 치외법권을 가지지.", ja: "BISは、いかなる政府の干渉も受けず、課税もされず、治外法権を持つ。", fr: "La BRI n'est soumise à aucune ingérence gouvernementale, ne paie pas d'impôts et jouit de l'extraterritorialité.", en: "The BIS is immune to government interference, tax-exempt, and holds extraterritorial rights."},
+            { type:'image', id: 24, kr: "바젤 규제는 전 세계 은행들이 사실상 강제로 따라야 하는 룰이야.", ja: "バーゼル規制は世界中の銀行が事実上で強制されるルールだ。", fr: "Les accords de Bâle sont des règles imposées de facto aux banques du monde entier.", en: "The Basel Accords are rules that banks worldwide are effectively forced to obey."},
+            { type:'image', id: 25, kr: "유엔(UN)이 정한 정책조차 강요받지 않을 권리는 어디로 갔지?", ja: "国連が決めた政策を強制されない権利はどこに消えた？", fr: "Où est passé le droit de ne pas se voir imposer les politiques décidées par l'ONU ?", en: "Where did the right to refuse UN-mandated policies go?"},
+            { type:'image', id: 26, kr: "완전히 거꾸로 돌아가고 있어.", ja: "まるで逆になってる。", fr: "C'est tout l'inverse.", en: "It's completely upside down."},
+            { type:'image', id: 27, kr: "바젤 규제의 참조원은 민간 신용평가사들이야.", ja: "バーゼル規制の参照元は民間の格付け会社だ。", fr: "La référence des accords de Bâle, ce sont les agences de notation privées.", en: "The reference point for the Basel Accords is private credit rating agencies."},
+            { type:'image', id: 28, kr: "S&P, 무디스, 피치... 전부 개인적인 '티어표(Tier List)' 놀음이나 다름없어.", ja: "S&P、ムーディーズ、フィッチ、どれも個人レベルのティア表(格付け)だ。", fr: "S&P, Moody's, Fitch... ce ne sont que des « Tier lists » subjectives.", en: "S&P, Moody's, Fitch... they're all just personal tier lists."},
+            { type:'image', id: 29, kr: "민간 등급 따위가 정책을 강요하고 있는 거지.", ja: "民間格付けが政策を左右してる。", fr: "Des notations privées imposent la politique.", en: "Private ratings are dictating policy."},
+            { type:'image', id: 30, kr: "중앙은행을 위한 은행", ja: "中央銀行のための銀行", fr: "La banque des banques centrales", en: "The central bank for central banks"},
+            { type:'image', id: 31, kr: "글리치: 서울 로그인", ja: "GLITCH: SEOUL LOGIN", fr: "GLITCH : SEOUL LOGIN", en: "GLITCH: SEOUL LOGIN"}
         ];
-
         // 1. インスタンス生成
         const viewer = new GlitchViewer({
             filePrefix: 'ep004/scene',  // 画像パスのプレフィックス
-            debugMode: false
+            debugMode: true
         });
 
         // 2. 「game」タイプの描画ロジックを登録（ここだけEP.003固有）
