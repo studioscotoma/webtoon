@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glitch: Seoul Login EP.005 - Gangnam style</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root {
+            --color-theme: #FF0055; /* EP.003のテーマカラー */
+            --color-cyan: #00FFFF;  /* ゲーム用の補助色 */
+            --color-magenta: #FF0055;
+        }
+
+        /* ▼▼▼ ここから追記：ゲーム用の固有スタイル ▼▼▼ */
+
+        /* 1. 全体を中央寄せするラッパー */
+        .game-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center; /* これがないと左に寄ります */
+            padding: 0 0 100px 0;
+        }
+
+        /* 2. ゲーム画面のコンテナ（サイズと位置の基準） */
+        .game-container {
+            position: relative;     /* これがないとオーバーレイが重なりません */
+            width: 90%;
+            max-width: 450px;
+            height: 500px;          /* これがないと縦に潰れます */
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+        }
+
+        /* 3. ゲーム本体 (iframe) */
+        iframe.game-frame {
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--color-cyan);
+            background-color: #050505;
+            display: block;
+            pointer-events: none; /* 初期はクリック無効 */
+            transition: all 0.3s;
+        }
+
+        /* 4. オーバーレイ（WARNING等の文字表示） */
+        .game-overlay {
+            position: absolute; /* 親(container)に対して絶対配置 */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            backdrop-filter: blur(3px);
+            cursor: pointer;
+            transition: all 0.5s ease;
+        }
+
+        .overlay-content {
+            text-align: center;
+            font-family: var(--font-ui);
+            width: 90%;
+        }
+
+        /* 状態A: WARNING (初期) */
+        .game-overlay .status-msg { color: var(--color-magenta); font-size: 12px; margin-bottom: 5px; }
+        .game-overlay .main-title { 
+            font-size: 24px; font-weight: 900; margin-bottom: 20px; color: var(--color-magenta);
+            animation: blink-text 1.5s infinite; 
+        }
+        .game-overlay .action-btn {
+            display: inline-block;
+            font-size: 14px; font-weight: bold; padding: 10px 20px;
+            color: #000; background-color: var(--color-magenta);
+            animation: pulse-border 2s infinite;
+            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+        }
+
+        /* 状態B: HACKED (クリア後) */
+        .game-overlay.hacked {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
+            pointer-events: auto !important;
+        }
+        .game-overlay.hacked .status-msg { color: var(--color-cyan); }
+        .game-overlay.hacked .main-title {
+            color: var(--color-cyan);
+            text-shadow: 0 0 20px var(--color-cyan);
+            animation: none;
+        }
+        .game-overlay.hacked .action-btn {
+            background-color: var(--color-cyan);
+            box-shadow: 0 0 20px rgba(0,255,255,0.5);
+            animation: none;
+            cursor: default;
+        }
+
+        /* アニメーション */
+        @keyframes blink-text {
+            0% { opacity: 1; text-shadow: 0 0 10px var(--color-magenta); }
+            50% { opacity: 0.6; text-shadow: 0 0 20px var(--color-magenta); }
+            100% { opacity: 1; text-shadow: 0 0 10px var(--color-magenta); }
+        }
+        @keyframes pulse-border {
+            0% { transform: scale(1); box-shadow: 0 0 0 rgba(255,0,85,0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,0,85,0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 rgba(255,0,85,0); }
+        }
+    </style>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P68TDMW1FN"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-P68TDMW1FN');
+    </script>
+
+    <!-- Microsoft Clarity tag -->
+    <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "uujhwpbxld");
+    </script>
+
+    <!-- AIO tag -->
+    <meta name="description" content="Play Glitch: Seoul Login Episode 4 'Swiss Protocol'. Trace the money flow from KOSPI to BlackRock's Aladdin and the Bank for International Settlements (BIS) in Basel. Features an interactive 'Rapid Code Breaker' mini-game.">
+    
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="EP.04 - Glitch: Seoul Login">
+    <meta property="og:description" content="Target: BlackRock & BIS. Kang Ji-hoon hacks the financial system to find the 'Central Bank of Central Banks'. Interactive hacking game included.">
+    <meta property="og:url" content="https://studioscotoma.github.io/webtoon/glitch/ep004.html">
+    <meta property="og:image" content="https://studioscotoma.github.io/webtoon/glitch/ep004/cover.webp">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="EP.04 - Glitch: Seoul Login">
+    <meta name="twitter:description" content="From Seoul to Basel. Hacking BlackRock's Aladdin and the BIS.">
+    <meta name="twitter:image" content="https://studioscotoma.github.io/webtoon/glitch/ep004/cover.webp">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ComicIssue",
+      "name": "Glitch: Seoul Login Episode 4",
+      "issueNumber": "4",
+      "url": "https://studioscotoma.github.io/webtoon/glitch/ep004.html",
+      "image": "https://studioscotoma.github.io/webtoon/glitch/ep004/cover.webp",
+      "description": "Episode 4 of Glitch: Seoul Login. Kang Ji-hoon investigates the capital outflow from Korea to BlackRock and discovers a connection to the Bank for International Settlements (BIS) in Switzerland. Players must use the 'Rapid Code Breaker' mini-game to bypass security.",
+      "author": {
+        "@type": "Organization",
+        "name": "Studio SCOTOMA"
+      },
+      "partOfSeries": {
+        "@type": "ComicSeries",
+        "name": "Glitch: Seoul Login",
+        "url": "https://studioscotoma.github.io/webtoon/"
+      },
+      "inLanguage": "ja"
+    }
+    </script>
+</head>
+<body>
+
+    <div id="cover-screen">
+        <img id="cover-image" src="ep005/cover.webp" alt="Glitch: Seoul Login EP.005 Cover" onerror="this.src='https://placehold.co/690x1000/000000/FF00FF?text=EP.004+Cover'">
+        <button id="start-button">CONNECT TO SEOUL</button>
+    </div>
+    
+    <div id="viewer-container">
+        <div id="comic-content"></div>
+
+        <div class="next-episode-area">
+            <a href="#" class="next-button disabled">
+                <span class="next-label">Next Operation</span>
+                <span class="next-title">EPISODE 06</span>
+            </a>
+        </div>
+        
+        <div class="nav-footer">
+            <a href="ep004.html" class="nav-link">&lt; PREV</a>
+            <div class="ep-select-wrapper">
+                <select onchange="if(this.value) location.href=this.value">
+                    <option value="ep001.html">EP.01</option>
+                    <option value="ep002.html">EP.02</option>
+                    <option value="ep003.html">EP.03</option>
+                    <option value="ep004.html">EP.04</option>
+                    <option value="#" selected>EP.05</option>
+                </select>
+            </div>
+            <a href="../index.html" class="nav-link">STUDIO &gt;</a>
+        </div>
+    </div>
+    
+    <script src="js/viewer.js"></script>
+
+    <script>
+        const scenarioData = [
+        {
+            type: 'image',
+            id: 1,
+            kr: "북한 접경으로부터 460m",
+            ja: "北朝鮮との境界から460m",
+            fr: "À 460 m de la frontière nord-coréenne",
+            en: "460m from the North Korean border"
+        },
+        {
+            type: 'image',
+            id: 2,
+            kr: "오두산 통일전망대",
+            ja: "烏頭山（オドゥサン）統一展望台",
+            fr: "Observatoire de l'unification d'Odusan",
+            en: "Odusan Unification Observatory"
+        },
+        {
+            type: 'image',
+            id: 3,
+            kr: "(여성 안내방송) 『……자유로운 대한민국에서는, 세계적인 기업 삼성전자가 반도체 분야 세계 1위를 기록……』",
+            ja: "(女性音声)『……自由な大韓民国では、世界的なサムスン電子が半導体で世界1位を記録……』",
+            fr: "(Voix de femme) « ...Dans la République de Corée libre, l'entreprise mondiale Samsung Electronics est numéro un mondial des semi-conducteurs... »",
+            en: "(Female Voice) \"...In the free Republic of Korea, global leader Samsung Electronics has ranked first in the world for semiconductors...\""
+        },
+        {
+            type: 'image',
+            id: 4,
+            kr: "북한 선전마을",
+            ja: "北朝鮮の宣伝村",
+            fr: "Village de propagande nord-coréen",
+            en: "North Korean Propaganda Village"
+        },
+        {
+            type: 'image',
+            id: 5,
+            kr: "EBR 8x30 쌍안경 (한국군 서플러스)",
+            ja: "EBR 8x30 双眼鏡(韓国軍サープラス)",
+            fr: "Jumelles EBR 8x30 (Surplus de l'armée coréenne)",
+            en: "EBR 8x30 Binoculars (ROK Army Surplus)"
+        },
+        {
+            type: 'image',
+            id: 6,
+            kr: "**지지직...**",
+            ja: "**BZZZT...**",
+            fr: "**BZZZT...**",
+            en: "**BZZZT...**"
+        },
+        {
+            type: 'image',
+            id: 7,
+            kr: "북한 선전마을은 유령 도시다.",
+            ja: "北朝鮮の宣伝村はゴーストタウンだ。",
+            fr: "Le village de propagande est une ville fantôme.",
+            en: "The Propaganda Village is a ghost town."
+        },
+        {
+            type: 'image',
+            id: 8,
+            kr: "**위잉**",
+            ja: "**VWOOP**",
+            fr: "**VWOOP**",
+            en: "**VWOOP**"
+        },
+        {
+            type: 'image',
+            id: 9,
+            kr: "북한 인구 2,600만 명",
+            ja: "北朝鮮の人口 2,600万人",
+            fr: "Population nord-coréenne : 26 millions",
+            en: "North Korean Population: 26 million"
+        },
+        {
+            type: 'image',
+            id: 10,
+            kr: "북한의 1인당 명목 GDP 640달러\n동아프리카 국가 수준",
+            ja: "北朝鮮の一人当たり名目GDP 640ドル 東アフリカ諸国と同水準",
+            fr: "PIB nominal par habitant du Nord : 640 $\nComparable aux pays d'Afrique de l'Est",
+            en: "North Korean per capita nominal GDP: $640\nEquivalent to East African nations"
+        },
+        {
+            type: 'image',
+            id: 11,
+            kr: "한국 인구 5,200만 명",
+            ja: "韓国の人口 5,200万人",
+            fr: "Population sud-coréenne : 52 millions",
+            en: "South Korean Population: 52 million"
+        },
+        {
+            type: 'image',
+            id: 12,
+            kr: "한국의 1인당 명목 GDP 3만 6,200달러\n남유럽 국가 수준",
+            ja: "韓国の一人当たり名目GDP 36,200ドル 南ヨーロッパ諸国と同水準",
+            fr: "PIB nominal par habitant du Sud : 36 200 $\nComparable aux pays d'Europe du Sud",
+            en: "South Korean per capita nominal GDP: $36,200\nEquivalent to Southern European nations"
+        },
+        {
+            type: 'image',
+            id: 13,
+            kr: "남북통일 시뮬레이션",
+            ja: "南北統一した場合のシミュレーション",
+            fr: "Simulation d'une réunification Nord-Sud",
+            en: "Simulation of North-South Reunification"
+        },
+        {
+            type: 'image',
+            id: 14,
+            kr: "인구의 3분의 1 규모인 난민을 수용했던 EU 꼴이 된다.",
+            ja: "人口の3/1の規模の避難民を受け入れたEUになる。",
+            fr: "Ce serait comme l'UE acceptant des réfugiés équivalant à un tiers de sa population.",
+            en: "It would be like the EU accepting refugees equal to one-third of its population."
+        },
+        {
+            type: 'image',
+            id: 15,
+            kr: "독일조차 고작 3%였다. 공멸은 불 보듯 뻔하다.",
+            ja: "ドイツでたったの3%。共倒れするのが目に見えてる。",
+            fr: "En Allemagne, c'était seulement 3 %. L'effondrement mutuel est inévitable.",
+            en: "In Germany, it was only 3%. Mutual destruction is inevitable."
+        },
+        {
+            type: 'image',
+            id: 16,
+            kr: "비행기 산소마스크 원칙\n(자신부터 쓰고, 그 다음 타인을 돕는다)",
+            ja: "飛行機の酸素マスクの原則（まず自分がつけ、次に他人を助ける）",
+            fr: "Le principe du masque à oxygène en avion\n(Mettez le vôtre d'abord, puis aidez les autres)",
+            en: "The airplane oxygen mask rule\n(Put yours on first, then help others)"
+        },
+        {
+            type: 'image',
+            id: 17,
+            kr: "일단은 한국 문제부터다.",
+            ja: "まずは韓国の問題からだ。",
+            fr: "D'abord, les problèmes de la Corée.",
+            en: "We have to deal with Korea's problems first."
+        },
+        {
+            type: 'image',
+            id: 18,
+            kr: "(여성 아나운서) 『김정은 국무위원장은 여동생, 딸과 함께 중국 최신 스마트폰을 쓰며 호화로운 생활을 누리고 있습니다……』",
+            ja: "(女性アナウンサー音声)『金正恩国務委員長は、自身の妹や娘と共に中国の最新機種のスマホを持ち、贅沢な暮らしを続けています。……』",
+            fr: "(Présentatrice) « Le président Kim Jong-un, accompagné de sa sœur et de sa fille, continue de mener une vie luxueuse avec les derniers smartphones chinois... »",
+            en: "(Female Announcer) \"Chairman Kim Jong Un, along with his sister and daughter, continues to live a life of luxury using the latest Chinese smartphones...\""
+        },
+        {
+            type: 'image',
+            id: 19,
+            kr: "트리아지 라인 (Triage Line)",
+            ja: "トリアージライン",
+            fr: "Ligne de triage",
+            en: "Triage Line"
+        },
+        {
+            type: 'image',
+            id: 20,
+            kr: "(여성 아나운서) 『북한은 우리나라를 적대국으로 규정했습니다.』",
+            ja: "(女性アナウンサー音声)『北朝鮮は我が国を敵対国と定義しました。』",
+            fr: "(Présentatrice) « La Corée du Nord a défini notre pays comme un état hostile. »",
+            en: "(Female Announcer) \"North Korea has defined our nation as a hostile state.\""
+        },
+        {
+            type: 'image',
+            id: 21,
+            kr: "통일을 바라는 유령(글리치)",
+            ja: "統一を望む幽霊(グリッチ)",
+            fr: "Un fantôme (Glitch) désirant l'unification",
+            en: "A ghost (Glitch) wishing for unification"
+        },
+        {
+            type: 'image',
+            id: 22,
+            kr: "손절 (Stop Loss)",
+            ja: "損切り",
+            fr: "Couper les pertes",
+            en: "Cut losses"
+        },
+        {
+            type: 'image',
+            id: 23,
+            kr: "유령(글리치)이 사라진다",
+            ja: "幽霊(グリッチ)が消える",
+            fr: "Le fantôme (Glitch) disparaît",
+            en: "The ghost (Glitch) disappears"
+        },
+        {
+            type: 'image',
+            id: 24,
+            kr: "투자금은 회수 불능이다.",
+            ja: "投資分は回収不能だ。",
+            fr: "L'investissement est irrécupérable.",
+            en: "The investment is unrecoverable."
+        },
+        {
+            type: 'image',
+            id: 25,
+            kr: "한강과 임진강",
+            ja: "漢江（ハンガン）と臨津江（イムジンガン）",
+            fr: "Le fleuve Han et la rivière Imjin",
+            en: "The Han River and the Imjin River"
+        },
+        {
+            type: 'image',
+            id: 26,
+            kr: "바라보다",
+            ja: "眺める",
+            fr: "Contempler",
+            en: "Gazing"
+        },
+        {
+            type: 'image',
+            id: 27,
+            kr: "밖으로 나간다",
+            ja: "外に出る",
+            fr: "Sortir",
+            en: "Going outside"
+        },
+        {
+            type: 'image',
+            id: 28,
+            kr: "누군가에게 할 수 있는 최고의 복수는…… 얼른 잊어버리고, 『행복』해지는 것이다.",
+            ja: "誰かへの一番の復讐は……さっさと忘れて、『幸せ』になることだ。",
+            fr: "La meilleure vengeance contre quelqu'un... c'est d'oublier vite et d'être « heureux ».",
+            en: "The best revenge against someone... is to forget them quickly and become \"happy.\""
+        },
+        {
+            type: 'image',
+            id: 29,
+            kr: "까치",
+            ja: "鵲",
+            fr: "Pie",
+            en: "Magpie"
+        },
+        {
+            type: 'image',
+            id: 30,
+            kr: "경부고속도로 (노선 1)",
+            ja: "京釜高速道路 (1号線)",
+            fr: "Autoroute Gyeongbu (Route 1)",
+            en: "Gyeongbu Expressway (Route 1)"
+        },
+        {
+            type: 'image',
+            id: 31,
+            kr: "INTEGRATED OUT",
+            ja: "INTEGRATED OUT",
+            fr: "INTEGRATED OUT",
+            en: "INTEGRATED OUT"
+        },
+        {
+            type: 'image',
+            id: 32,
+            kr: "GLITCH: SEOUL LOGIN",
+            ja: "GLITCH: SEOUL LOGIN",
+            fr: "GLITCH: SEOUL LOGIN",
+            en: "GLITCH: SEOUL LOGIN"
+        }
+        ];
+
+        // 1. インスタンス生成
+        const viewer = new GlitchViewer({
+            filePrefix: 'ep005/scene',  // 画像パスのプレフィックス
+            debugMode: false
+        });
+
+        // 2. 「game」タイプの描画ロジックを登録（ここだけEP.004固有）
+        viewer.registerType('game', (scene) => {
+            // ここに元のコードにあった createGameElement の中身を書く
+            const wrapper = document.createElement('div');
+            wrapper.className = 'game-wrapper';
+            
+            const container = document.createElement('div');
+            container.className = 'game-container';
+
+            // iframe作成
+            const iframe = document.createElement('iframe');
+            iframe.className = 'game-frame';
+            iframe.src = scene.src;
+            
+            // オーバーレイ作成
+            const overlay = document.createElement('div');
+            overlay.className = 'game-overlay';
+            overlay.innerHTML = `
+                <div class="overlay-content">
+                    <div class="status-msg">WARNING: FIREWALL DETECTED</div>
+                    <div class="main-title">START HACK</div>
+                    <div class="action-btn">[ INITIATE BREACH ]</div>
+                </div>`;
+
+            // クリックイベント
+            overlay.addEventListener('click', function() {
+                // if(this.classList.contains('hacked')) return;
+                // this.style.opacity = '0';
+                // setTimeout(() => { this.style.display = 'none'; }, 500);
+                // iframe.style.pointerEvents = 'auto';
+                if(this.classList.contains('hacked')) return;
+                
+                // ▼▼▼ 追加: ゲーム開始の合図を送る ▼▼▼
+                iframe.contentWindow.postMessage('GAME_START', '*');
+                // ▲▲▲ 追加終了 ▲▲▲
+
+                this.style.opacity = '0';
+                setTimeout(() => { this.style.display = 'none'; }, 500);
+                iframe.style.pointerEvents = 'auto';
+            });
+
+            container.appendChild(iframe);
+            container.appendChild(overlay);
+            wrapper.appendChild(container);
+            
+            return wrapper;
+        });
+
+        // 3. ゲームクリア監視用イベントリスナー（EP.003固有）
+        window.addEventListener('message', function(event) {
+            if (event.data === 'GAME_CLEAR') {
+                const overlay = document.querySelector('.game-overlay');
+                const iframe = document.querySelector('.game-frame');
+                if (overlay && iframe) {
+                    overlay.style.display = 'flex';
+                    requestAnimationFrame(() => {
+                        overlay.style.opacity = '1';
+                        overlay.classList.add('hacked');
+                        overlay.querySelector('.overlay-content').innerHTML = `
+                             <div class="status-msg">SYSTEM HACKED</div>
+                             <div class="main-title">COMPLETE</div>
+                             <div class="action-btn">[ ACCESS GRANTED ]</div>`;
+                    });
+                    iframe.style.pointerEvents = 'none';
+                    iframe.style.borderColor = "#00FFFF"; // 色変数の利用を推奨
+                }
+            }
+        });
+
+        // 4. 開始
+        viewer.init(scenarioData);
+
+    </script>
+</body>
+</html>
