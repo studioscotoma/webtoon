@@ -3,15 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Glitch: Seoul Login EP.005 - Gangnam style</title>
+    <title>Glitch: Seoul Login EP.005</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
         :root {
-            --color-theme: #FF0055; /* EP.003のテーマカラー */
-            --color-cyan: #00FFFF;  /* ゲーム用の補助色 */
-            --color-magenta: #FF0055;
+            /* 変更点: テーマカラーを「トリアージ・オレンジ」に変更。
+               意味: 警告、酸素マスク、国境線、そして「断絶」のエネルギー。
+            */
+            --color-theme: #FF4F00; 
+            
+            /* ゲームUIは冷徹なデジタルカラーを維持し、テーマカラーと対比させる */
+            --color-cyan: #00FFFF;  
+            --color-magenta: #FF0055; /* 必要に応じてアクセントとして残す */
         }
-
         /* ▼▼▼ ここから追記：ゲーム用の固有スタイル ▼▼▼ */
 
         /* 1. 全体を中央寄せするラッパー */
@@ -130,28 +134,28 @@
     </script>
 
     <!-- AIO tag -->
-    <meta name="description" content="Play Glitch: Seoul Login Episode 4 'Swiss Protocol'. Trace the money flow from KOSPI to BlackRock's Aladdin and the Bank for International Settlements (BIS) in Basel. Features an interactive 'Rapid Code Breaker' mini-game.">
+    <meta name="description" content="Play Glitch: Seoul Login Episode 5 'Triage Line'. Standing 460m from North Korea at Odusan Observatory, the protagonist applies the 'Oxygen Mask' rule to the concept of reunification. A story of disconnection and 'Stop Loss'.">
     
     <meta property="og:type" content="article">
-    <meta property="og:title" content="EP.04 - Glitch: Seoul Login">
-    <meta property="og:description" content="Target: BlackRock & BIS. Kang Ji-hoon hacks the financial system to find the 'Central Bank of Central Banks'. Interactive hacking game included.">
-    <meta property="og:url" content="https://studioscotoma.github.io/webtoon/glitch/ep004.html">
-    <meta property="og:image" content="https://studioscotoma.github.io/webtoon/glitch/ep004/cover.webp">
+    <meta property="og:title" content="EP.05 - Glitch: Seoul Login">
+    <meta property="og:description" content="Target: The Ghost of Unification. At Odusan Observatory, the economic disparity triggers a 'Stop Loss' decision. The 'Oxygen Mask' rule is applied: Save yourself first.">
+    <meta property="og:url" content="https://studioscotoma.github.io/webtoon/glitch/ep005.html">
+    <meta property="og:image" content="https://studioscotoma.github.io/webtoon/glitch/ep005/cover.webp">
     
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="EP.04 - Glitch: Seoul Login">
-    <meta name="twitter:description" content="From Seoul to Basel. Hacking BlackRock's Aladdin and the BIS.">
-    <meta name="twitter:image" content="https://studioscotoma.github.io/webtoon/glitch/ep004/cover.webp">
+    <meta name="twitter:title" content="EP.05 - Glitch: Seoul Login">
+    <meta name="twitter:description" content="From Odusan Observatory. Confronting the 'Ghost' of Unification with the cold logic of Triage and Stop Loss.">
+    <meta name="twitter:image" content="https://studioscotoma.github.io/webtoon/glitch/ep005/cover.webp">
 
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "ComicIssue",
-      "name": "Glitch: Seoul Login Episode 4",
-      "issueNumber": "4",
-      "url": "https://studioscotoma.github.io/webtoon/glitch/ep004.html",
-      "image": "https://studioscotoma.github.io/webtoon/glitch/ep004/cover.webp",
-      "description": "Episode 4 of Glitch: Seoul Login. Kang Ji-hoon investigates the capital outflow from Korea to BlackRock and discovers a connection to the Bank for International Settlements (BIS) in Switzerland. Players must use the 'Rapid Code Breaker' mini-game to bypass security.",
+      "name": "Glitch: Seoul Login Episode 5",
+      "issueNumber": "5",
+      "url": "https://studioscotoma.github.io/webtoon/glitch/ep005.html",
+      "image": "https://studioscotoma.github.io/webtoon/glitch/ep005/cover.webp",
+      "description": "Episode 5 of Glitch: Seoul Login. Located at the Odusan Unification Observatory, overlooking the North Korean Propaganda Village. The protagonist simulates the economic collapse of reunification and decides to execute a 'Stop Loss'—choosing personal survival over the 'Ghost' of national unity.",
       "author": {
         "@type": "Organization",
         "name": "Studio SCOTOMA"
@@ -164,6 +168,8 @@
       "inLanguage": "ja"
     }
     </script>
+    <script src="js/viewer.js"></script>
+    <script src="js/navigation.js"></script>
 </head>
 <body>
 
@@ -174,27 +180,7 @@
     
     <div id="viewer-container">
         <div id="comic-content"></div>
-
-        <div class="next-episode-area">
-            <a href="#" class="next-button disabled">
-                <span class="next-label">Next Operation</span>
-                <span class="next-title">EPISODE 06</span>
-            </a>
-        </div>
-        
-        <div class="nav-footer">
-            <a href="ep004.html" class="nav-link">&lt; PREV</a>
-            <div class="ep-select-wrapper">
-                <select onchange="if(this.value) location.href=this.value">
-                    <option value="ep001.html">EP.01</option>
-                    <option value="ep002.html">EP.02</option>
-                    <option value="ep003.html">EP.03</option>
-                    <option value="ep004.html">EP.04</option>
-                    <option value="#" selected>EP.05</option>
-                </select>
-            </div>
-            <a href="../index.html" class="nav-link">STUDIO &gt;</a>
-        </div>
+        <div id="navigation-placeholder"></div>
     </div>
     
     <script src="js/viewer.js"></script>
@@ -536,7 +522,10 @@
 
         // 4. 開始
         viewer.init(scenarioData);
-
+        
+        // 第1引数: 現在のエピソード番号
+        // 第2引数: 全エピソード数 (ここだけ管理すればOK)
+        renderNavigation(5, 5);
     </script>
 </body>
 </html>

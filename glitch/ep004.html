@@ -7,9 +7,9 @@
     <link rel="stylesheet" href="css/style.css">
     <style>
         :root {
-            --color-theme: #FF0055; /* EP.003のテーマカラー */
-            --color-cyan: #00FFFF;  /* ゲーム用の補助色 */
-            --color-magenta: #FF0055;
+            --color-theme: #FF3333; /* Digital Swiss Red */
+            --color-cyan: #00FFFF;  /* Glitch/Hacker Color (Existing) */
+            --color-magenta: #FF0055; /* Secondary Accent */
         }
 
         /* ▼▼▼ ここから追記：ゲーム用の固有スタイル ▼▼▼ */
@@ -164,6 +164,8 @@
       "inLanguage": "ja"
     }
     </script>
+    <script src="js/viewer.js"></script>
+    <script src="js/navigation.js"></script>
 </head>
 <body>
 
@@ -174,29 +176,8 @@
     
     <div id="viewer-container">
         <div id="comic-content"></div>
-
-        <div class="next-episode-area">
-            <a href="#" class="next-button disabled">
-                <span class="next-label">Next Operation</span>
-                <span class="next-title">EPISODE 05</span>
-            </a>
-        </div>
-        
-        <div class="nav-footer">
-            <a href="ep003.html" class="nav-link">&lt; PREV</a>
-            <div class="ep-select-wrapper">
-                <select onchange="if(this.value) location.href=this.value">
-                    <option value="ep001.html">EP.01</option>
-                    <option value="ep002.html">EP.02</option>
-                    <option value="ep003.html">EP.03</option>
-                    <option value="#" selected>EP.04</option>
-                </select>
-            </div>
-            <a href="../index.html" class="nav-link">STUDIO &gt;</a>
-        </div>
+        <div id="navigation-placeholder"></div>
     </div>
-    
-    <script src="js/viewer.js"></script>
 
     <script>
         const scenarioData = [
@@ -533,7 +514,10 @@
 
         // 4. 開始
         viewer.init(scenarioData);
-
+        
+        // 第1引数: 現在のエピソード番号
+        // 第2引数: 全エピソード数 (ここだけ管理すればOK)
+        renderNavigation(4, 5);
     </script>
 </body>
 </html>

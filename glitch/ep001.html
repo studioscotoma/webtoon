@@ -57,6 +57,8 @@
       "inLanguage": "ja"
     }
     </script>
+    <script src="js/viewer.js"></script>
+    <script src="js/navigation.js"></script>    
 </head>
 <body>
 
@@ -67,28 +69,7 @@
     
     <div id="viewer-container">
         <div id="comic-content"></div>
-
-        <div class="next-episode-area">
-            <a href="ep002.html" class="next-button">
-                <span class="next-label">To Be Continued...</span>
-                <span class="next-title">EPISODE 02</span>
-            </a>
-        </div>
-        
-        <div class="nav-footer">
-            <a href="#" class="nav-link disabled">&lt; PREV</a>
-            
-            <div class="ep-select-wrapper">
-                <select onchange="if(this.value) location.href=this.value">
-                    <option value="#" selected>EP.01</option>
-                    <option value="ep002.html">EP.02</option>
-                    <option value="ep003.html">EP.03</option>
-                    <option value="ep004.html">EP.04</option>
-                </select>
-            </div>
-
-            <a href="../index.html" class="nav-link">STUDIO &gt;</a>
-        </div>
+        <div id="navigation-placeholder"></div>
     </div>
     
     <script src="js/viewer.js"></script>
@@ -321,7 +302,10 @@
         });
 
         viewer.init(scenarioData);
-
+        
+        // 第1引数: 現在のエピソード番号
+        // 第2引数: 全エピソード数 (ここだけ管理すればOK)
+        renderNavigation(1, 5);
     </script>
     
 </body>
