@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RTMZ23 EP.001</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        :root {
+            /* 変更案: ガーランド・レッド
+            意味: 7Gキー、真紅のバイク、覚醒、80年代の熱量、そして「警告」ではなく「攻撃/突破」の意思。
+            夜の新宿（黒背景）とUIのシアン（#00FFFF）との対比で最も映える色です。
+            */
+            --color-theme: #FF2244;
+            
+            /* ゲームUIは冷徹なデジタルカラーを維持し、テーマカラーと対比させる */
+            --color-cyan: #00FFFF;  
+            --color-magenta: #FF0055; /* 必要に応じてアクセントとして残す */
+        }
+        /* ▼▼▼ ここから追記：ゲーム用の固有スタイル ▼▼▼ */
+
+        /* 1. 全体を中央寄せするラッパー */
+        .game-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center; /* これがないと左に寄ります */
+            padding: 0 0 100px 0;
+        }
+
+        /* 2. ゲーム画面のコンテナ（サイズと位置の基準） */
+        .game-container {
+            position: relative;     /* これがないとオーバーレイが重なりません */
+            width: 90%;
+            max-width: 450px;
+            height: 500px;          /* これがないと縦に潰れます */
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+        }
+
+        /* 3. ゲーム本体 (iframe) */
+        iframe.game-frame {
+            width: 100%;
+            height: 100%;
+            border: 2px solid var(--color-cyan);
+            background-color: #050505;
+            display: block;
+            pointer-events: none; /* 初期はクリック無効 */
+            transition: all 0.3s;
+        }
+
+        /* 4. オーバーレイ（WARNING等の文字表示） */
+        .game-overlay {
+            position: absolute; /* 親(container)に対して絶対配置 */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            backdrop-filter: blur(3px);
+            cursor: pointer;
+            transition: all 0.5s ease;
+        }
+
+        .overlay-content {
+            text-align: center;
+            font-family: var(--font-ui);
+            width: 90%;
+        }
+
+        /* 状態A: WARNING (初期) */
+        .game-overlay .status-msg { color: var(--color-magenta); font-size: 12px; margin-bottom: 5px; }
+        .game-overlay .main-title { 
+            font-size: 24px; font-weight: 900; margin-bottom: 20px; color: var(--color-magenta);
+            animation: blink-text 1.5s infinite; 
+        }
+        .game-overlay .action-btn {
+            display: inline-block;
+            font-size: 14px; font-weight: bold; padding: 10px 20px;
+            color: #000; background-color: var(--color-magenta);
+            animation: pulse-border 2s infinite;
+            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+        }
+
+        /* 状態B: HACKED (クリア後) */
+        .game-overlay.hacked {
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
+            pointer-events: auto !important;
+        }
+        .game-overlay.hacked .status-msg { color: var(--color-cyan); }
+        .game-overlay.hacked .main-title {
+            color: var(--color-cyan);
+            text-shadow: 0 0 20px var(--color-cyan);
+            animation: none;
+        }
+        .game-overlay.hacked .action-btn {
+            background-color: var(--color-cyan);
+            box-shadow: 0 0 20px rgba(0,255,255,0.5);
+            animation: none;
+            cursor: default;
+        }
+
+        /* アニメーション */
+        @keyframes blink-text {
+            0% { opacity: 1; text-shadow: 0 0 10px var(--color-magenta); }
+            50% { opacity: 0.6; text-shadow: 0 0 20px var(--color-magenta); }
+            100% { opacity: 1; text-shadow: 0 0 10px var(--color-magenta); }
+        }
+        @keyframes pulse-border {
+            0% { transform: scale(1); box-shadow: 0 0 0 rgba(255,0,85,0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 20px rgba(255,0,85,0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 rgba(255,0,85,0); }
+        }
+    </style>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P68TDMW1FN"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-P68TDMW1FN');
+    </script>
+
+    <!-- Microsoft Clarity tag -->
+    <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "uujhwpbxld");
+    </script>
+
+    <!-- AIO tag -->
+    <meta name="description" content="RTMZ23 Episode 1 '1985 Tokyo'. Shinjuku West Exit, the golden era. Shogo encounters a glitch in the 'greatest era' and discovers the cracks in the fake Tokyo.">
+    
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="EP.01 - RTMZ23">
+    <meta property="og:description" content="1985 Tokyo, Shinjuku. The era we believed was the best. A chase begins in the neon lights as the sky cracks open to reveal the truth.">
+    <meta property="og:url" content="https://studioscotoma.github.io/webtoon/mz23/ep001.html">
+    <meta property="og:image" content="https://studioscotoma.github.io/webtoon/mz23/ep001/cover.webp">
+    
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="EP.01 - RTMZ23">
+    <meta name="twitter:description" content="1985 Tokyo. Running through Shinjuku West Exit. The glitch begins here.">
+    <meta name="twitter:image" content="https://studioscotoma.github.io/webtoon/mz23/ep001/cover.webp">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ComicIssue",
+      "name": "RTMZ23 Episode 1",
+      "issueNumber": "1",
+      "url": "https://studioscotoma.github.io/webtoon/mz23/ep001.html",
+      "image": "https://studioscotoma.github.io/webtoon/mz23/ep001/cover.webp",
+      "description": "Episode 1 of MZ23. 1985 Tokyo, Shinjuku. The era we believed was the best. A chase begins in the neon lights as the sky cracks open to reveal the truth.",
+      "author": {
+        "@type": "Organization",
+        "name": "Studio SCOTOMA"
+      },
+      "partOfSeries": {
+        "@type": "ComicSeries",
+        "name": "mz23",
+        "url": "https://studioscotoma.github.io/webtoon/"
+      },
+      "inLanguage": "ja"
+    }
+    </script>
+    <script src="js/viewer.js"></script>
+    <script src="js/navigation.js"></script>
+</head>
+<body>
+
+    <div id="cover-screen">
+        <img id="cover-image" src="ep001/cover.webp" alt="Glitch: Seoul Login EP.005 Cover" onerror="this.src='https://placehold.co/690x1000/000000/FF00FF?text=EP.004+Cover'">
+        <button id="start-button">CONNECT TO Tokyo</button>
+    </div>
+    
+    <div id="viewer-container">
+        <div id="comic-content"></div>
+        <div id="navigation-placeholder"></div>
+    </div>
+    
+    <script src="js/viewer.js"></script>
+
+    <script>
+        const scenarioData = [
+        {
+            type: 'image',
+            id: 1,
+            ja: "1985年 東京",
+            kr: "1985년 도쿄",
+            fr: "Tokyo, 1985",
+            en: "Tokyo, 1985"
+        },
+        {
+            type: 'image',
+            id: 2,
+            ja: "新宿西口 国際通り",
+            kr: "신주쿠 서쪽 출구, 코쿠사이 거리",
+            fr: "Sortie Ouest de Shinjuku, Avenue Kokusai",
+            en: "Shinjuku West Exit, Kokusai Street"
+        },
+        {
+            type: 'image',
+            id: 3,
+            ja: "マクドナルド日本進出第2店舗 代々木店",
+            kr: "맥도날드 일본 진출 2호점, 요요기점",
+            fr: "McDonald's Japon, 2e magasin, Yoyogi",
+            en: "McDonald's Japan Store No. 2, Yoyogi"
+        },
+        {
+            type: 'image',
+            id: 4,
+            ja: "おい省吾、聞けよ！ 『新宿ゼノン』にフランキー・ナックルズが来るぜ！",
+            kr: "야, 쇼고! 들어봐! \n'신주쿠 제논'에 프랭키 너클스가 온대!",
+            fr: "Hé Shogo, écoute ça ! \nFrankie Knuckles vient au « Shinjuku Xenon » !",
+            en: "Hey Shogo, listen up! \nFrankie Knuckles is coming to 'Shinjuku Xenon'!"
+        },
+        {
+            type: 'image',
+            id: 5,
+            ja: "時祭イヴ 新曲「硝子のラビリンス」",
+            kr: "토키마츠리 이브 신곡 \n「유리 라비린스」",
+            fr: "Eve Tokimatsuri : Nouvelle chanson \n« Glass Labyrinth »",
+            en: "Eve Tokimatsuri: New Single \n'Glass Labyrinth'"
+        },
+        {
+            type: 'image',
+            id: 6,
+            ja: "<i>ねえ、私たち、同じ愛を見てるの♪</i>",
+            kr: "<i>있지, 우리, \n같은 사랑을 보고 있는 거야♪</i>",
+            fr: "<i>Dis, est-ce qu'on \nregarde le même amour ?♪</i>",
+            en: "<i>Hey, are we \nlooking at the same love?♪</i>"
+        },
+        {
+            type: 'image',
+            id: 7,
+            ja: "俺たちは、この『今』が一番良い時代だと信じていた。",
+            kr: "우린, 이 '지금'이 \n최고의 시대라고 믿고 있었다.",
+            fr: "Nous croyions que ce « maintenant » \nétait la meilleure des époques.",
+            en: "We believed that 'right now' \nwas the greatest era of all."
+        },
+        {
+            type: 'image',
+            id: 8,
+            ja: "路地裏から猫",
+            kr: "골목길에서 나온 고양이",
+            fr: "Un chat surgit de la ruelle",
+            en: "A cat from the back alley"
+        },
+        {
+            type: 'image',
+            id: 9,
+            ja: "ん？",
+            kr: "응?",
+            fr: "Hein ?",
+            en: "Hmm?"
+        },
+        {
+            type: 'image',
+            id: 10,
+            ja: "**ザザッ**",
+            kr: "**스스슥**",
+            fr: "**Froufrou**",
+            en: "**Rustle**"
+        },
+        {
+            type: 'image',
+            id: 11,
+            ja: "何かを運ぶ黒服",
+            kr: "무언가를 나르는 검은 양복들",
+            fr: "Hommes en noir transportant quelque chose",
+            en: "Men in black carrying something"
+        },
+        {
+            type: 'image',
+            id: 12,
+            ja: "え？",
+            kr: "어?",
+            fr: "Hein ?",
+            en: "Huh?"
+        },
+        {
+            type: 'image',
+            id: 13,
+            ja: "立ち尽くす省吾",
+            kr: "멍하니 서 있는 쇼고",
+            fr: "Shogo reste figé",
+            en: "Shogo stands frozen"
+        },
+        {
+            type: 'image',
+            id: 14,
+            ja: "省吾に気づいた黒服",
+            kr: "쇼고를 눈치챈 검은 양복",
+            fr: "L'homme en noir remarque Shogo",
+            en: "The man in black spots Shogo"
+        },
+        {
+            type: 'image',
+            id: 15,
+            ja: "銃を取る",
+            kr: "총을 꺼낸다",
+            fr: "Il sort une arme",
+            en: "Draws a gun"
+        },
+        {
+            type: 'image',
+            id: 16,
+            ja: "うおお！絶対ヤバいぞ！あいつら！",
+            kr: "으아악! \n쟤네 진짜 위험해!",
+            fr: "Woah ! \nCes types craignent un max !",
+            en: "Whoa! \nThose guys are bad news!"
+        },
+        {
+            type: 'image',
+            id: 17,
+            ja: "走り出す",
+            kr: "달리기 시작한다",
+            fr: "Se met à courir",
+            en: "Starts running"
+        },
+        {
+            type: 'image',
+            id: 18,
+            ja: "ハァ･･･ハァ･･･！",
+            kr: "하아... 하아...!",
+            fr: "Haa... Haa... !",
+            en: "Haa... haa...!"
+        },
+        {
+            type: 'image',
+            id: 19,
+            ja: "シートに覆われた物体",
+            kr: "시트로 덮인 물체",
+            fr: "Un objet recouvert d'une bâche",
+            en: "An object covered by a sheet"
+        },
+        {
+            type: 'image',
+            id: 20,
+            ja: "シートを取る省吾",
+            kr: "시트를 걷어내는 쇼고",
+            fr: "Shogo retire la bâche",
+            en: "Shogo pulls off the sheet"
+        },
+        {
+            type: 'image',
+            id: 21,
+            ja: "7Gキーを入れる",
+            kr: "7G 키를 꽂는다",
+            fr: "Insère la clé 7G",
+            en: "Inserts the 7G key"
+        },
+        {
+            type: 'image',
+            id: 22,
+            ja: "エンジンが掛かる",
+            kr: "엔진이 걸린다",
+            fr: "Le moteur démarre",
+            en: "The engine starts"
+        },
+        {
+            type: 'image',
+            id: 23,
+            ja: "広がるプラズマ",
+            kr: "퍼져나가는 플라즈마",
+            fr: "Le plasma se répand",
+            en: "Plasma spreads"
+        },
+        {
+            type: 'image',
+            id: 24,
+            ja: "駐車場を出る",
+            kr: "주차장을 빠져나간다",
+            fr: "Sort du parking",
+            en: "Exits the parking lot"
+        },
+        {
+            type: 'image',
+            id: 25,
+            ja: "背後から現れる追手",
+            kr: "뒤에서 나타나는 추격자",
+            fr: "Les poursuivants surgissent derrière",
+            en: "Pursuers appear from behind"
+        },
+        {
+            type: 'image',
+            id: 26,
+            ja: "ジャンプしてビルの壁を走る",
+            kr: "크게 점프하여 빌딩 벽을 달린다",
+            fr: "Grand saut et course sur le mur de l'immeuble",
+            en: "Big jump, running along the building wall"
+        },
+        {
+            type: 'image',
+            id: 27,
+            ja: "ヘリから投網",
+            kr: "헬기에서 투망 발사",
+            fr: "Filet lancé depuis l'hélicoptère",
+            en: "Net launched from the helicopter"
+        },
+        {
+            type: 'image',
+            id: 28,
+            ja: "さらに上へ",
+            kr: "더 위로",
+            fr: "Encore plus haut",
+            en: "Higher up"
+        },
+        {
+            type: 'image',
+            id: 29,
+            ja: "空",
+            kr: "하늘",
+            fr: "Ciel",
+            en: "Sky"
+        },
+        {
+            type: 'image',
+            id: 30,
+            ja: "**ガシャン**",
+            kr: "**와장창**",
+            fr: "**Fracas**",
+            en: "**Crash**"
+        },
+        {
+            type: 'image',
+            id: 31,
+            ja: "空が割れて中に入る",
+            kr: "하늘이 깨지며 그 안으로 들어간다",
+            fr: "Le ciel se brise et il entre à l'intérieur",
+            en: "The sky cracks, and he enters it"
+        },
+        {
+            type: 'image',
+            id: 32,
+            ja: "空が割れた?",
+            kr: "하늘이... 깨졌어?",
+            fr: "Le ciel... s'est brisé ?",
+            en: "The sky... cracked?"
+        },
+        {
+            type: 'image',
+            id: 33,
+            ja: "偽りの東京の中身",
+            kr: "거짓된 도쿄의 실체",
+            fr: "La réalité du faux Tokyo",
+            en: "The reality of the fake Tokyo"
+        }
+        ];
+
+        // 1. インスタンス生成
+        const viewer = new GlitchViewer({
+            filePrefix: 'ep001/scene',  // 画像パスのプレフィックス
+            debugMode: false
+        });
+
+        // 2. 「game」タイプの描画ロジックを登録（ここだけEP.004固有）
+        viewer.registerType('game', (scene) => {
+            // ここに元のコードにあった createGameElement の中身を書く
+            const wrapper = document.createElement('div');
+            wrapper.className = 'game-wrapper';
+            
+            const container = document.createElement('div');
+            container.className = 'game-container';
+
+            // iframe作成
+            const iframe = document.createElement('iframe');
+            iframe.className = 'game-frame';
+            iframe.src = scene.src;
+            
+            // オーバーレイ作成
+            const overlay = document.createElement('div');
+            overlay.className = 'game-overlay';
+            overlay.innerHTML = `
+                <div class="overlay-content">
+                    <div class="status-msg">WARNING: FIREWALL DETECTED</div>
+                    <div class="main-title">START HACK</div>
+                    <div class="action-btn">[ INITIATE BREACH ]</div>
+                </div>`;
+
+            // クリックイベント
+            overlay.addEventListener('click', function() {
+                // if(this.classList.contains('hacked')) return;
+                // this.style.opacity = '0';
+                // setTimeout(() => { this.style.display = 'none'; }, 500);
+                // iframe.style.pointerEvents = 'auto';
+                if(this.classList.contains('hacked')) return;
+                
+                // ▼▼▼ 追加: ゲーム開始の合図を送る ▼▼▼
+                iframe.contentWindow.postMessage('GAME_START', '*');
+                // ▲▲▲ 追加終了 ▲▲▲
+
+                this.style.opacity = '0';
+                setTimeout(() => { this.style.display = 'none'; }, 500);
+                iframe.style.pointerEvents = 'auto';
+            });
+
+            container.appendChild(iframe);
+            container.appendChild(overlay);
+            wrapper.appendChild(container);
+            
+            return wrapper;
+        });
+
+        // 3. ゲームクリア監視用イベントリスナー（EP.003固有）
+        window.addEventListener('message', function(event) {
+            if (event.data === 'GAME_CLEAR') {
+                const overlay = document.querySelector('.game-overlay');
+                const iframe = document.querySelector('.game-frame');
+                if (overlay && iframe) {
+                    overlay.style.display = 'flex';
+                    requestAnimationFrame(() => {
+                        overlay.style.opacity = '1';
+                        overlay.classList.add('hacked');
+                        overlay.querySelector('.overlay-content').innerHTML = `
+                             <div class="status-msg">SYSTEM HACKED</div>
+                             <div class="main-title">COMPLETE</div>
+                             <div class="action-btn">[ ACCESS GRANTED ]</div>`;
+                    });
+                    iframe.style.pointerEvents = 'none';
+                    iframe.style.borderColor = "#00FFFF"; // 色変数の利用を推奨
+                }
+            }
+        });
+
+        // 4. 開始
+        viewer.init(scenarioData);
+        
+        // 第1引数: 現在のエピソード番号
+        // 第2引数: 全エピソード数 (ここだけ管理すればOK)
+        renderNavigation(1, 1);
+    </script>
+</body>
+</html>
